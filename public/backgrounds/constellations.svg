@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="520" viewBox="0 0 520 520">
+  <rect width="520" height="520" fill="transparent"/>
+
+  <!-- dots (wallpaper stars) -->
+  <g fill="rgba(255,255,255,0.22)">
+    <circle cx="46" cy="58" r="1.2"/>
+    <circle cx="96" cy="116" r="1.0"/>
+    <circle cx="164" cy="78" r="1.4"/>
+    <circle cx="230" cy="142" r="1.1"/>
+    <circle cx="304" cy="96" r="1.3"/>
+    <circle cx="360" cy="156" r="1.0"/>
+    <circle cx="412" cy="84" r="1.2"/>
+
+    <circle cx="68" cy="240" r="1.0"/>
+    <circle cx="132" cy="286" r="1.3"/>
+    <circle cx="182" cy="338" r="1.1"/>
+    <circle cx="246" cy="262" r="1.2"/>
+    <circle cx="312" cy="312" r="1.0"/>
+    <circle cx="372" cy="352" r="1.3"/>
+    <circle cx="446" cy="268" r="1.1"/>
+
+    <circle cx="58" cy="446" r="1.2"/>
+    <circle cx="144" cy="462" r="1.0"/>
+    <circle cx="242" cy="442" r="1.3"/>
+    <circle cx="332" cy="464" r="1.1"/>
+    <circle cx="428" cy="446" r="1.2"/>
+
+    <!-- extra scattered smalls -->
+    <circle cx="22" cy="180" r=".8"/>
+    <circle cx="500" cy="210" r=".8"/>
+    <circle cx="410" cy="16" r=".8"/>
+    <circle cx="120" cy="18" r=".8"/>
+    <circle cx="260" cy="18" r=".8"/>
+    <circle cx="260" cy="500" r=".8"/>
+    <circle cx="18" cy="500" r=".8"/>
+    <circle cx="502" cy="500" r=".8"/>
+  </g>
+
+  <!-- short constellation strokes (very subtle) -->
+  <g stroke="rgba(255,255,255,0.10)" stroke-width="1" stroke-linecap="round">
+    <path d="M46 58 L96 116 L164 78 L230 142" fill="none"/>
+    <path d="M304 96 L360 156 L412 84" fill="none"/>
+    <path d="M68 240 L132 286 L182 338" fill="none"/>
+    <path d="M246 262 L312 312 L372 352 L446 268" fill="none"/>
+    <path d="M58 446 L144 462 L242 442 L332 464 L428 446" fill="none"/>
+
+    <!-- tiny decorative links -->
+    <path d="M120 18 L164 78" fill="none"/>
+    <path d="M410 16 L412 84" fill="none"/>
+  </g>
+</svg>
