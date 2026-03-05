@@ -153,8 +153,7 @@ export default function Page() {
           </div>
 
           <div className="navIcons">
-            <IconLink href={socials.instagram} label="Instagram"><SimpleIcon name="ig" /></IconLink>
-            <IconLink href={socials.tiktok} label="TikTok"><SimpleIcon name="tt" /></IconLink>
+            
           </div>
         </div>
       </header>
