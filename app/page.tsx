@@ -158,7 +158,15 @@ export default function Page() {
         </div>
       </header>
 
-      <main id="top" className="wrap">
+      <main
+  id="top"
+  className="wrap"
+  style={{
+    backgroundImage: "url('/fondo.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "repeat"
+  }}
         {/* 1) HERO */}
         <section className="hero">
           <div className="heroCard">
