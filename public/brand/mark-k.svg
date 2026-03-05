@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="84" height="84" viewBox="0 0 84 84">
+  <defs>
+    <radialGradient id="g" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="55%" stop-color="#B7C6FF" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#8F7CFF" stop-opacity="0.70"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.2" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- links -->
+  <g stroke="url(#g)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" opacity="0.95">
+    <!-- vertical spine -->
+    <path d="M20 14 L20 70"/>
+    <!-- diagonals to form K -->
+    <path d="M20 42 L56 18"/>
+    <path d="M20 42 L58 64"/>
+    <!-- small middle joint -->
+    <path d="M20 42 L38 42"/>
+  </g>
+
+  <!-- nodes -->
+  <g fill="url(#g)" filter="url(#glow)">
+    <circle cx="20" cy="14" r="3.2"/>
+    <circle cx="20" cy="28" r="2.3"/>
+    <circle cx="20" cy="42" r="3.0"/>
+    <circle cx="20" cy="56" r="2.3"/>
+    <circle cx="20" cy="70" r="3.2"/>
+
+    <circle cx="56" cy="18" r="3.1"/>
+    <circle cx="40" cy="32" r="2.2"/>
+    <circle cx="38" cy="42" r="2.6"/>
+    <circle cx="46" cy="52" r="2.2"/>
+    <circle cx="58" cy="64" r="3.1"/>
+  </g>
+</svg>
