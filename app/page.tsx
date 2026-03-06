@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 type Lang = "es" | "en";
 
@@ -121,9 +121,22 @@ function SimpleIcon({ name }: { name: "ig" | "tt" | "yt" | "x" | "in" }) {
 }
 
 export default function Page() {
+
   const [lang, setLang] = useState<Lang>("es");
+  const [scrolled, setScrolled] = useState(false);
+
   const t = useMemo(() => copy[lang], [lang]);
 
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 24);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   // Cambia estas URLs a tus redes cuando las tengas
   const socials = {
     instagram: "https://instagram.com/",
@@ -135,7 +148,7 @@ export default function Page() {
 
   return (
     <div className="page">
-      <header className="nav">
+     <header className={`nav ${scrolled ? "navScrolled" : ""}`}>
         <div className="brand" onClick={() => scrollToId("top")} role="button" tabIndex={0}>
           <img src="/brand/logo-kironcode.svg" alt="Kiron Code" />
         </div>
