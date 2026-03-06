@@ -167,6 +167,7 @@ export default function Page() {
     backgroundPosition: "center",
     backgroundRepeat: "repeat"
   }}
+  >      
         {/* 1) HERO */}
         <section className="hero">
           <div className="heroCard">
