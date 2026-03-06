@@ -124,6 +124,12 @@ export default function Page() {
 
   const [lang, setLang] = useState<Lang>("es");
   const [scrolled, setScrolled] = useState(false);
+  const [name, setName] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [birthTime, setBirthTime] = useState("");
+  const [birthCity, setBirthCity] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [formMessage, setFormMessage] = useState("");
 
   const t = useMemo(() => copy[lang], [lang]);
 
@@ -201,59 +207,95 @@ export default function Page() {
               <h2 className="h2">{t.form.title}</h2>
               <p className="sub">{t.form.subtitle}</p>
 
-              <form
-                className="form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  scrollToId("results");
-                }}
-              >
-                <label className="field">
-                  <span className="label">{t.form.name}</span>
-                  <input className="input" placeholder={lang === "es" ? "Tu nombre" : "Your name"} />
-                </label>
+            <form
+  className="form"
+  onSubmit={async (e) => {
+    e.preventDefault();
+    setFormMessage("");
 
-                <div className="row2">
-                  <label className="field">
-                    <span className="label">{t.form.birthDate}</span>
-                    <input className="input" type="date" />
-                  </label>
-                  <label className="field">
-                    <span className="label">{t.form.birthTime}</span>
-                    <input className="input" type="time" />
-                  </label>
-                </div>
+    if (!name || !birthDate || !birthTime || !birthCity) {
+      setFormMessage(
+        lang === "es"
+          ? "Completa todos los campos para continuar."
+          : "Please complete all fields to continue."
+      );
+      return;
+    }
 
-                <label className="field">
-                  <span className="label">{t.form.birthCity}</span>
-                  <input className="input" placeholder={lang === "es" ? "Ej. Bilbao" : "e.g., Bilbao"} />
-                </label>
+    try {
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setFormMessage(
+        lang === "es"
+          ? "Perfecto. Bajando a tu vista previa..."
+          : "Perfect. Moving to your preview..."
+      );
+      scrollToId("results");
+    } finally {
+      setLoading(false);
+    }
+  }}
+>
+  <label className="field">
+    <span className="label">{t.form.name}</span>
+    <input
+      className="input"
+      placeholder={lang === "es" ? "Tu nombre" : "Your name"}
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+    />
+  </label>
 
-                <button className="cta" type="submit">{t.form.btn}</button>
-                <p className="micro">
-                  {lang === "es"
-                    ? "Al continuar aceptas nuestras condiciones y la política de privacidad."
-                    : "By continuing you agree to our terms and privacy policy."}
-                </p>
-              </form>
-            </div>
+  <div className="row2">
+    <label className="field">
+      <span className="label">{t.form.birthDate}</span>
+      <input
+        className="input"
+        type="date"
+        value={birthDate}
+        onChange={(e) => setBirthDate(e.target.value)}
+      />
+    </label>
 
-            <div className="panel">
-              <div className="miniTitle">{lang === "es" ? "Qué verás" : "What you’ll see"}</div>
-              <p className="sub">
-                {lang === "es"
-                  ? "Una carta visual y un adelanto de interpretación. Luego podrás desbloquear el informe completo."
-                  : "A visual chart and a short interpretation preview. Then you can unlock the full report."}
-              </p>
-              <div className="note">
-                {lang === "es"
-                  ? "Fondo tipo constelaciones, estilo premium, sin referencias a tecnología."
-                  : "Constellation wallpaper background, premium style, no tech references."}
-              </div>
-            </div>
-          </div>
-        </section>
+    <label className="field">
+      <span className="label">{t.form.birthTime}</span>
+      <input
+        className="input"
+        type="time"
+        value={birthTime}
+        onChange={(e) => setBirthTime(e.target.value)}
+      />
+    </label>
+  </div>
 
+  <label className="field">
+    <span className="label">{t.form.birthCity}</span>
+    <input
+      className="input"
+      placeholder={lang === "es" ? "Ej. Bilbao" : "e.g., Bilbao"}
+      value={birthCity}
+      onChange={(e) => setBirthCity(e.target.value)}
+    />
+  </label>
+
+  <button className="cta" type="submit" disabled={loading}>
+    {loading
+      ? lang === "es"
+        ? "Generando..."
+        : "Generating..."
+      : t.form.btn}
+  </button>
+
+  {formMessage ? (
+    <p className="formMessage">{formMessage}</p>
+  ) : null}
+
+  <p className="micro">
+    {lang === "es"
+      ? "Al continuar aceptas nuestras condiciones y la política de privacidad."
+      : "By continuing you agree to our terms and privacy policy."}
+  </p>
+</form>
         {/* 3) RESULTS */}
         <section className="section" id="results">
           <div className="panel">
