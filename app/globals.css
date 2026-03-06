@@ -81,7 +81,9 @@ body{
   color: #ffffff;
   font-weight: 700;
 }
-
+.brand{
+  text-shadow: 0 1px 10px rgba(0,0,0,0.35);
+}
 .brand img{
   display:block;
   height: 28px;
@@ -245,6 +247,13 @@ body{
   padding: 22px;
   background: rgba(10,15,25,0.65);
   backdrop-filter: blur(6px);
+}
+/* sombra suave para tarjetas */
+.heroCard,
+.panel,
+.checkoutBox,
+.card{
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
 }
 .h2{
   margin: 0 0 10px;
@@ -456,4 +465,64 @@ body{
   margin-top: 14px;
   color: rgba(255,255,255,0.55);
   font-size: 12px;
+}
+@media (max-width: 900px){
+  .grid2{
+    grid-template-columns: 1fr;
+  }
+
+  .nav{
+    width: calc(100% - 20px);
+    padding: 12px 14px;
+  }
+
+  .navLinks{
+    display:none;
+  }
+
+  .hero{
+    padding-top: 90px;
+  }
+
+  .ctaRow{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .h1{
+    font-size: 36px;
+  }
+
+  .resultsGrid{
+    grid-template-columns: 1fr;
+  }
+
+  .premiumGrid{
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px){
+  .row2{
+    grid-template-columns: 1fr;
+  }
+
+  .wrap{
+    padding: 88px 14px 48px;
+  }
+
+  .panel,
+  .heroCard,
+  .checkoutBox,
+  .card{
+    padding: 16px;
+  }
+
+  .h1{
+    font-size: 32px;
+  }
+
+  .sub{
+    font-size: 15px;
+  }
 }
