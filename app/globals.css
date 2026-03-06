@@ -312,6 +312,17 @@ body{
   font-size: 12px;
   color: rgba(255,255,255,0.55);
 }
+.formMessage{
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.92);
+}
+
+.cta[disabled]{
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
 
 .note{
   margin-top: 14px;
