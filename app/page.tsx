@@ -296,6 +296,9 @@ export default function Page() {
       : "By continuing you agree to our terms and privacy policy."}
   </p>
 </form>
+            </div>
+          </div>
+        </section>
         {/* 3) RESULTS */}
         <section className="section" id="results">
           <div className="panel">
