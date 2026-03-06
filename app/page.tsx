@@ -387,21 +387,25 @@ export default function Page() {
           </div>
         </section>
 
-        {/* 5) FOOTER */}
-        <footer className="footer">
-          <div className="footerTop">
-            <div className="footerBrand">
-              <img className="footerMark" src="/brand/mark-k.svg" alt="Kiron Code mark" />
-              <div>
-                <div className="footerTitle">Kiron Code</div>
-                <div className="footerSub">{t.footer.sub}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="footerBottom">{t.footer.rights}</div>
-        </footer>
-      </main>
+ {/* 5) FOOTER */}
+<footer className="footer">
+  <div className="footerTop">
+    <div className="footerBrand">
+      <img
+        className="footerMark"
+        src="/brand/mark-k.svg"
+        alt="Kiron Code mark"
+      />
+      <div>
+        <div className="footerTitle">Kiron Code</div>
+        <div className="footerSub">{t.footer.sub}</div>
+      </div>
     </div>
-  );
+  </div>
+
+  <div className="footerBottom">{t.footer.rights}</div>
+</footer>
+    </main>
+</div>
+);
 }
