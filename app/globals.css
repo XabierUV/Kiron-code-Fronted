@@ -17,14 +17,10 @@ body{
 }
 
 .page{
-  background:
-    radial-gradient(1100px 650px at 20% -10%, rgba(159,139,255,.12), transparent 58%),
-    radial-gradient(900px 520px at 90% 0%, rgba(183,198,255,.08), transparent 55%),
-    linear-gradient(180deg, rgba(7,10,18,0.92), rgba(7,10,18,0.985)),
-    url("/backgrounds/constellations.svg");
-  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
-  background-size: auto, auto, auto, 520px 520px;
-  background-position: center top, center top, center top, 0 0;
+  background-image: url("/fondo.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: repeat;
   min-height: 100vh;
 }
 
