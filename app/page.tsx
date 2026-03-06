@@ -397,14 +397,6 @@ export default function Page() {
                 <div className="footerSub">{t.footer.sub}</div>
               </div>
             </div>
-
-            <div className="footerSocials" aria-label="Social links">
-              <IconLink href={socials.instagram} label="Instagram"><SimpleIcon name="ig" /></IconLink>
-              <IconLink href={socials.tiktok} label="TikTok"><SimpleIcon name="tt" /></IconLink>
-              <IconLink href={socials.youtube} label="YouTube"><SimpleIcon name="yt" /></IconLink>
-              <IconLink href={socials.x} label="X"><SimpleIcon name="x" /></IconLink>
-              <IconLink href={socials.linkedin} label="LinkedIn"><SimpleIcon name="in" /></IconLink>
-            </div>
           </div>
 
           <div className="footerBottom">{t.footer.rights}</div>
