@@ -130,6 +130,7 @@ export default function Page() {
   const [birthCity, setBirthCity] = useState("");
   const [loading, setLoading] = useState(false);
   const [formMessage, setFormMessage] = useState("");
+  const [birthCountry, setBirthCountry] = useState("");
 
   const t = useMemo(() => copy[lang], [lang]);
 
@@ -212,8 +213,7 @@ export default function Page() {
   onSubmit={async (e) => {
     e.preventDefault();
     setFormMessage("");
-
-    if (!name || !birthDate || !birthTime || !birthCity) {
+    if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
       setFormMessage(
         lang === "es"
           ? "Completa todos los campos para continuar."
@@ -244,6 +244,15 @@ export default function Page() {
       value={name}
       onChange={(e) => setName(e.target.value)}
     />
+  </label>
+  <label className="field">
+  <span className="label">{lang === "es" ? "País de nacimiento" : "Birth country"}</span>
+  <input
+    className="input"
+    placeholder={lang === "es" ? "Ej. España" : "e.g., Spain"}
+    value={birthCountry}
+    onChange={(e) => setBirthCountry(e.target.value)}
+  />
   </label>
 
   <div className="row2">
