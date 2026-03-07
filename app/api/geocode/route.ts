@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolveBirthLocation } from "@/lib/geocode";
+import { resolveBirthLocation } from "../../../lib/geocode";
 
 export async function POST(request: NextRequest) {
   try {
