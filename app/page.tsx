@@ -131,7 +131,12 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [formMessage, setFormMessage] = useState("");
   const [birthCountry, setBirthCountry] = useState("");
-
+  const [resolvedLocation, setResolvedLocation] = useState<null | {
+  displayName: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+   }>(null);
   const t = useMemo(() => copy[lang], [lang]);
 
   useEffect(() => {
@@ -209,32 +214,66 @@ export default function Page() {
               <p className="sub">{t.form.subtitle}</p>
 
             <form
-  className="form"
-  onSubmit={async (e) => {
-    e.preventDefault();
-    setFormMessage("");
-    if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
-      setFormMessage(
-        lang === "es"
-          ? "Completa todos los campos para continuar."
-          : "Please complete all fields to continue."
+onSubmit={async (e) => {
+  e.preventDefault();
+  setFormMessage("");
+  setResolvedLocation(null);
+
+  if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
+    setFormMessage(
+      lang === "es"
+        ? "Completa todos los campos para continuar."
+        : "Please complete all fields to continue."
+    );
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const response = await fetch("/api/geocode", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        birthCity,
+        birthCountry
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(
+        data.error ||
+          (lang === "es"
+            ? "No hemos podido localizar la ciudad."
+            : "We could not resolve the city.")
       );
-      return;
     }
 
-    try {
-      setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setFormMessage(
-        lang === "es"
-          ? "Perfecto. Bajando a tu vista previa..."
-          : "Perfect. Moving to your preview..."
-      );
-      scrollToId("results");
-    } finally {
-      setLoading(false);
-    }
-  }}
+    setResolvedLocation(data.location);
+
+    setFormMessage(
+      lang === "es"
+        ? `Ubicación encontrada: ${data.location.displayName}`
+        : `Location found: ${data.location.displayName}`
+    );
+
+    scrollToId("results");
+  } catch (error) {
+    setFormMessage(
+      error instanceof Error
+        ? error.message
+        : lang === "es"
+        ? "Ha ocurrido un error inesperado."
+        : "An unexpected error occurred."
+    );
+  } finally {
+    setLoading(false);
+  }
+}}
 >
   <label className="field">
     <span className="label">{t.form.name}</span>
@@ -299,7 +338,17 @@ export default function Page() {
   {formMessage ? (
     <p className="formMessage">{formMessage}</p>
   ) : null}
-
+{resolvedLocation ? (
+  <div className="note">
+    <strong>{lang === "es" ? "Ubicación resuelta:" : "Resolved location:"}</strong>
+    <br />
+    {resolvedLocation.displayName}
+    <br />
+    lat: {resolvedLocation.latitude.toFixed(4)} | lon: {resolvedLocation.longitude.toFixed(4)}
+    <br />
+    timezone: {resolvedLocation.timezone}
+  </div>
+) : null}
   <p className="micro">
     {lang === "es"
       ? "Al continuar aceptas nuestras condiciones y la política de privacidad."
