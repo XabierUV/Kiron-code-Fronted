@@ -1,5 +1,5 @@
-import { GeocodeInput, ResolvedLocation } from "@/types/location";
-import { getTimezoneFromCoords } from "@/lib/timezone";
+import { GeocodeInput, ResolvedLocation } from "../types/location";
+import { getTimezoneFromCoords } from "./timezone";
 
 type NominatimResult = {
   display_name: string;
