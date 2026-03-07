@@ -244,16 +244,7 @@ export default function Page() {
       value={name}
       onChange={(e) => setName(e.target.value)}
     />
-  </label>
-  <label className="field">
-  <span className="label">{lang === "es" ? "País de nacimiento" : "Birth country"}</span>
-  <input
-    className="input"
-    placeholder={lang === "es" ? "Ej. España" : "e.g., Spain"}
-    value={birthCountry}
-    onChange={(e) => setBirthCountry(e.target.value)}
-  />
-  </label>
+  
 
   <div className="row2">
     <label className="field">
@@ -285,6 +276,16 @@ export default function Page() {
       value={birthCity}
       onChange={(e) => setBirthCity(e.target.value)}
     />
+  </label>
+    </label>
+  <label className="field">
+  <span className="label">{lang === "es" ? "País de nacimiento" : "Birth country"}</span>
+  <input
+    className="input"
+    placeholder={lang === "es" ? "Ej. España" : "e.g., Spain"}
+    value={birthCountry}
+    onChange={(e) => setBirthCountry(e.target.value)}
+  />
   </label>
 
   <button className="cta" type="submit" disabled={loading}>
