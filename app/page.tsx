@@ -220,11 +220,11 @@ onSubmit={async (e) => {
   setResolvedLocation(null);
 
   if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
-    setFormMessage(
-      lang === "es"
-        ? "Completa todos los campos para continuar."
-        : "Please complete all fields to continue."
-    );
+   setFormMessage(
+  lang === "es"
+    ? "Ubicación encontrada correctamente."
+    : "Location found successfully."
+);
     return;
   }
 
@@ -338,17 +338,7 @@ onSubmit={async (e) => {
   {formMessage ? (
     <p className="formMessage">{formMessage}</p>
   ) : null}
-{resolvedLocation ? (
-  <div className="note">
-    <strong>{lang === "es" ? "Ubicación resuelta:" : "Resolved location:"}</strong>
-    <br />
-    {resolvedLocation.displayName}
-    <br />
-    lat: {resolvedLocation.latitude.toFixed(4)} | lon: {resolvedLocation.longitude.toFixed(4)}
-    <br />
-    timezone: {resolvedLocation.timezone}
-  </div>
-) : null}
+
   <p className="micro">
     {lang === "es"
       ? "Al continuar aceptas nuestras condiciones y la política de privacidad."
