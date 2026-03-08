@@ -231,15 +231,18 @@ onSubmit={async (e) => {
   try {
     setLoading(true);
 
-    const response = await fetch("/api/geocode", {
+    const response = await fetch("/api/chart", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        birthCity,
-        birthCountry
-      })
+  name,
+  birthDate,
+  birthTime,
+  birthCity,
+  birthCountry
+})
     });
 
     const data = await response.json();
@@ -254,12 +257,13 @@ onSubmit={async (e) => {
     }
 
     setResolvedLocation(data.location);
+    console.log("chart", data.chart);
 
     setFormMessage(
-      lang === "es"
-        ? `Ubicación encontrada: ${data.location.displayName}`
-        : `Location found: ${data.location.displayName}`
-    );
+  lang === "es"
+    ? "Calculando tu Kiron Code..."
+    : "Calculating your Kiron Code..."
+);
 
     scrollToId("results");
   } catch (error) {
