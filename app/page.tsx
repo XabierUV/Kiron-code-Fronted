@@ -123,22 +123,40 @@ function SimpleIcon({ name }: { name: "ig" | "tt" | "yt" | "x" | "in" }) {
 export default function Page() {
 
   const [lang, setLang] = useState<Lang>("es");
-  const [scrolled, setScrolled] = useState(false);
-  const [name, setName] = useState("");
-  const [birthDate, setBirthDate] = useState("");
-  const [birthTime, setBirthTime] = useState("");
-  const [birthCity, setBirthCity] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [formMessage, setFormMessage] = useState("");
-  const [birthCountry, setBirthCountry] = useState("");
-  const [resolvedLocation, setResolvedLocation] = useState<null | {
+const [scrolled, setScrolled] = useState(false);
+const [name, setName] = useState("");
+const [birthDate, setBirthDate] = useState("");
+const [birthTime, setBirthTime] = useState("");
+const [birthCity, setBirthCity] = useState("");
+const [loading, setLoading] = useState(false);
+const [formMessage, setFormMessage] = useState("");
+const [birthCountry, setBirthCountry] = useState("");
+const [resolvedLocation, setResolvedLocation] = useState<null | {
   displayName: string;
   latitude: number;
   longitude: number;
   timezone: string;
-   }>(null);
-  const t = useMemo(() => copy[lang], [lang]);
+}>(null);
 
+const [chartData, setChartData] = useState<null | {
+  chiron: {
+    sign: string;
+    degree: number;
+    house: number;
+  };
+}>(null);
+
+const t = useMemo(() => copy[lang], [lang]);
+
+const [chartData, setChartData] = useState<null | {
+  chiron: {
+    sign: string;
+    degree: number;
+    house: number;
+  };
+}>(null);
+
+const t = useMemo(() => copy[lang], [lang]);
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 24);
@@ -217,8 +235,8 @@ export default function Page() {
 onSubmit={async (e) => {
   e.preventDefault();
   setFormMessage("");
-  setResolvedLocation(null);
-
+setResolvedLocation(null);
+setChartData(null);
   if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
    setFormMessage(
   lang === "es"
@@ -257,6 +275,7 @@ onSubmit={async (e) => {
     }
 
     setResolvedLocation(data.location);
+    setChartData(data.chart);
     console.log("chart", data.chart);
 
     setFormMessage(
