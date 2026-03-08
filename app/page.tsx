@@ -137,17 +137,6 @@ const [resolvedLocation, setResolvedLocation] = useState<null | {
   longitude: number;
   timezone: string;
 }>(null);
-
-const [chartData, setChartData] = useState<null | {
-  chiron: {
-    sign: string;
-    degree: number;
-    house: number;
-  };
-}>(null);
-
-const t = useMemo(() => copy[lang], [lang]);
-
 const [chartData, setChartData] = useState<null | {
   chiron: {
     sign: string;
