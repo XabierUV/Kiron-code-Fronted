@@ -225,74 +225,75 @@ const t = useMemo(() => copy[lang], [lang]);
               <h2 className="h2">{t.form.title}</h2>
               <p className="sub">{t.form.subtitle}</p>
 
-            <form
-onSubmit={async (e) => {
-  e.preventDefault();
-  setFormMessage("");
-setResolvedLocation(null);
-setChartData(null);
-  setPreviewData(null);
-  if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
-   setFormMessage(
-  lang === "es"
-    ? "Ubicación encontrada correctamente."
-    : "Location found successfully."
-);
-    return;
-  }
+ <form
+  className="form"
+  onSubmit={async (e) => {
+    e.preventDefault();
+    setFormMessage("");
+    setResolvedLocation(null);
+    setChartData(null);
+    setPreviewData(null);
 
-  try {
-    setLoading(true);
-
-    const response = await fetch("/api/chart", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-  name,
-  birthDate,
-  birthTime,
-  birthCity,
-  birthCountry
-})
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.ok) {
-      throw new Error(
-        data.error ||
-          (lang === "es"
-            ? "No hemos podido localizar la ciudad."
-            : "We could not resolve the city.")
+    if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
+      setFormMessage(
+        lang === "es"
+          ? "Completa todos los campos para continuar."
+          : "Please complete all fields to continue."
       );
+      return;
     }
 
-    setResolvedLocation(data.location);
-setChartData(data.chart);
-setPreviewData(data.preview);
-    console.log("chart", data.chart);
+    try {
+      setLoading(true);
 
-    setFormMessage(
-  lang === "es"
-    ? "Calculando tu Kiron Code..."
-    : "Calculating your Kiron Code..."
-);
+      const response = await fetch("/api/chart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          birthDate,
+          birthTime,
+          birthCity,
+          birthCountry
+        })
+      });
 
-    scrollToId("results");
-  } catch (error) {
-    setFormMessage(
-      error instanceof Error
-        ? error.message
-        : lang === "es"
-        ? "Ha ocurrido un error inesperado."
-        : "An unexpected error occurred."
-    );
-  } finally {
-    setLoading(false);
-  }
-}}
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        throw new Error(
+          data.error ||
+            (lang === "es"
+              ? "No hemos podido generar tu Kiron Code."
+              : "We could not generate your Kiron Code.")
+        );
+      }
+
+      setResolvedLocation(data.location);
+      setChartData(data.chart);
+      setPreviewData(data.preview);
+
+      setFormMessage(
+        lang === "es"
+          ? "Kiron Code generado correctamente."
+          : "Kiron Code generated successfully."
+      );
+
+      scrollToId("results");
+    } catch (error) {
+      setFormMessage(
+        error instanceof Error
+          ? error.message
+          : lang === "es"
+          ? "Ha ocurrido un error inesperado."
+          : "An unexpected error occurred."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }}
 >
   <label className="field">
     <span className="label">{t.form.name}</span>
@@ -302,7 +303,7 @@ setPreviewData(data.preview);
       value={name}
       onChange={(e) => setName(e.target.value)}
     />
-  
+  </label>
 
   <div className="row2">
     <label className="field">
@@ -326,25 +327,29 @@ setPreviewData(data.preview);
     </label>
   </div>
 
-  <label className="field">
-    <span className="label">{t.form.birthCity}</span>
-    <input
-      className="input"
-      placeholder={lang === "es" ? "Ej. Bilbao" : "e.g., Bilbao"}
-      value={birthCity}
-      onChange={(e) => setBirthCity(e.target.value)}
-    />
-  </label>
+  <div className="row2">
+    <label className="field">
+      <span className="label">{t.form.birthCity}</span>
+      <input
+        className="input"
+        placeholder={lang === "es" ? "Ej. Bilbao" : "e.g., Bilbao"}
+        value={birthCity}
+        onChange={(e) => setBirthCity(e.target.value)}
+      />
     </label>
-  <label className="field">
-  <span className="label">{lang === "es" ? "País de nacimiento" : "Birth country"}</span>
-  <input
-    className="input"
-    placeholder={lang === "es" ? "Ej. España" : "e.g., Spain"}
-    value={birthCountry}
-    onChange={(e) => setBirthCountry(e.target.value)}
-  />
-  </label>
+
+    <label className="field">
+      <span className="label">
+        {lang === "es" ? "País de nacimiento" : "Birth country"}
+      </span>
+      <input
+        className="input"
+        placeholder={lang === "es" ? "Ej. España" : "e.g., Spain"}
+        value={birthCountry}
+        onChange={(e) => setBirthCountry(e.target.value)}
+      />
+    </label>
+  </div>
 
   <button className="cta" type="submit" disabled={loading}>
     {loading
