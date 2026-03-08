@@ -382,7 +382,17 @@ setChartData(null);
 
               <div>
                 <div className="miniTitle">{lang === "es" ? "Adelanto" : "Preview"}</div>
-
+{chartData ? (
+  <div className="note">
+    <strong>{lang === "es" ? "Tu Quirón" : "Your Chiron"}</strong>
+    <br />
+    {lang === "es" ? "Signo" : "Sign"}: {chartData.chiron.sign}
+    <br />
+    {lang === "es" ? "Grado" : "Degree"}: {chartData.chiron.degree}
+    <br />
+    {lang === "es" ? "Casa" : "House"}: {chartData.chiron.house}
+  </div>
+) : null}
                 <div className="cards">
                   <div className="card">
                     <div className="cardTitle">{lang === "es" ? "Fortalezas" : "Strengths"}</div>
