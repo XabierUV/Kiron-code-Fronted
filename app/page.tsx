@@ -144,6 +144,11 @@ const [chartData, setChartData] = useState<null | {
     house: number;
   };
 }>(null);
+  const [previewData, setPreviewData] = useState<null | {
+  strengths: string;
+  challenges: string;
+  patterns: string;
+}>(null);
 
 const t = useMemo(() => copy[lang], [lang]);
   useEffect(() => {
@@ -226,6 +231,7 @@ onSubmit={async (e) => {
   setFormMessage("");
 setResolvedLocation(null);
 setChartData(null);
+  setPreviewData(null);
   if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
    setFormMessage(
   lang === "es"
@@ -264,7 +270,8 @@ setChartData(null);
     }
 
     setResolvedLocation(data.location);
-    setChartData(data.chart);
+setChartData(data.chart);
+setPreviewData(data.preview);
     console.log("chart", data.chart);
 
     setFormMessage(
@@ -393,34 +400,40 @@ setChartData(null);
     {lang === "es" ? "Casa" : "House"}: {chartData.chiron.house}
   </div>
 ) : null}
-                <div className="cards">
-                  <div className="card">
-                    <div className="cardTitle">{lang === "es" ? "Fortalezas" : "Strengths"}</div>
-                    <div className="cardBody">
-                      {lang === "es"
-                        ? "Capacidad de decisión cuando alineas intuición y propósito."
-                        : "Decisiveness when intuition and purpose align."}
-                    </div>
-                  </div>
+ <div className="cards">
+  <div className="card">
+    <div className="cardTitle">{lang === "es" ? "Fortalezas" : "Strengths"}</div>
+    <div className="cardBody">
+      {previewData
+        ? previewData.strengths
+        : lang === "es"
+        ? "Capacidad de decisión cuando alineas intuición y propósito."
+        : "Decisiveness when intuition and purpose align."}
+    </div>
+  </div>
 
-                  <div className="card">
-                    <div className="cardTitle">{lang === "es" ? "Retos" : "Challenges"}</div>
-                    <div className="cardBody">
-                      {lang === "es"
-                        ? "Elegir el momento: no todo se fuerza, el destino se abre."
-                        : "Timing matters: not everything is forced—destiny opens."}
-                    </div>
-                  </div>
+  <div className="card">
+    <div className="cardTitle">{lang === "es" ? "Retos" : "Challenges"}</div>
+    <div className="cardBody">
+      {previewData
+        ? previewData.challenges
+        : lang === "es"
+        ? "Elegir el momento: no todo se fuerza, el destino se abre."
+        : "Timing matters: not everything is forced—destiny opens."}
+    </div>
+  </div>
 
-                  <div className="card">
-                    <div className="cardTitle">{lang === "es" ? "Patrones" : "Patterns"}</div>
-                    <div className="cardBody">
-                      {lang === "es"
-                        ? "Ciclos que se repiten en amor, trabajo y cambios importantes."
-                        : "Recurring cycles across love, work, and major shifts."}
-                    </div>
-                  </div>
-                </div>
+  <div className="card">
+    <div className="cardTitle">{lang === "es" ? "Patrones" : "Patterns"}</div>
+    <div className="cardBody">
+      {previewData
+        ? previewData.patterns
+        : lang === "es"
+        ? "Ciclos que se repiten en amor, trabajo y cambios importantes."
+        : "Recurring cycles across love, work, and major shifts."}
+    </div>
+  </div>
+</div>
 
                 <button className="cta" onClick={() => scrollToId("premium")}>{t.premium.btn}</button>
               </div>
