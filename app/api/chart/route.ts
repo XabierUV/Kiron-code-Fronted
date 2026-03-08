@@ -103,7 +103,6 @@ function buildPreview(sign: ChironSign, house: number) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
     const { birthDate, birthTime, birthCity, birthCountry } = body;
 
     if (!birthDate || !birthTime || !birthCity || !birthCountry) {
@@ -135,16 +134,6 @@ export async function POST(request: NextRequest) {
       preview
     });
   } catch {
-    return NextResponse.json(
-      { ok: false, error: "Chart generation failed." },
-      { status: 500 }
-    );
-  }
-}
-      chart
-    });
-
-  } catch (error) {
     return NextResponse.json(
       { ok: false, error: "Chart generation failed." },
       { status: 500 }
