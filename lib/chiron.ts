@@ -1,11 +1,18 @@
 import sweph from "sweph";
 
 export function calculateChiron(julianDay: number) {
-  const result = sweph.calc_ut(julianDay, sweph.SE_CHIRON);
+  const result: any = sweph.calc_ut(julianDay, sweph.SE_CHIRON, 0);
 
-  const longitude = result.longitude;
+  const longitude =
+    typeof result?.longitude === "number"
+      ? result.longitude
+      : Array.isArray(result?.data)
+      ? result.data[0]
+      : undefined;
 
-  const signIndex = Math.floor(longitude / 30);
+  if (!Number.isFinite(longitude)) {
+    throw new Error("Could not calculate Chiron longitude.");
+  }
 
   const signs = [
     "Aries",
@@ -20,10 +27,10 @@ export function calculateChiron(julianDay: number) {
     "Capricorn",
     "Aquarius",
     "Pisces"
-  ];
+  ] as const;
 
+  const signIndex = Math.floor(longitude / 30);
   const sign = signs[signIndex];
-
   const degree = longitude % 30;
 
   return {
