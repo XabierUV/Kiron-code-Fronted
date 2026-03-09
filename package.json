@@ -19,5 +19,6 @@
     "@types/react-dom": "^18.0.0",
     "@types/node": "^20.0.0",
     "tz-lookup": "^6.1.25"
+    "sweph": "^2.10.3"
   }
 }
