@@ -1,7 +1,14 @@
 import sweph from "sweph";
 
 export function calculateChiron(julianDay: number) {
-  const result: any = sweph.calc_ut(julianDay, sweph.SE_CHIRON, 0);
+  const swephAny = sweph as any;
+  const chironId = swephAny.SE_CHIRON;
+
+  if (typeof chironId !== "number") {
+    throw new Error("SE_CHIRON is not available in the sweph package.");
+  }
+
+  const result: any = swephAny.calc_ut(julianDay, chironId, 0);
 
   const longitude =
     typeof result?.longitude === "number"
