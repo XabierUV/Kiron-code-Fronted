@@ -246,7 +246,7 @@ const t = useMemo(() => copy[lang], [lang]);
     try {
       setLoading(true);
 
-      const response = await fetch("/api/chart", {
+      const response = await fetch("https://luminous-patience-production.up.railway.app/chart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
