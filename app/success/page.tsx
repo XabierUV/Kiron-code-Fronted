@@ -91,7 +91,7 @@ export default function SuccessPage() {
               <h3>Descargar PDF</h3>
               <p>Tu informe premium ya está disponible también en formato PDF.</p>
               <p>
-                
+                <a
                   href={data.report.pdfUrl}
                   target="_blank"
                   rel="noreferrer"
