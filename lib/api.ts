@@ -86,7 +86,7 @@ export async function verifyCheckoutSession(sessionId: string) {
     }
   );
 
-  const data = await parseJsonResponse(response);
+  const data = await response.json();
 
   if (!response.ok || !data.ok) {
     throw new Error(data.error || "Checkout verification failed");
