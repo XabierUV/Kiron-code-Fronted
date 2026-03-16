@@ -16,9 +16,8 @@ export const copy = {
     },
     form: {
       sectionLabel: "Tus datos de nacimiento",
-      title: "Dónde empezó todo.",
-      subtitle:
-        "Fecha, hora y lugar exactos. Así de preciso trabaja Quirón.",
+      title: "El universo recuerda el momento exacto.",
+      subtitle: "Fecha, hora y lugar de nacimiento.",
       name: "Nombre",
       birthDate: "Fecha de nacimiento",
       birthTime: "Hora de nacimiento",
@@ -39,9 +38,8 @@ export const copy = {
     },
     results: {
       sectionLabel: "Vista previa",
-      title: "Esto es solo el principio.",
-      subtitle:
-        "Una primera lectura de tu Quirón. Lo que viene después te va a cambiar.",
+      title: "Aquí comienza tu camino.",
+      subtitle: "Tu Quirón, calculado con precisión real.",
       previewTitle: "Adelanto",
       chironTitle: "Tu Quirón",
       sign: "Signo",
@@ -50,12 +48,9 @@ export const copy = {
       strengths: "Fortalezas",
       challenges: "Retos",
       patterns: "Patrones",
-      fallbackStrengths:
-        "Capacidad de decisión cuando alineas intuición y propósito.",
-      fallbackChallenges:
-        "Elegir el momento: no todo se fuerza, el destino se abre.",
-      fallbackPatterns:
-        "Ciclos que se repiten en amor, trabajo y cambios importantes.",
+      fallbackStrengths: "Tu mayor fortaleza está donde menos la esperas.",
+      fallbackChallenges: "El patrón que te frena tiene nombre.",
+      fallbackPatterns: "Se repite. Siempre. Hasta que lo ves.",
       cta: "Quiero mi informe completo · 19€",
       location: "Ubicación resuelta",
     },
