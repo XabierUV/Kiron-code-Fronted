@@ -12,7 +12,7 @@ export const copy = {
       title: "Descubre tu mapa cósmico.",
       subtitle:
         "Kiron Code interpreta tu nacimiento con una experiencia visual limpia, intensa y pensada para revelar patrones reales.",
-      primaryCta: "Generar carta",
+      primaryCta: "Calcular mi Quirón",
     },
     form: {
       sectionLabel: "Datos de nacimiento",
@@ -24,7 +24,7 @@ export const copy = {
       birthTime: "Hora de nacimiento",
       birthCity: "Ciudad de nacimiento",
       birthCountry: "País de nacimiento",
-      submit: "Ver mi Kiron Code",
+      submit: "Ver mi Quirón",
       loading: "Generando...",
       helper:
         "Al continuar aceptas nuestras condiciones y política de privacidad.",
@@ -56,7 +56,7 @@ export const copy = {
         "Elegir el momento: no todo se fuerza, el destino se abre.",
       fallbackPatterns:
         "Ciclos que se repiten en amor, trabajo y cambios importantes.",
-      cta: "Desbloquear informe completo",
+      cta: "Ver mi informe de Quirón completo · 19€",
       location: "Ubicación resuelta",
     },
     premium: {
@@ -93,7 +93,7 @@ export const copy = {
       title: "Discover your cosmic blueprint.",
       subtitle:
         "Kiron Code interprets your birth through a clean, intense visual experience built to reveal real patterns.",
-      primaryCta: "Generate chart",
+      primaryCta: "Calculate my Chiron",
     },
     form: {
       sectionLabel: "Birth data",
@@ -105,7 +105,7 @@ export const copy = {
       birthTime: "Birth time",
       birthCity: "Birth city",
       birthCountry: "Birth country",
-      submit: "See my Kiron Code",
+      submit: "See my Chiron",
       loading: "Generating...",
       helper: "By continuing you agree to our terms and privacy policy.",
       placeholders: {
@@ -136,7 +136,7 @@ export const copy = {
         "Timing matters: not everything is forced—destiny opens.",
       fallbackPatterns:
         "Recurring cycles across love, work, and major shifts.",
-      cta: "Unlock full report",
+      cta: "See my full Chiron report · €19",
       location: "Resolved location",
     },
     premium: {

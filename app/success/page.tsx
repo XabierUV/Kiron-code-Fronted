@@ -64,11 +64,9 @@ export default function SuccessPage() {
           <p className="sectionText">
             Aquí tienes tu informe premium desbloqueado.
           </p>
-          <p style={{ marginTop: 16 }}>
-            <Link href="/" className="primaryButton">
-              Volver al inicio
-            </Link>
-          </p>
+          <Link href="/" className="primaryButton">
+            Volver al inicio
+          </Link>
         </div>
 
         <div className="resultsPanel">
@@ -111,6 +109,9 @@ export default function SuccessPage() {
                   <p>{section.text}</p>
                 </article>
               ))}
+              <button type="button" className="primaryButton">
+                Descubrir mi informe psicológico completo · 39€
+              </button>
             </>
           ) : null}
         </div>

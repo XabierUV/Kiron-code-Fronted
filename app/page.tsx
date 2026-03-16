@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/site-header";
 import { HeroSection } from "@/components/hero-section";
 import { ChartForm } from "@/components/chart-form";
 import { PreviewSection } from "@/components/preview-section";
-import { PremiumSection } from "@/components/premium-section";
 import { SiteFooter } from "@/components/site-footer";
 import { copy } from "@/lib/copy";
 import { createCheckout, fetchChart } from "@/lib/api";
@@ -178,7 +177,7 @@ export default function Page() {
           resolvedLocation={resolvedLocation}
           hasPremiumReport={Boolean(premiumReport)}
           onPremiumClick={() =>
-            scrollToId(premiumReport ? "full-report" : "premium")
+            premiumReport ? scrollToId("full-report") : handleCheckout()
           }
         />
 
@@ -203,11 +202,6 @@ export default function Page() {
           </section>
         ) : null}
 
-        <PremiumSection
-          lang={lang}
-          onCheckout={handleCheckout}
-          checkoutLoading={checkoutLoading}
-        />
       </main>
 
       <SiteFooter lang={lang} />
