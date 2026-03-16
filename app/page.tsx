@@ -152,7 +152,6 @@ export default function Page() {
         <HeroSection
           lang={lang}
           onPrimaryClick={() => scrollToId("chart")}
-          onSecondaryClick={() => scrollToId("premium")}
         />
 
         <ChartForm

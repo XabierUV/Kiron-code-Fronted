@@ -4,14 +4,9 @@ import { copy } from "@/lib/copy";
 type HeroSectionProps = {
   lang: Lang;
   onPrimaryClick: () => void;
-  onSecondaryClick: () => void;
 };
 
-export function HeroSection({
-  lang,
-  onPrimaryClick,
-  onSecondaryClick,
-}: HeroSectionProps) {
+export function HeroSection({ lang, onPrimaryClick }: HeroSectionProps) {
   const t = copy[lang];
 
   return (
@@ -23,13 +18,6 @@ export function HeroSection({
       <div className="heroActions">
         <button type="button" className="primaryButton" onClick={onPrimaryClick}>
           {t.hero.primaryCta}
-        </button>
-        <button
-          type="button"
-          className="secondaryButton"
-          onClick={onSecondaryClick}
-        >
-          {t.hero.secondaryCta}
         </button>
       </div>
     </section>

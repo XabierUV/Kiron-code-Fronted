@@ -13,7 +13,6 @@ export const copy = {
       subtitle:
         "Kiron Code interpreta tu nacimiento con una experiencia visual limpia, intensa y pensada para revelar patrones reales.",
       primaryCta: "Generar carta",
-      secondaryCta: "Ver premium",
     },
     form: {
       sectionLabel: "Datos de nacimiento",
@@ -75,8 +74,6 @@ export const copy = {
       note: "Pago único. Sin suscripción.",
       price: "19€",
       checkoutTitle: "Premium",
-      checkoutText:
-        "Aquí conectaremos Stripe más adelante. Por ahora dejamos preparada la estructura visual y funcional.",
       checkoutMeta: "Seguro · Rápido · Acceso inmediato",
       alert: "Solo frontend por ahora.",
     },
@@ -97,7 +94,6 @@ export const copy = {
       subtitle:
         "Kiron Code interprets your birth through a clean, intense visual experience built to reveal real patterns.",
       primaryCta: "Generate chart",
-      secondaryCta: "See premium",
     },
     form: {
       sectionLabel: "Birth data",
@@ -158,8 +154,6 @@ export const copy = {
       note: "One-time payment. No subscription.",
       price: "€19",
       checkoutTitle: "Premium",
-      checkoutText:
-        "We’ll connect Stripe later. For now, this prepares the visual and functional structure.",
       checkoutMeta: "Secure · Fast · Instant access",
       alert: "Frontend only for now.",
     },

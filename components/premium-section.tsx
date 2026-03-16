@@ -38,7 +38,6 @@ export function PremiumSection({
           </div>
 
           <p className="miniLabel">{t.premium.checkoutTitle}</p>
-          <p className="premiumText">{t.premium.checkoutText}</p>
 
           <button
             type="button"
