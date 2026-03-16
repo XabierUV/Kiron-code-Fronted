@@ -6,7 +6,9 @@ import {
   fetchUnlockedReportBySession,
   verifyCheckoutSession,
 } from "@/lib/api";
-import type { PremiumReport } from "@/types/chart";
+import type { Lang, PremiumReport } from "@/types/chart";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 type UnlockedReportState = {
   report: {
@@ -23,9 +25,18 @@ type UnlockedReportState = {
 };
 
 export default function SuccessPage() {
+  const [lang, setLang] = useState<Lang>("es");
+  const [scrolled, setScrolled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState<UnlockedReportState | null>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     async function loadReport() {
@@ -56,7 +67,15 @@ export default function SuccessPage() {
   }, []);
 
   return (
-    <main className="pageContent">
+    <div className="pageShell" id="top">
+      <SiteHeader
+        lang={lang}
+        setLang={setLang}
+        scrolled={scrolled}
+        onNavigate={(id) => { window.location.href = `/#${id}`; }}
+      />
+
+      <main className="pageContent">
       <section className="contentSection">
         <div className="sectionIntro">
           <p className="sectionLabel">Pago completado</p>
@@ -120,6 +139,9 @@ export default function SuccessPage() {
           ) : null}
         </div>
       </section>
-    </main>
+      </main>
+
+      <SiteFooter lang={lang} />
+    </div>
   );
 }
