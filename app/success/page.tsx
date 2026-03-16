@@ -60,7 +60,7 @@ export default function SuccessPage() {
       <section className="contentSection">
         <div className="sectionIntro">
           <p className="sectionLabel">Pago completado</p>
-          <h1 className="sectionTitle">Tu compra se ha procesado correctamente.</h1>
+          <h1 className="sectionTitle">Tu informe está listo.</h1>
           <p className="sectionText">
             Aquí tienes tu informe premium desbloqueado.
           </p>
@@ -85,33 +85,41 @@ export default function SuccessPage() {
           ) : null}
 
           {data?.report?.pdfUrl ? (
-            <article className="insightCard">
-              <h3>Descargar PDF</h3>
-              <p>Tu informe premium ya está disponible también en formato PDF.</p>
-              <p>
-                <a
-                  href={data.report.pdfUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  download="kiron-report.pdf"
-                >
-                  Abrir PDF premium
-                </a>
-              </p>
+            <article
+              className="insightCard"
+              style={{
+                borderColor: "#c9a84c",
+                boxShadow: "0 0 0 1px #c9a84c",
+              }}
+            >
+              <h3 style={{ color: "#c9a84c" }}>Tu informe en PDF</h3>
+              <p>Descárgalo ahora y tenlo siempre disponible.</p>
+              <a
+                href={data.report.pdfUrl}
+                target="_blank"
+                rel="noreferrer"
+                download="kiron-report.pdf"
+                className="primaryButton"
+                style={{ display: "inline-block", marginTop: "12px" }}
+              >
+                Abrir PDF premium
+              </a>
             </article>
           ) : null}
 
           {data?.report?.reportJson ? (
             <>
               {data.report.reportJson.sections.map((section, index) => (
-                <article key={index} className="insightCard">
-                  <h3>{section.title}</h3>
-                  <p>{section.text}</p>
+                <article key={index} className="insightCard" style={{ paddingTop: "28px", paddingBottom: "28px" }}>
+                  <h3 style={{ fontSize: "20px", marginBottom: "12px" }}>{section.title}</h3>
+                  <p style={{ lineHeight: "1.8" }}>{section.text}</p>
                 </article>
               ))}
-              <button type="button" className="primaryButton">
-                Descubrir mi informe psicológico completo · 39€
-              </button>
+              <div style={{ marginTop: "40px" }}>
+                <button type="button" className="primaryButton">
+                  Descubrir mi informe psicológico completo · 39€
+                </button>
+              </div>
             </>
           ) : null}
         </div>

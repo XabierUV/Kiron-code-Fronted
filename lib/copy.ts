@@ -9,16 +9,16 @@ export const copy = {
     },
     hero: {
       eyebrow: "Precisión astronómica. Diseño radical.",
-      title: "Descubre tu mapa cósmico.",
+      title: "Lo que te rompió es exactamente lo que te hace imparable.",
       subtitle:
-        "Kiron Code interpreta tu nacimiento con una experiencia visual limpia, intensa y pensada para revelar patrones reales.",
+        "Quirón revela la herida que define tu potencial. Calculado con precisión astronómica real.",
       primaryCta: "Calcular mi Quirón",
     },
     form: {
-      sectionLabel: "Datos de nacimiento",
-      title: "Introduce tus datos.",
+      sectionLabel: "Tus datos de nacimiento",
+      title: "Dónde empezó todo.",
       subtitle:
-        "Fecha, hora, ciudad y país de nacimiento. Con eso generamos tu vista previa.",
+        "Fecha, hora y lugar exactos. Así de preciso trabaja Quirón.",
       name: "Nombre",
       birthDate: "Fecha de nacimiento",
       birthTime: "Hora de nacimiento",
@@ -39,9 +39,9 @@ export const copy = {
     },
     results: {
       sectionLabel: "Vista previa",
-      title: "Tu primera lectura.",
+      title: "Esto es solo el principio.",
       subtitle:
-        "Una lectura inicial de Quirón y tres ejes clave para empezar a entender tu patrón.",
+        "Una primera lectura de tu Quirón. Lo que viene después te va a cambiar.",
       previewTitle: "Adelanto",
       chironTitle: "Tu Quirón",
       sign: "Signo",
@@ -56,25 +56,25 @@ export const copy = {
         "Elegir el momento: no todo se fuerza, el destino se abre.",
       fallbackPatterns:
         "Ciclos que se repiten en amor, trabajo y cambios importantes.",
-      cta: "Ver mi informe de Quirón completo · 19€",
+      cta: "Quiero mi informe completo · 19€",
       location: "Ubicación resuelta",
     },
     premium: {
-      sectionLabel: "Premium",
-      title: "Desbloquea el informe completo.",
+      sectionLabel: "Informe Quirón",
+      title: "El informe que nadie más va a leer.",
       subtitle:
-        "Una interpretación más profunda, clara y diseñada para releerse en los momentos importantes.",
+        "12 páginas. Tu herida. Tu patrón. Tu don. Escrito para ti.",
       features: [
-        "Análisis completo de carta natal",
-        "Lectura estructurada de rasgos y talentos",
-        "Ciclos vitales y momentos de cambio",
-        "Compatibilidad: vínculos, amor y carrera",
+        "La herida que llevas cargando desde la infancia",
+        "Por qué se repite en tus relaciones y trabajo",
+        "El don exacto que emerge cuando la sanas",
+        "Tu camino de sanación personalizado",
       ],
-      button: "Pasar a Premium",
+      button: "Quiero mi informe · 19€",
       note: "Pago único. Sin suscripción.",
       price: "19€",
       checkoutTitle: "Premium",
-      checkoutMeta: "Seguro · Rápido · Acceso inmediato",
+      checkoutMeta: "Pago único · Sin suscripción · Acceso inmediato",
       alert: "Solo frontend por ahora.",
     },
     footer: {
@@ -90,16 +90,16 @@ export const copy = {
     },
     hero: {
       eyebrow: "Astronomical precision. Radical design.",
-      title: "Discover your cosmic blueprint.",
+      title: "What broke you is exactly what makes you unstoppable.",
       subtitle:
-        "Kiron Code interprets your birth through a clean, intense visual experience built to reveal real patterns.",
+        "Chiron reveals the wound that defines your potential. Calculated with real astronomical precision.",
       primaryCta: "Calculate my Chiron",
     },
     form: {
-      sectionLabel: "Birth data",
-      title: "Enter your details.",
+      sectionLabel: "Your birth details",
+      title: "Where it all began.",
       subtitle:
-        "Birth date, time, city and country. With that, we generate your preview.",
+        "Exact date, time and place. That's how precise Chiron works.",
       name: "Name",
       birthDate: "Birth date",
       birthTime: "Birth time",
@@ -119,9 +119,9 @@ export const copy = {
     },
     results: {
       sectionLabel: "Preview",
-      title: "Your first reading.",
+      title: "This is just the beginning.",
       subtitle:
-        "An initial Chiron reading and three key axes to begin understanding your pattern.",
+        "A first reading of your Chiron. What comes next will change you.",
       previewTitle: "Preview",
       chironTitle: "Your Chiron",
       sign: "Sign",
@@ -136,25 +136,25 @@ export const copy = {
         "Timing matters: not everything is forced—destiny opens.",
       fallbackPatterns:
         "Recurring cycles across love, work, and major shifts.",
-      cta: "See my full Chiron report · €19",
+      cta: "I want my full report · €19",
       location: "Resolved location",
     },
     premium: {
-      sectionLabel: "Premium",
-      title: "Unlock the full report.",
+      sectionLabel: "Chiron Report",
+      title: "The report no one else will ever read.",
       subtitle:
-        "A deeper interpretation, clear and designed to be revisited in the moments that matter.",
+        "12 pages. Your wound. Your pattern. Your gift. Written for you.",
       features: [
-        "Full natal chart analysis",
-        "Structured reading of traits and talents",
-        "Life cycles and turning points",
-        "Compatibility: relationships, love and career",
+        "The wound you've been carrying since childhood",
+        "Why it keeps repeating in your relationships and work",
+        "The exact gift that emerges when you heal it",
+        "Your personalized healing path",
       ],
-      button: "Upgrade to Premium",
+      button: "I want my report · €19",
       note: "One-time payment. No subscription.",
       price: "€19",
       checkoutTitle: "Premium",
-      checkoutMeta: "Secure · Fast · Instant access",
+      checkoutMeta: "One-time payment · No subscription · Instant access",
       alert: "Frontend only for now.",
     },
     footer: {
