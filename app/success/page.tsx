@@ -64,9 +64,11 @@ export default function SuccessPage() {
           <p className="sectionText">
             Aquí tienes tu informe premium desbloqueado.
           </p>
-          <Link href="/" className="primaryButton">
-            Volver al inicio
-          </Link>
+          <p style={{ marginTop: "24px" }}>
+            <Link href="/" className="primaryButton">
+              Volver al inicio
+            </Link>
+          </p>
         </div>
 
         <div className="resultsPanel">
@@ -85,14 +87,8 @@ export default function SuccessPage() {
           ) : null}
 
           {data?.report?.pdfUrl ? (
-            <article
-              className="insightCard"
-              style={{
-                borderColor: "#c9a84c",
-                boxShadow: "0 0 0 1px #c9a84c",
-              }}
-            >
-              <h3 style={{ color: "#c9a84c" }}>Tu informe en PDF</h3>
+            <article className="insightCard">
+              <h3>Tu informe en PDF</h3>
               <p>Descárgalo ahora y tenlo siempre disponible.</p>
               <a
                 href={data.report.pdfUrl}
@@ -102,7 +98,7 @@ export default function SuccessPage() {
                 className="primaryButton"
                 style={{ display: "inline-block", marginTop: "12px" }}
               >
-                Abrir PDF premium
+                Abrir PDF
               </a>
             </article>
           ) : null}
