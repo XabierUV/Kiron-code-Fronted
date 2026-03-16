@@ -9,7 +9,7 @@ export const copy = {
     },
     hero: {
       eyebrow: "Precisión astronómica. Diseño radical.",
-      title: "Lo que te rompió es exactamente lo que te hace imparable.",
+      title: "Descubre tu mapa cósmico.",
       subtitle:
         "Quirón revela la herida que define tu potencial. Calculado con precisión astronómica real.",
       primaryCta: "Calcular mi Quirón",
@@ -85,7 +85,7 @@ export const copy = {
     },
     hero: {
       eyebrow: "Astronomical precision. Radical design.",
-      title: "What broke you is exactly what makes you unstoppable.",
+      title: "Discover your cosmic map.",
       subtitle:
         "Chiron reveals the wound that defines your potential. Calculated with real astronomical precision.",
       primaryCta: "Calculate my Chiron",
