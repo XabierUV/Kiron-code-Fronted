@@ -6,6 +6,7 @@ export const copy = {
       chart: "Carta",
       results: "Resultados",
       premium: "Productos",
+      myChart: "Mi carta",
     },
     hero: {
       eyebrow: "Precisión astronómica. Diseño radical.",
@@ -82,6 +83,7 @@ export const copy = {
       chart: "Chart",
       results: "Results",
       premium: "Products",
+      myChart: "My chart",
     },
     hero: {
       eyebrow: "Astronomical precision. Radical design.",

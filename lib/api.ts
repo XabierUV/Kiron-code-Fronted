@@ -79,6 +79,31 @@ export async function fetchUnlockedReportBySession(sessionId: string) {
 
   return data;
 }
+export async function sendMagicLink(email: string): Promise<{ ok: boolean; error?: string }> {
+  const response = await fetch(`${API_BASE}/magic-link`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await response.json();
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || "Magic link request failed");
+  }
+  return data;
+}
+
+export async function fetchCustomerPortal(token: string) {
+  const response = await fetch(
+    `${API_BASE}/magic-link/verify?token=${encodeURIComponent(token)}`,
+    { method: "GET" }
+  );
+  const data = await response.json();
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || "Portal access failed");
+  }
+  return data;
+}
+
 export async function verifyCheckoutSession(sessionId: string) {
   const response = await fetch(
     `${API_BASE}/checkout/verify/${encodeURIComponent(sessionId)}`,

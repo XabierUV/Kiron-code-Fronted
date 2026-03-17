@@ -52,6 +52,9 @@ export function SiteHeader({
         >
           {t.nav.premium}
         </button>
+        <a href="/mi-carta" className="navAction" style={{ textDecoration: "none" }}>
+          {t.nav.myChart}
+        </a>
       </nav>
 
       <div className="langSwitch" role="group" aria-label="Language switch">
