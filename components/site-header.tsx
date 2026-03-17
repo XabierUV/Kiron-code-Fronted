@@ -48,7 +48,7 @@ export function SiteHeader({
         <button
           type="button"
           className="navAction"
-          onClick={() => onNavigate("premium")}
+          onClick={() => onNavigate("productos")}
         >
           {t.nav.premium}
         </button>

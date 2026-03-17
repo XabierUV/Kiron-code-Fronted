@@ -5,7 +5,7 @@ export const copy = {
     nav: {
       chart: "Carta",
       results: "Resultados",
-      premium: "Premium",
+      premium: "Productos",
     },
     hero: {
       eyebrow: "Precisión astronómica. Diseño radical.",
@@ -26,7 +26,7 @@ export const copy = {
       submit: "Ver mi Quirón",
       loading: "Generando...",
       helper:
-        "Al continuar aceptas nuestras condiciones y política de privacidad.",
+        "Al continuar aceptas nuestra Política de Privacidad y el tratamiento de tus datos para generar tu carta natal. No compartimos tus datos con terceros.",
       placeholders: {
         name: "Tu nombre",
         city: "Ej. Bilbao",
@@ -65,10 +65,10 @@ export const copy = {
         "El don exacto que emerge cuando la sanas",
         "Tu camino de sanación personalizado",
       ],
-      button: "Quiero mi informe · 19€",
+      button: "Quiero La Herida y el Don · 19€",
       note: "Pago único. Sin suscripción.",
       price: "19€",
-      checkoutTitle: "Premium",
+      checkoutTitle: "La Herida y el Don",
       checkoutMeta: "Pago único · Sin suscripción · Acceso inmediato",
       alert: "Solo frontend por ahora.",
     },
@@ -81,7 +81,7 @@ export const copy = {
     nav: {
       chart: "Chart",
       results: "Results",
-      premium: "Premium",
+      premium: "Products",
     },
     hero: {
       eyebrow: "Astronomical precision. Radical design.",
@@ -102,7 +102,7 @@ export const copy = {
       birthCountry: "Birth country",
       submit: "See my Chiron",
       loading: "Generating...",
-      helper: "By continuing you agree to our terms and privacy policy.",
+      helper: "By continuing you agree to our Privacy Policy and the processing of your data to generate your birth chart. We do not share your data with third parties.",
       placeholders: {
         name: "Your name",
         city: "e.g. Bilbao",
@@ -145,10 +145,10 @@ export const copy = {
         "The exact gift that emerges when you heal it",
         "Your personalized healing path",
       ],
-      button: "I want my report · €19",
+      button: "I want The Wound and the Gift · €19",
       note: "One-time payment. No subscription.",
       price: "€19",
-      checkoutTitle: "Premium",
+      checkoutTitle: "The Wound and the Gift",
       checkoutMeta: "One-time payment · No subscription · Instant access",
       alert: "Frontend only for now.",
     },

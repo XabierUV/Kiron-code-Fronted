@@ -83,8 +83,11 @@ export default function SuccessPage() {
           <p className="sectionText">
             Aquí tienes tu informe premium desbloqueado.
           </p>
+          <p className="sectionText" style={{ marginTop: "14px" }}>
+            En los próximos 10 minutos recibirás tu informe en el email que proporcionaste durante el pago.
+          </p>
           <p style={{ marginTop: "24px" }}>
-            <Link href="/" className="primaryButton">
+            <Link href="/" style={{ textDecoration: "underline", color: "var(--text-soft)" }}>
               Volver al inicio
             </Link>
           </p>
@@ -114,8 +117,7 @@ export default function SuccessPage() {
                 target="_blank"
                 rel="noreferrer"
                 download="kiron-report.pdf"
-                className="primaryButton"
-                style={{ display: "inline-block", marginTop: "12px" }}
+                style={{ textDecoration: "underline", marginTop: "12px", display: "inline-block" }}
               >
                 Abrir PDF
               </a>
@@ -132,7 +134,7 @@ export default function SuccessPage() {
               ))}
               <div style={{ marginTop: "40px" }}>
                 <button type="button" className="primaryButton">
-                  Descubrir mi informe psicológico completo · 39€
+                  Descubrir Tu Mapa Interior · 39€
                 </button>
               </div>
             </>

@@ -202,6 +202,50 @@ export default function Page() {
           </section>
         ) : null}
 
+        <section className="contentSection" id="productos">
+          <div className="sectionIntro">
+            <p className="sectionLabel">Productos</p>
+            <h2 className="sectionTitle">Elige tu camino.</h2>
+            <p className="sectionText">Cada producto revela una capa más profunda de tu mapa.</p>
+          </div>
+
+          <div className="resultsPanel">
+            {[
+              {
+                name: "Tu Quirón",
+                description: "Calculamos tu Quirón con precisión astronómica real. Signo, casa, grado. Tu rueda natal completa. El punto de partida de todo.",
+                price: "Incluido",
+              },
+              {
+                name: "La Herida y el Don · 19€",
+                description: "12 páginas que nombran lo que llevas años sintiendo sin poder explicarlo. Tu herida, cómo se formó, cómo se repite y el don que emerge cuando la sanas.",
+                price: "19€ · Pago único",
+              },
+              {
+                name: "Tu Mapa Interior · 39€",
+                description: "Tu carta natal completa. Sol, Luna, Saturno, Nodo Norte y todos los aspectos que definen quién eres y hacia dónde vas. Incluye La Herida y el Don.",
+                price: "39€ · Pago único",
+              },
+              {
+                name: "El Vínculo · 59€",
+                description: "Dos cartas comparadas. Por qué te enganchas a ciertas personas, qué activan en tu herida y qué pueden construir juntos.",
+                price: "59€ · Pago único",
+              },
+              {
+                name: "Kiron Vivo · 9€/mes",
+                description: "Tránsitos mensuales de Quirón. Qué se activa en ti cada mes, cuándo son tus momentos de mayor crecimiento y cómo navegarlos.",
+                price: "9€/mes · Cancela cuando quieras",
+              },
+            ].map((product) => (
+              <article key={product.name} className="insightCard">
+                <h3>{product.name}</h3>
+                <p>{product.description}</p>
+                <p className="miniLabel" style={{ marginTop: "12px", marginBottom: 0 }}>{product.price}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
       </main>
 
       <SiteFooter lang={lang} />
