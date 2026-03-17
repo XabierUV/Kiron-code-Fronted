@@ -20,6 +20,7 @@ export function PreviewSection({
   hasPremiumReport,
 }: PreviewSectionProps) {
   const t = copy[lang];
+  const hasData = chartData !== null;
 
   return (
     <section className="contentSection" id="results">
@@ -29,28 +30,26 @@ export function PreviewSection({
         <p className="sectionText">{t.results.subtitle}</p>
       </div>
 
-      <div className="resultsLayout" style={{ minWidth: 0 }}>
-        <NatalChartWheel chartData={chartData} />
+      {!hasData ? (
+        <NatalChartWheel chartData={null} />
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", minWidth: 0 }}>
+          <NatalChartWheel chartData={chartData} fullWidth />
 
-        <div className="resultsPanel" style={{ minWidth: 0 }}>
-          <p className="miniLabel">{t.results.previewTitle}</p>
+          <article className="insightCard">
+            <h3>{t.results.strengths}</h3>
+            <p>{previewData?.strengths ?? t.results.fallbackStrengths}</p>
+          </article>
 
-          <div className="insightStack">
-            <article className="insightCard">
-              <h3>{t.results.strengths}</h3>
-              <p>{previewData?.strengths ?? t.results.fallbackStrengths}</p>
-            </article>
+          <article className="insightCard">
+            <h3>{t.results.challenges}</h3>
+            <p>{previewData?.challenges ?? t.results.fallbackChallenges}</p>
+          </article>
 
-            <article className="insightCard">
-              <h3>{t.results.challenges}</h3>
-              <p>{previewData?.challenges ?? t.results.fallbackChallenges}</p>
-            </article>
-
-            <article className="insightCard">
-              <h3>{t.results.patterns}</h3>
-              <p>{previewData?.patterns ?? t.results.fallbackPatterns}</p>
-            </article>
-          </div>
+          <article className="insightCard">
+            <h3>{t.results.patterns}</h3>
+            <p>{previewData?.patterns ?? t.results.fallbackPatterns}</p>
+          </article>
 
           <button
             type="button"
@@ -58,7 +57,7 @@ export function PreviewSection({
             onClick={onPremiumClick}
             style={{
               width: "100%",
-              marginTop: "32px",
+              marginTop: "6px",
               minHeight: "64px",
               fontSize: "17px",
             }}
@@ -66,7 +65,7 @@ export function PreviewSection({
             {hasPremiumReport ? "Ver informe completo" : t.results.cta}
           </button>
         </div>
-      </div>
+      )}
     </section>
   );
 }

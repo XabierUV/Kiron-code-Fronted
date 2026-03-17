@@ -24,7 +24,7 @@ export const copy = {
       birthTime: "Hora de nacimiento",
       birthCity: "Ciudad de nacimiento",
       birthCountry: "País de nacimiento",
-      submit: "Ver mi Quirón",
+      submit: "Calcular mi Quirón",
       loading: "Generando...",
       helper:
         "Al continuar aceptas nuestra Política de Privacidad y el tratamiento de tus datos para generar tu carta natal. No compartimos tus datos con terceros.",

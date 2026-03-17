@@ -2,6 +2,7 @@ import type { ChartData, ChartPoint } from "@/types/chart";
 
 type NatalChartWheelProps = {
   chartData: ChartData | null;
+  fullWidth?: boolean;
 };
 
 const POINT_ORDER = [
@@ -114,7 +115,7 @@ function getStackedPointRadius(index: number) {
   return 180;
 }
 
-export function NatalChartWheel({ chartData }: NatalChartWheelProps) {
+export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) {
   const size = 520;
   const center = 260;
 
@@ -133,7 +134,7 @@ export function NatalChartWheel({ chartData }: NatalChartWheelProps) {
   const asc = ascendant ?? 0;
 
   return (
-    <div className="natalWheelWrap">
+    <div className="natalWheelWrap" style={fullWidth ? { maxWidth: "none" } : undefined}>
       <svg
         viewBox={`0 0 ${size} ${size}`}
         className="natalWheel"
