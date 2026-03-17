@@ -148,10 +148,7 @@ export default function Page() {
       />
 
       <main className="pageContent">
-        <HeroSection
-          lang={lang}
-          onPrimaryClick={() => scrollToId("chart")}
-        />
+        <HeroSection lang={lang} />
 
         <ChartForm
           lang={lang}
