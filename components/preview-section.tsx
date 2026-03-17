@@ -30,27 +30,25 @@ export function PreviewSection({
         <p className="sectionText">{t.results.subtitle}</p>
       </div>
 
-      {!hasData ? (
-        <NatalChartWheel chartData={null} />
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "14px", minWidth: 0 }}>
-          <NatalChartWheel chartData={chartData} fullWidth />
+      <div className="resultsPanel" style={{ minWidth: 0 }}>
+        <NatalChartWheel chartData={chartData} fullWidth={hasData} />
 
-          <article className="insightCard">
-            <h3>{t.results.strengths}</h3>
-            <p>{previewData?.strengths ?? t.results.fallbackStrengths}</p>
-          </article>
+        <article className="insightCard" style={{ marginTop: "14px" }}>
+          <h3>{t.results.strengths}</h3>
+          <p>{previewData?.strengths ?? t.results.fallbackStrengths}</p>
+        </article>
 
-          <article className="insightCard">
-            <h3>{t.results.challenges}</h3>
-            <p>{previewData?.challenges ?? t.results.fallbackChallenges}</p>
-          </article>
+        <article className="insightCard">
+          <h3>{t.results.challenges}</h3>
+          <p>{previewData?.challenges ?? t.results.fallbackChallenges}</p>
+        </article>
 
-          <article className="insightCard">
-            <h3>{t.results.patterns}</h3>
-            <p>{previewData?.patterns ?? t.results.fallbackPatterns}</p>
-          </article>
+        <article className="insightCard">
+          <h3>{t.results.patterns}</h3>
+          <p>{previewData?.patterns ?? t.results.fallbackPatterns}</p>
+        </article>
 
+        {hasData && (
           <button
             type="button"
             className="primaryButton"
@@ -64,8 +62,8 @@ export function PreviewSection({
           >
             {hasPremiumReport ? "Ver informe completo" : t.results.cta}
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </section>
   );
 }
