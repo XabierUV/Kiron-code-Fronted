@@ -11,17 +11,6 @@ type PreviewSectionProps = {
   hasPremiumReport: boolean;
 };
 
-function formatPointLine(
-  label: string,
-  sign?: string | null,
-  degree?: number | null,
-  house?: number | null
-) {
-  if (!sign || degree == null || house == null) return null;
-
-  return `${label}: ${sign} · ${degree.toFixed(2)}° · Casa ${house}`;
-}
-
 export function PreviewSection({
   lang,
   chartData,
@@ -31,21 +20,6 @@ export function PreviewSection({
   hasPremiumReport,
 }: PreviewSectionProps) {
   const t = copy[lang];
-
-  const sun = chartData?.points?.sun;
-  const moon = chartData?.points?.moon;
-  const asc = chartData?.angles?.ascendant;
-
-  const sunLine = formatPointLine("Sol", sun?.sign, sun?.degreeInSign, sun?.house);
-  const moonLine = formatPointLine("Luna", moon?.sign, moon?.degreeInSign, moon?.house);
-  const chironLine = chartData?.chiron
-    ? `Quirón: ${chartData.chiron.sign} · ${chartData.chiron.degree.toFixed(2)}° · Casa ${chartData.chiron.house}`
-    : null;
-
-  const ascLine =
-    asc?.sign && asc?.degreeInSign != null
-      ? `Ascendente: ${asc.sign} · ${asc.degreeInSign.toFixed(2)}°`
-      : null;
 
   return (
     <section className="contentSection" id="results">
@@ -60,38 +34,6 @@ export function PreviewSection({
 
         <div className="resultsPanel" style={{ minWidth: 0 }}>
           <p className="miniLabel">{t.results.previewTitle}</p>
-
-          {chartData ? (
-            <div className="resultBox">
-              <strong>{t.results.chironTitle}</strong>
-              <div>
-                {t.results.sign}: {chartData.chiron.sign}
-              </div>
-              <div>
-                {t.results.degree}: {chartData.chiron.degree.toFixed(2)}
-              </div>
-              <div>
-                {t.results.house}: {chartData.chiron.house}
-              </div>
-            </div>
-          ) : null}
-
-          {chartData ? (
-            <div className="resultBox subtle">
-              <strong>Base natal</strong>
-              {sunLine ? <div>{sunLine}</div> : null}
-              {moonLine ? <div>{moonLine}</div> : null}
-              {ascLine ? <div>{ascLine}</div> : null}
-              {chironLine ? <div>{chironLine}</div> : null}
-            </div>
-          ) : null}
-
-          {resolvedLocation ? (
-            <div className="resultBox subtle">
-              <strong>{t.results.location}</strong>
-              <div>{resolvedLocation.displayName}</div>
-            </div>
-          ) : null}
 
           <div className="insightStack">
             <article className="insightCard">

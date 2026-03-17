@@ -124,9 +124,9 @@ export function ChartForm({
           </button>
         </div>
 
-        {formMessage ? <p className="formMessage">{formMessage}</p> : null}
-
         <p className="formHelper">{t.form.helper}</p>
+
+        {formMessage ? <p className="formMessage">{formMessage}</p> : null}
       </form>
     </section>
   );

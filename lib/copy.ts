@@ -102,7 +102,7 @@ export const copy = {
       birthCountry: "Birth country",
       submit: "See my Chiron",
       loading: "Generating...",
-      helper: "By continuing you agree to our Privacy Policy and the processing of your data to generate your birth chart. We do not share your data with third parties.",
+      helper: "By continuing you accept our Privacy Policy and the processing of your data to generate your birth chart. We do not share your data with third parties.",
       placeholders: {
         name: "Your name",
         city: "e.g. Bilbao",
