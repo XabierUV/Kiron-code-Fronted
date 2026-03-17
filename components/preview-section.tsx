@@ -55,10 +55,10 @@ export function PreviewSection({
         <p className="sectionText">{t.results.subtitle}</p>
       </div>
 
-      <div className="resultsLayout">
+      <div className="resultsLayout" style={{ minWidth: 0 }}>
         <NatalChartWheel chartData={chartData} />
 
-        <div className="resultsPanel">
+        <div className="resultsPanel" style={{ minWidth: 0 }}>
           <p className="miniLabel">{t.results.previewTitle}</p>
 
           {chartData ? (
@@ -85,8 +85,6 @@ export function PreviewSection({
               {chironLine ? <div>{chironLine}</div> : null}
             </div>
           ) : null}
-
-        
 
           {resolvedLocation ? (
             <div className="resultBox subtle">
@@ -116,6 +114,12 @@ export function PreviewSection({
             type="button"
             className="primaryButton"
             onClick={onPremiumClick}
+            style={{
+              width: "100%",
+              marginTop: "32px",
+              minHeight: "64px",
+              fontSize: "17px",
+            }}
           >
             {hasPremiumReport ? "Ver informe completo" : t.results.cta}
           </button>
