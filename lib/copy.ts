@@ -164,7 +164,7 @@ export const copy = {
         "Timing matters: not everything is forced—destiny opens.",
       fallbackPatterns:
         "Recurring cycles across love, work, and major shifts.",
-      cta: "I want my full report · €19",
+      cta: "The Wound and the Gift · €19",
       location: "Resolved location",
     },
     premium: {

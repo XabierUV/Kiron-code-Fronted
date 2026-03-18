@@ -87,7 +87,7 @@ export function PreviewSection({
               fontSize: "17px",
             }}
           >
-            {hasPremiumReport ? "Ver informe completo" : "La Herida y el Don · 19€"}
+            {hasPremiumReport ? "Ver informe completo" : t.results.cta}
           </button>
         </div>
       )}
