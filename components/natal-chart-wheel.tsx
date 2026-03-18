@@ -240,7 +240,7 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
                 dominantBaseline="middle"
                 className="angleLabel"
               >
-                ASC
+                AC
               </text>
             </g>
           );
@@ -275,7 +275,7 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
           );
         })() : null}
 
-        {/* Planets – converted from ecliptic longitude to SVG angle */}
+        {/* Planets – Unicode symbols, no dot */}
         {points.map((point, index) => {
           const pointRadius = getStackedPointRadius(index);
           const pos = polarToCartesian(
@@ -284,19 +284,22 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
             pointRadius,
             lonToAngle(point.longitude ?? 0, asc)
           );
+          const isChiron = point.key === "chiron";
 
           return (
-            <g key={point.key}>
-              <circle cx={pos.x} cy={pos.y} r={7} className="pointDot" />
-              <text
-                x={pos.x}
-                y={roundCoord(pos.y - 14)}
-                textAnchor="middle"
-                className="pointLabel"
-              >
-                {getPointLabel(point)}
-              </text>
-            </g>
+            <text
+              key={point.key}
+              x={pos.x}
+              y={pos.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              style={{
+                fill: isChiron ? "#C9A96E" : "rgba(255,255,255,0.9)",
+                fontSize: "14px",
+              }}
+            >
+              {getPointLabel(point)}
+            </text>
           );
         })}
 
