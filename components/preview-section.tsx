@@ -51,7 +51,7 @@ export function PreviewSection({
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "14px", minWidth: 0 }}>
-          <NatalChartWheel chartData={chartData} fullWidth />
+          <NatalChartWheel chartData={chartData} fullWidth lang={lang} />
 
           <div style={{ padding: "16px 0 8px" }}>
             <p style={{ margin: "0 0 6px", color: "var(--text)", fontSize: "13px", fontWeight: "700", letterSpacing: "0.18em", textTransform: "uppercase" }}>{t.results.sectionLabel}</p>

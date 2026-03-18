@@ -73,6 +73,38 @@ export const copy = {
       checkoutMeta: "Pago único · Sin suscripción · Acceso inmediato",
       alert: "Solo frontend por ahora.",
     },
+    products: {
+      sectionLabel: "PRODUCTOS",
+      title: "Elige tu camino.",
+      subtitle: "Cada producto revela una capa más profunda de tu mapa.",
+      items: [
+        {
+          name: "Tu Quirón",
+          description: "Calculamos tu Quirón con precisión astronómica real. Signo, casa, grado. Tu rueda natal completa. El punto de partida de todo.",
+          price: "INCLUIDO",
+        },
+        {
+          name: "La Herida y el Don · 19€",
+          description: "12 páginas que nombran lo que llevas años sintiendo sin poder explicarlo. Tu herida, cómo se formó, cómo se repite y el don que emerge cuando la sanas.",
+          price: "19€ · PAGO ÚNICO",
+        },
+        {
+          name: "Tu Mapa Interior · 39€",
+          description: "Tu carta natal completa. Sol, Luna, Saturno, Nodo Norte y todos los aspectos que definen quién eres y hacia dónde vas. Incluye La Herida y el Don.",
+          price: "39€ · PAGO ÚNICO",
+        },
+        {
+          name: "El Vínculo · 59€",
+          description: "Dos cartas comparadas. Por qué te enganchas a ciertas personas, qué activan en tu herida y qué pueden construir juntos.",
+          price: "59€ · PAGO ÚNICO",
+        },
+        {
+          name: "Kiron Vivo · 9€/mes",
+          description: "Tránsitos mensuales de Quirón. Qué se activa en ti cada mes, cuándo son tus momentos de mayor crecimiento y cómo navegarlos.",
+          price: "9€/MES · CANCELA CUANDO QUIERAS",
+        },
+      ],
+    },
     footer: {
       text: "Tu destino, explicado con claridad.",
       rights: `© ${new Date().getFullYear()} Kiron Code. Todos los derechos reservados.`,
@@ -117,7 +149,7 @@ export const copy = {
     results: {
       sectionLabel: "PREVIEW OF THE WOUND AND THE GIFT",
       title: "This is just the beginning.",
-      subtitle: "Turn your wound into your engine.",
+      subtitle: "Turn your Wound into your Gift.",
       previewTitle: "Preview",
       chironTitle: "Your Chiron",
       sign: "Sign",
@@ -152,6 +184,38 @@ export const copy = {
       checkoutTitle: "The Wound and the Gift",
       checkoutMeta: "One-time payment · No subscription · Instant access",
       alert: "Frontend only for now.",
+    },
+    products: {
+      sectionLabel: "PRODUCTS",
+      title: "Choose your path.",
+      subtitle: "Each product reveals a deeper layer of your map.",
+      items: [
+        {
+          name: "Your Chiron",
+          description: "We calculate your Chiron with real astronomical precision. Sign, house, degree. Your full natal wheel. The starting point of everything.",
+          price: "INCLUDED",
+        },
+        {
+          name: "The Wound and the Gift · €19",
+          description: "12 pages that name what you've been feeling for years without being able to explain it. Your wound, how it formed, how it repeats and the gift that emerges when you heal it.",
+          price: "€19 · ONE-TIME PAYMENT",
+        },
+        {
+          name: "Your Inner Map · €39",
+          description: "Your complete natal chart. Sun, Moon, Saturn, North Node and all the aspects that define who you are and where you're going. Includes The Wound and the Gift.",
+          price: "€39 · ONE-TIME PAYMENT",
+        },
+        {
+          name: "The Bond · €59",
+          description: "Two charts compared. Why you get attached to certain people, what they activate in your wound and what you can build together.",
+          price: "€59 · ONE-TIME PAYMENT",
+        },
+        {
+          name: "Chiron Alive · €9/mo",
+          description: "Monthly Chiron transits. What activates in you each month, when your moments of greatest growth are and how to navigate them.",
+          price: "€9/MO · CANCEL ANYTIME",
+        },
+      ],
     },
     footer: {
       text: "Your destiny, clearly explained.",

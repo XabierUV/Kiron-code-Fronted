@@ -1,8 +1,9 @@
-import type { ChartData, ChartPoint } from "@/types/chart";
+import type { ChartData, ChartPoint, Lang } from "@/types/chart";
 
 type NatalChartWheelProps = {
   chartData: ChartData | null;
   fullWidth?: boolean;
+  lang?: Lang;
 };
 
 const POINT_ORDER = [
@@ -115,7 +116,7 @@ function getStackedPointRadius(index: number) {
   return 180;
 }
 
-export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) {
+export function NatalChartWheel({ chartData, fullWidth, lang = "es" }: NatalChartWheelProps) {
   const size = 520;
   const center = 260;
 
@@ -240,7 +241,7 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
                 dominantBaseline="middle"
                 className="angleLabel"
               >
-                AC
+                ASC
               </text>
             </g>
           );
@@ -333,7 +334,7 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
                 dominantBaseline="middle"
                 style={{ fill: "#C9A96E", fontSize: "13px", fontWeight: "600", letterSpacing: "3px", textTransform: "uppercase" }}
               >
-                Quirón revelado
+                {lang === "en" ? "Chiron revealed" : "Quirón revelado"}
               </text>
             </g>
           );
