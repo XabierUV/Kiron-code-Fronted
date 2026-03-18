@@ -71,6 +71,7 @@ export function PreviewSection({
           </article>
 
           <button
+            id="cta-herida-don"
             type="button"
             className="primaryButton"
             onClick={onPremiumClick}
@@ -81,7 +82,7 @@ export function PreviewSection({
               fontSize: "17px",
             }}
           >
-            {hasPremiumReport ? "Ver informe completo" : t.results.cta}
+            {hasPremiumReport ? "Ver informe completo" : "La Herida y el Don · 19€"}
           </button>
         </div>
       )}

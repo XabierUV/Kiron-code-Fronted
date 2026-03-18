@@ -21,18 +21,18 @@ const POINT_ORDER = [
 ];
 
 const POINT_LABELS: Record<string, string> = {
-  sun: "Sun",
-  moon: "Moon",
-  mercury: "Mer",
-  venus: "Ven",
-  mars: "Mars",
-  jupiter: "Jup",
-  saturn: "Sat",
-  uranus: "Ura",
-  neptune: "Nep",
-  pluto: "Plu",
-  chiron: "Chi",
-  mean_node: "Node",
+  sun: "☉",
+  moon: "☽",
+  mercury: "☿",
+  venus: "♀",
+  mars: "♂",
+  jupiter: "♃",
+  saturn: "♄",
+  uranus: "♅",
+  neptune: "♆",
+  pluto: "♇",
+  chiron: "⚷",
+  mean_node: "☊",
 };
 
 function roundCoord(value: number, decimals = 3) {
@@ -301,6 +301,22 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
         })}
 
         <circle cx={center} cy={center} r={18} className="wheelCore" />
+
+        {fullWidth && (
+          <text
+            x={center}
+            y={size - 14}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            style={{ fill: "rgba(255,255,255,0.7)", fontSize: "13px", letterSpacing: "0.12em", cursor: "pointer", textTransform: "uppercase" }}
+            onClick={() => {
+              const el = document.getElementById("cta-herida-don");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+          >
+            Quirón revelado
+          </text>
+        )}
       </svg>
     </div>
   );
