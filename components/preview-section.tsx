@@ -55,6 +55,11 @@ export function PreviewSection({
         <div style={{ display: "flex", flexDirection: "column", gap: "14px", minWidth: 0 }}>
           <NatalChartWheel chartData={chartData} fullWidth />
 
+          <div style={{ padding: "16px 0 8px" }}>
+            <p className="sectionLabel">{t.results.sectionLabel}</p>
+            <p className="sectionText">{t.results.subtitle}</p>
+          </div>
+
           <article className="insightCard">
             <h3>{t.results.strengths}</h3>
             <p>{previewData?.strengths ?? t.results.fallbackStrengths}</p>
