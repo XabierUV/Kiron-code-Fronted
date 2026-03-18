@@ -52,7 +52,7 @@ export const copy = {
       fallbackStrengths: "Tu mayor fortaleza está donde menos la esperas.",
       fallbackChallenges: "El patrón que te frena tiene nombre.",
       fallbackPatterns: "Se repite. Siempre. Hasta que lo ves.",
-      cta: "Quiero mi informe completo · 19€",
+      cta: "La Herida y el Don · 19€",
       location: "Ubicación resuelta",
     },
     premium: {
