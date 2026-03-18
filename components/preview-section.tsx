@@ -26,7 +26,6 @@ export function PreviewSection({
     <section className="contentSection" id="results">
       <div className="sectionIntro">
         <h2 className="sectionTitle">{t.results.title}</h2>
-        <p className="sectionText" style={{ fontSize: "32px", opacity: 0.6, marginTop: "18px" }}>→</p>
       </div>
 
       {!hasData ? (
@@ -55,7 +54,7 @@ export function PreviewSection({
           <NatalChartWheel chartData={chartData} fullWidth />
 
           <div style={{ padding: "16px 0 8px" }}>
-            <p className="sectionLabel" style={{ color: "var(--text)" }}>{t.results.sectionLabel}</p>
+            <p style={{ margin: "0 0 6px", color: "var(--text)", fontSize: "13px", fontWeight: "700", letterSpacing: "0.18em", textTransform: "uppercase" }}>{t.results.sectionLabel}</p>
             <p style={{ margin: 0, color: "#C9A96E", fontSize: "14px", lineHeight: 1.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {t.results.subtitle}
             </p>

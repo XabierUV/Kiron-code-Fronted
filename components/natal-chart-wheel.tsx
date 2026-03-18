@@ -295,7 +295,7 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
               dominantBaseline="middle"
               style={{
                 fill: isChiron ? "#C9A96E" : "rgba(255,255,255,0.9)",
-                fontSize: "14px",
+                fontSize: isChiron ? "17px" : "14px",
               }}
             >
               {getPointLabel(point)}
@@ -305,21 +305,39 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
 
         <circle cx={center} cy={center} r={18} className="wheelCore" />
 
-        {fullWidth && (
-          <text
-            x={center}
-            y={size - 14}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            style={{ fill: "#C9A96E", fontSize: "16px", fontWeight: "bold", letterSpacing: "0.14em", cursor: "pointer", textTransform: "uppercase" }}
-            onClick={() => {
-              const el = document.getElementById("cta-herida-don");
-              if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-            }}
-          >
-            Quirón revelado
-          </text>
-        )}
+        {fullWidth && (() => {
+          const btnY = size - 20;
+          const btnW = 210;
+          const btnH = 28;
+          const handleClick = () => {
+            const el = document.getElementById("cta-herida-don");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          };
+          return (
+            <g onClick={handleClick} style={{ cursor: "pointer" }}>
+              <rect
+                x={center - btnW / 2}
+                y={btnY - btnH / 2}
+                width={btnW}
+                height={btnH}
+                rx={4}
+                ry={4}
+                fill="rgba(201,169,110,0.06)"
+                stroke="#C9A96E"
+                strokeWidth={1}
+              />
+              <text
+                x={center}
+                y={btnY}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                style={{ fill: "#C9A96E", fontSize: "13px", fontWeight: "600", letterSpacing: "3px", textTransform: "uppercase" }}
+              >
+                Quirón revelado
+              </text>
+            </g>
+          );
+        })()}
       </svg>
     </div>
   );
