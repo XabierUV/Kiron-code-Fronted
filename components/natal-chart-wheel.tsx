@@ -311,7 +311,7 @@ export function NatalChartWheel({ chartData, fullWidth }: NatalChartWheelProps) 
             y={size - 14}
             textAnchor="middle"
             dominantBaseline="middle"
-            style={{ fill: "rgba(255,255,255,0.7)", fontSize: "13px", letterSpacing: "0.12em", cursor: "pointer", textTransform: "uppercase" }}
+            style={{ fill: "#C9A96E", fontSize: "16px", fontWeight: "bold", letterSpacing: "0.14em", cursor: "pointer", textTransform: "uppercase" }}
             onClick={() => {
               const el = document.getElementById("cta-herida-don");
               if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
