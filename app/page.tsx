@@ -7,6 +7,7 @@ import { ChartForm } from "@/components/chart-form";
 import { PreviewSection } from "@/components/preview-section";
 import { SiteFooter } from "@/components/site-footer";
 import { ConsentModal, type ConsentData } from "@/components/consent-modal";
+import { VinculoConfigModal, type VinculoData } from "@/components/vinculo-config-modal";
 import { copy } from "@/lib/copy";
 import { createCheckout, fetchChart } from "@/lib/api";
 import type {
@@ -94,6 +95,8 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [pendingProductType, setPendingProductType] = useState<"CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION" | null>(null);
+  const [vinculoStep, setVinculoStep] = useState(false);
+  const [vinculoData, setVinculoData] = useState<VinculoData | null>(null);
   const [formMessage, setFormMessage] = useState("");
 
   const [resolvedLocation, setResolvedLocation] = useState<LocationData | null>(null);
@@ -175,12 +178,21 @@ export default function Page() {
 
       setCheckoutLoading(true);
 
+      const vd = vinculoData;
       const checkout = await createCheckout({
         chartId,
         reportId,
         productType,
         deliveryEmail: consentData?.deliveryEmail,
         marketingConsent: consentData?.marketingConsent,
+        ...(vd && {
+          vinculoRelationship: vd.relationship,
+          vinculoPersonBId: vd.personBId,
+          vinculoPerson2Name: vd.person2Name,
+          vinculoPerson2BirthDate: vd.person2BirthDate,
+          vinculoPerson2BirthTime: vd.person2BirthTime,
+          vinculoPerson2BirthCity: vd.person2BirthCity,
+        }),
       });
 
       console.log("checkout response", checkout);
@@ -317,7 +329,10 @@ export default function Page() {
                   type="button"
                   className="primaryButton"
                   disabled={checkoutLoading}
-                  onClick={() => setPendingProductType(product.productType)}
+                  onClick={() => {
+                    setPendingProductType(product.productType);
+                    if (product.productType === "COMPATIBILITY") setVinculoStep(true);
+                  }}
                   style={{ width: "100%" }}
                 >
                   {checkoutLoading ? (lang === "en" ? "Redirecting..." : "Redirigiendo...") : product.btnLabel}
@@ -350,15 +365,27 @@ export default function Page() {
 
       <SiteFooter lang={lang} />
 
-      {pendingProductType && (
+      {pendingProductType === "COMPATIBILITY" && vinculoStep && (
+        <VinculoConfigModal
+          lang={lang}
+          onConfirm={(vd) => {
+            setVinculoData(vd);
+            setVinculoStep(false);
+          }}
+          onCancel={() => { setPendingProductType(null); setVinculoStep(false); setVinculoData(null); }}
+        />
+      )}
+
+      {pendingProductType && !vinculoStep && (
         <ConsentModal
           lang={lang}
           onConfirm={(data) => {
             const pt = pendingProductType;
             setPendingProductType(null);
+            setVinculoData(null);
             handleCheckout(pt, data);
           }}
-          onCancel={() => setPendingProductType(null)}
+          onCancel={() => { setPendingProductType(null); setVinculoData(null); }}
         />
       )}
     </div>

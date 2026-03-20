@@ -8,6 +8,7 @@ import {
   createCheckout,
 } from "@/lib/api";
 import { ConsentModal, type ConsentData } from "@/components/consent-modal";
+import { VinculoConfigModal, type VinculoData } from "@/components/vinculo-config-modal";
 import type { Lang, PremiumReport } from "@/types/chart";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -44,6 +45,8 @@ export default function SuccessPage() {
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const [upsellLoading, setUpsellLoading] = useState(false);
   const [showUpsellModal, setShowUpsellModal] = useState(false);
+  const [upsellVinculoStep, setUpsellVinculoStep] = useState(false);
+  const [upsellVinculoData, setUpsellVinculoData] = useState<VinculoData | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -123,6 +126,7 @@ export default function SuccessPage() {
   async function handleUpsell(consentData?: ConsentData) {
     if (!upsell || !data) return;
     setUpsellLoading(true);
+    const vd = upsellVinculoData;
     try {
       const checkout = await createCheckout({
         chartId: data.report.chartId,
@@ -130,6 +134,14 @@ export default function SuccessPage() {
         productType: upsell.productType,
         deliveryEmail: consentData?.deliveryEmail,
         marketingConsent: consentData?.marketingConsent,
+        ...(vd && {
+          vinculoRelationship: vd.relationship,
+          vinculoPersonBId: vd.personBId,
+          vinculoPerson2Name: vd.person2Name,
+          vinculoPerson2BirthDate: vd.person2BirthDate,
+          vinculoPerson2BirthTime: vd.person2BirthTime,
+          vinculoPerson2BirthCity: vd.person2BirthCity,
+        }),
       });
       if (checkout.checkoutUrl) window.location.href = checkout.checkoutUrl;
     } catch (err) {
@@ -243,7 +255,13 @@ export default function SuccessPage() {
                       className="primaryButton"
                       style={{ width: "100%", minHeight: "64px", fontSize: "17px" }}
                       disabled={upsellLoading}
-                      onClick={() => setShowUpsellModal(true)}
+                      onClick={() => {
+                        if (upsell?.productType === "COMPATIBILITY") {
+                          setUpsellVinculoStep(true);
+                        } else {
+                          setShowUpsellModal(true);
+                        }
+                      }}
                     >
                       {upsellLoading
                         ? (lang === "en" ? "Redirecting..." : "Redirigiendo...")
@@ -260,6 +278,14 @@ export default function SuccessPage() {
 
       <SiteFooter lang={lang} />
 
+      {upsellVinculoStep && (
+        <VinculoConfigModal
+          lang={lang}
+          onConfirm={(vd) => { setUpsellVinculoData(vd); setUpsellVinculoStep(false); setShowUpsellModal(true); }}
+          onCancel={() => { setUpsellVinculoStep(false); setUpsellVinculoData(null); }}
+        />
+      )}
+
       {showUpsellModal && (
         <ConsentModal
           lang={lang}
@@ -267,7 +293,7 @@ export default function SuccessPage() {
             setShowUpsellModal(false);
             handleUpsell(data);
           }}
-          onCancel={() => setShowUpsellModal(false)}
+          onCancel={() => { setShowUpsellModal(false); setUpsellVinculoData(null); }}
         />
       )}
     </div>

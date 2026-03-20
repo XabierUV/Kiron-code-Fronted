@@ -46,6 +46,12 @@ export async function createCheckout(payload: {
   productType: "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION";
   deliveryEmail?: string;
   marketingConsent?: boolean;
+  vinculoRelationship?: string;
+  vinculoPersonBId?: string;
+  vinculoPerson2Name?: string;
+  vinculoPerson2BirthDate?: string;
+  vinculoPerson2BirthTime?: string;
+  vinculoPerson2BirthCity?: string;
 }): Promise<{ ok: boolean; checkoutUrl?: string; sessionId?: string; error?: string }> {
   console.log("[createCheckout] API_BASE:", API_BASE);
   const response = await fetch(`${API_BASE}/checkout`, {

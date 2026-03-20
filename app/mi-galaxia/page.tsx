@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { sendMagicLink, fetchCustomerPortal, createCheckout } from "@/lib/api";
 import type { Lang } from "@/types/chart";
 import { ConsentModal, type ConsentData } from "@/components/consent-modal";
+import { VinculoConfigModal, type VinculoData } from "@/components/vinculo-config-modal";
 
 type PurchasedProduct = {
   productType: string;
@@ -61,6 +62,8 @@ export default function MiCartaPage() {
   const [portalError, setPortalError] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [pendingPortalCheckout, setPendingPortalCheckout] = useState<{ productType: string; chartId: string; reportId: string } | null>(null);
+  const [vinculoStep, setVinculoStep] = useState(false);
+  const [vinculoData, setVinculoData] = useState<VinculoData | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -106,12 +109,21 @@ export default function MiCartaPage() {
   async function handlePortalCheckout(productType: string, chartId: string, reportId: string, consentData?: ConsentData) {
     setCheckoutLoading(productType);
     try {
+      const vd = vinculoData;
       const checkout = await createCheckout({
         chartId,
         reportId,
         productType: productType as "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION",
         deliveryEmail: consentData?.deliveryEmail,
         marketingConsent: consentData?.marketingConsent,
+        ...(vd && {
+          vinculoRelationship: vd.relationship,
+          vinculoPersonBId: vd.personBId,
+          vinculoPerson2Name: vd.person2Name,
+          vinculoPerson2BirthDate: vd.person2BirthDate,
+          vinculoPerson2BirthTime: vd.person2BirthTime,
+          vinculoPerson2BirthCity: vd.person2BirthCity,
+        }),
       });
       if (checkout.checkoutUrl) {
         window.location.href = checkout.checkoutUrl;
@@ -303,7 +315,10 @@ export default function MiCartaPage() {
                               type="button"
                               className="primaryButton"
                               disabled={checkoutLoading === item.key}
-                              onClick={() => setPendingPortalCheckout({ productType: item.key, chartId: portalData.chartId, reportId: portalData.reportId })}
+                              onClick={() => {
+                                setPendingPortalCheckout({ productType: item.key, chartId: portalData.chartId, reportId: portalData.reportId });
+                                if (item.key === "COMPATIBILITY") setVinculoStep(true);
+                              }}
                             >
                               {checkoutLoading === item.key ? "Redirigiendo..." : `${item.name} · ${item.price}`}
                             </button>
@@ -321,15 +336,24 @@ export default function MiCartaPage() {
 
       <SiteFooter lang={lang} />
 
-      {pendingPortalCheckout && (
+      {pendingPortalCheckout?.productType === "COMPATIBILITY" && vinculoStep && (
+        <VinculoConfigModal
+          lang={lang}
+          onConfirm={(vd) => { setVinculoData(vd); setVinculoStep(false); }}
+          onCancel={() => { setPendingPortalCheckout(null); setVinculoStep(false); setVinculoData(null); }}
+        />
+      )}
+
+      {pendingPortalCheckout && !vinculoStep && (
         <ConsentModal
           lang={lang}
           onConfirm={(data) => {
             const args = pendingPortalCheckout;
             setPendingPortalCheckout(null);
+            setVinculoData(null);
             handlePortalCheckout(args.productType, args.chartId, args.reportId, data);
           }}
-          onCancel={() => setPendingPortalCheckout(null)}
+          onCancel={() => { setPendingPortalCheckout(null); setVinculoData(null); }}
         />
       )}
     </div>
