@@ -127,22 +127,22 @@ export default function SuccessPage() {
                     </div>
 
                     <article className="insightCard">
-                      <p style={{ margin: 0 }}>
-                        En los próximos minutos recibirás tu informe en el email que proporcionaste durante el pago.
-                      </p>
-                    </article>
-
-                    <p style={{ margin: "12px 0 0", color: "var(--text-faint)", fontSize: "13px", lineHeight: 1.6 }}>
                       {lang === "en" ? (
-                        <>If you leave this page, you&apos;ll find your report in{" "}
-                          <Link href="/mi-carta" style={{ color: "var(--text-soft)", textDecoration: "underline" }}>MY CHART</Link>{" "}
-                          using your email.</>
+                        <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
+                          You will receive your report in the email you provided during payment within the next few minutes.<br /><br />
+                          If you leave this page, you&apos;ll find your report in{" "}
+                          <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MY CHART</Link>{" "}
+                          using your email.
+                        </p>
                       ) : (
-                        <>Si sales de esta página, encontrarás tu informe en{" "}
-                          <Link href="/mi-carta" style={{ color: "var(--text-soft)", textDecoration: "underline" }}>MI CARTA</Link>{" "}
-                          usando tu email.</>
+                        <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
+                          En los próximos minutos recibirás tu informe en el email que proporcionaste durante el pago.<br /><br />
+                          Si sales de esta página, encontrarás tu informe en{" "}
+                          <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MI CARTA</Link>{" "}
+                          usando tu email.
+                        </p>
                       )}
-                    </p>
+                    </article>
 
                     <p style={{ marginTop: "8px" }}>
                       <Link href="/" className="secondaryButton" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
