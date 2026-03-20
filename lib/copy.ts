@@ -59,7 +59,7 @@ export const copy = {
       sectionLabel: "Informe Quirón",
       title: "El informe que nadie más va a leer.",
       subtitle:
-        "12 páginas. Tu herida. Tu patrón. Tu don. Escrito para ti.",
+        "18 páginas. Tu herida. Tu patrón. Tu don. Escrito para ti.",
       features: [
         "La herida que llevas cargando desde la infancia",
         "Por qué se repite en tus relaciones y trabajo",
@@ -85,7 +85,7 @@ export const copy = {
         },
         {
           name: "La Herida y el Don · 19€",
-          description: "12 páginas que nombran lo que llevas años sintiendo sin poder explicarlo. Tu herida, cómo se formó, cómo se repite y el don que emerge cuando la sanas.",
+          description: "18 páginas que nombran lo que llevas años sintiendo sin poder explicarlo. Tu herida, cómo se formó, cómo se repite y el don que emerge cuando la sanas.",
           price: "19€ · PAGO ÚNICO",
         },
         {
@@ -171,7 +171,7 @@ export const copy = {
       sectionLabel: "Chiron Report",
       title: "The report no one else will ever read.",
       subtitle:
-        "12 pages. Your wound. Your pattern. Your gift. Written for you.",
+        "18 pages. Your wound. Your pattern. Your gift. Written for you.",
       features: [
         "The wound you've been carrying since childhood",
         "Why it keeps repeating in your relationships and work",
@@ -197,7 +197,7 @@ export const copy = {
         },
         {
           name: "The Wound and the Gift · €19",
-          description: "12 pages that name what you've been feeling for years without being able to explain it. Your wound, how it formed, how it repeats and the gift that emerges when you heal it.",
+          description: "18 pages that name what you've been feeling for years without being able to explain it. Your wound, how it formed, how it repeats and the gift that emerges when you heal it.",
           price: "€19 · ONE-TIME PAYMENT",
         },
         {
