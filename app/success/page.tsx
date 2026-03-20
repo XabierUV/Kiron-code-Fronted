@@ -10,6 +10,8 @@ import type { Lang, PremiumReport } from "@/types/chart";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
+const COUNTDOWN_SECONDS = 10 * 60;
+
 type UnlockedReportState = {
   report: {
     id: string;
@@ -24,12 +26,19 @@ type UnlockedReportState = {
   };
 };
 
+function formatTime(seconds: number) {
+  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
 export default function SuccessPage() {
   const [lang, setLang] = useState<Lang>("es");
   const [scrolled, setScrolled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState<UnlockedReportState | null>(null);
+  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -66,6 +75,16 @@ export default function SuccessPage() {
     loadReport();
   }, []);
 
+  // Countdown — only ticks while PDF is not yet available
+  useEffect(() => {
+    if (data?.report?.pdfUrl) return;
+    if (countdown <= 0) return;
+    const id = setInterval(() => setCountdown((c) => c - 1), 1000);
+    return () => clearInterval(id);
+  }, [data?.report?.pdfUrl, countdown]);
+
+  const hasPdf = Boolean(data?.report?.pdfUrl);
+
   return (
     <div className="pageShell" id="top">
       <SiteHeader
@@ -76,71 +95,98 @@ export default function SuccessPage() {
       />
 
       <main className="pageContent">
-      <section className="contentSection">
-        <div className="sectionIntro">
-          <p className="sectionLabel">Pago completado</p>
-          <h1 className="sectionTitle">Tu informe está listo.</h1>
-          <p className="sectionText">
-            Aquí tienes tu informe premium desbloqueado.
-          </p>
-          <p className="sectionText" style={{ marginTop: "14px" }}>
-            En los próximos 10 minutos recibirás tu informe en el email que proporcionaste durante el pago.
-          </p>
-          <p style={{ marginTop: "24px" }}>
-            <Link href="/" style={{ textDecoration: "underline", color: "var(--text-soft)" }}>
-              Volver al inicio
-            </Link>
-          </p>
-        </div>
+        <section className="contentSection">
 
-        <div className="resultsPanel">
-          {loading ? (
-            <article className="insightCard">
-              <h3>Cargando informe...</h3>
-              <p>Estamos validando el pago y recuperando tu contenido premium.</p>
-            </article>
-          ) : null}
-
-          {error ? (
-            <article className="insightCard">
-              <h3>No se pudo cargar el informe</h3>
-              <p>{error}</p>
-            </article>
-          ) : null}
-
-          {data?.report?.pdfUrl ? (
-            <article className="insightCard">
-              <h3>Tu informe en PDF</h3>
-              <p>Descárgalo ahora y tenlo siempre disponible.</p>
-              <a
-                href={data.report.pdfUrl}
-                target="_blank"
-                rel="noreferrer"
-                download="kiron-report.pdf"
-                style={{ textDecoration: "underline", marginTop: "12px", display: "inline-block" }}
-              >
-                Abrir PDF
-              </a>
-            </article>
-          ) : null}
-
-          {data?.report?.reportJson ? (
+          {/* ── ESTADO 1: informe en generación ── */}
+          {!hasPdf && (
             <>
-              {data.report.reportJson.sections.map((section, index) => (
-                <article key={index} className="insightCard" style={{ paddingTop: "28px", paddingBottom: "28px" }}>
-                  <h3 style={{ fontSize: "20px", marginBottom: "12px" }}>{section.title}</h3>
-                  <p style={{ lineHeight: "1.8" }}>{section.text}</p>
-                </article>
-              ))}
-              <div style={{ marginTop: "40px" }}>
-                <button type="button" className="primaryButton">
-                  Descubrir Tu Mapa Interior · 39€
-                </button>
+              <div className="sectionIntro">
+                <p className="sectionLabel">Pago completado</p>
+                <h1 className="sectionTitle">Generando tu informe.</h1>
+                <p className="sectionText">
+                  En los próximos 10 minutos recibirás tu informe en el email que proporcionaste durante el pago.
+                </p>
+                <p style={{ marginTop: "24px" }}>
+                  <Link href="/" style={{ textDecoration: "underline", color: "var(--text-soft)" }}>
+                    Volver al inicio
+                  </Link>
+                </p>
+              </div>
+
+              <div className="resultsPanel">
+                {loading ? (
+                  <article className="insightCard">
+                    <h3>Validando pago...</h3>
+                    <p>Estamos verificando tu pago y preparando tu informe.</p>
+                  </article>
+                ) : error ? (
+                  <article className="insightCard">
+                    <h3>No se pudo cargar el informe</h3>
+                    <p>{error}</p>
+                  </article>
+                ) : (
+                  <article className="insightCard">
+                    <h3>Tu informe está en camino</h3>
+                    <p>Lo recibirás en tu email en menos de 10 minutos.</p>
+                    <p style={{
+                      marginTop: "20px",
+                      fontSize: "42px",
+                      fontWeight: "700",
+                      letterSpacing: "-0.04em",
+                      color: "var(--text)",
+                      lineHeight: 1,
+                    }}>
+                      {formatTime(countdown)}
+                    </p>
+                  </article>
+                )}
               </div>
             </>
-          ) : null}
-        </div>
-      </section>
+          )}
+
+          {/* ── ESTADO 2: PDF disponible ── */}
+          {hasPdf && (
+            <>
+              <div className="sectionIntro">
+                <p className="sectionLabel">Pago completado</p>
+                <h1 className="sectionTitle">Tu informe está listo.</h1>
+                <p className="sectionText">
+                  Aquí tienes tu informe premium desbloqueado.
+                </p>
+              </div>
+
+              <div className="resultsPanel">
+                <article className="insightCard">
+                  <h3>Tu informe en PDF</h3>
+                  <p>Descárgalo ahora y tenlo siempre disponible.</p>
+                  <a
+                    href={data!.report.pdfUrl!}
+                    target="_blank"
+                    rel="noreferrer"
+                    download="kiron-report.pdf"
+                    style={{ textDecoration: "underline", marginTop: "12px", display: "inline-block" }}
+                  >
+                    Abrir PDF
+                  </a>
+                </article>
+
+                {data?.report?.reportJson?.sections.map((section, index) => (
+                  <article key={index} className="insightCard" style={{ paddingTop: "28px", paddingBottom: "28px" }}>
+                    <h3 style={{ fontSize: "20px", marginBottom: "12px" }}>{section.title}</h3>
+                    <p style={{ lineHeight: "1.8" }}>{section.text}</p>
+                  </article>
+                ))}
+
+                <div style={{ marginTop: "8px" }}>
+                  <button type="button" className="primaryButton" style={{ width: "100%", minHeight: "64px", fontSize: "17px" }}>
+                    Descubrir Tu Mapa Interior · 39€
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+        </section>
       </main>
 
       <SiteFooter lang={lang} />
