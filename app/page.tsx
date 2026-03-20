@@ -6,6 +6,7 @@ import { HeroSection } from "@/components/hero-section";
 import { ChartForm } from "@/components/chart-form";
 import { PreviewSection } from "@/components/preview-section";
 import { SiteFooter } from "@/components/site-footer";
+import { ConsentModal } from "@/components/consent-modal";
 import { copy } from "@/lib/copy";
 import { createCheckout, fetchChart } from "@/lib/api";
 import type {
@@ -92,6 +93,7 @@ export default function Page() {
 
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [pendingProductType, setPendingProductType] = useState<"CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION" | null>(null);
   const [formMessage, setFormMessage] = useState("");
 
   const [resolvedLocation, setResolvedLocation] = useState<LocationData | null>(null);
@@ -235,7 +237,7 @@ export default function Page() {
           resolvedLocation={resolvedLocation}
           hasPremiumReport={Boolean(premiumReport)}
           onPremiumClick={() =>
-            premiumReport ? scrollToId("full-report") : handleCheckout("CHIRON")
+            premiumReport ? scrollToId("full-report") : setPendingProductType("CHIRON")
           }
         />
 
@@ -312,7 +314,7 @@ export default function Page() {
                   type="button"
                   className="primaryButton"
                   disabled={checkoutLoading}
-                  onClick={() => handleCheckout(product.productType)}
+                  onClick={() => setPendingProductType(product.productType)}
                   style={{ width: "100%" }}
                 >
                   {checkoutLoading ? (lang === "en" ? "Redirecting..." : "Redirigiendo...") : product.btnLabel}
@@ -344,6 +346,18 @@ export default function Page() {
       </main>
 
       <SiteFooter lang={lang} />
+
+      {pendingProductType && (
+        <ConsentModal
+          lang={lang}
+          onConfirm={() => {
+            const pt = pendingProductType;
+            setPendingProductType(null);
+            handleCheckout(pt);
+          }}
+          onCancel={() => setPendingProductType(null)}
+        />
+      )}
     </div>
   );
 }

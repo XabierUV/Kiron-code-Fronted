@@ -7,6 +7,7 @@ import {
   verifyCheckoutSession,
   createCheckout,
 } from "@/lib/api";
+import { ConsentModal } from "@/components/consent-modal";
 import type { Lang, PremiumReport } from "@/types/chart";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -42,6 +43,7 @@ export default function SuccessPage() {
   const [data, setData] = useState<UnlockedReportState | null>(null);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const [upsellLoading, setUpsellLoading] = useState(false);
+  const [showUpsellModal, setShowUpsellModal] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -239,7 +241,7 @@ export default function SuccessPage() {
                       className="primaryButton"
                       style={{ width: "100%", minHeight: "64px", fontSize: "17px" }}
                       disabled={upsellLoading}
-                      onClick={handleUpsell}
+                      onClick={() => setShowUpsellModal(true)}
                     >
                       {upsellLoading
                         ? (lang === "en" ? "Redirecting..." : "Redirigiendo...")
@@ -255,6 +257,17 @@ export default function SuccessPage() {
       </main>
 
       <SiteFooter lang={lang} />
+
+      {showUpsellModal && (
+        <ConsentModal
+          lang={lang}
+          onConfirm={() => {
+            setShowUpsellModal(false);
+            handleUpsell();
+          }}
+          onCancel={() => setShowUpsellModal(false)}
+        />
+      )}
     </div>
   );
 }

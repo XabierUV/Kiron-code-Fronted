@@ -784,3 +784,93 @@ button {
   stroke-width: 1.5;
   stroke-dasharray: 4 4;
 }
+
+/* ── Consent Modal ── */
+.consentOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.consentModal {
+  width: min(520px, 100%);
+  padding: 32px;
+  background: #0a0a0f;
+  border: 1px solid rgba(201, 168, 110, 0.2);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+}
+
+.consentLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+}
+
+.consentCheckbox {
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  accent-color: #C9A86E;
+  cursor: pointer;
+}
+
+.consentText {
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.consentLink {
+  color: var(--text-soft);
+  text-decoration: underline;
+}
+
+.consentActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.consentConfirm {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 160ms ease, background 160ms ease;
+  background: #C9A86E;
+  color: #050505;
+}
+
+.consentConfirm:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+}
+
+.consentCancel {
+  width: 100%;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.consentCancel:hover {
+  color: var(--text-soft);
+}

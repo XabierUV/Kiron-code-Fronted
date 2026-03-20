@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { sendMagicLink, fetchCustomerPortal, createCheckout } from "@/lib/api";
 import type { Lang } from "@/types/chart";
+import { ConsentModal } from "@/components/consent-modal";
 
 type PurchasedProduct = {
   productType: string;
@@ -59,6 +60,7 @@ export default function MiCartaPage() {
   const [portalLoading, setPortalLoading] = useState(false);
   const [portalError, setPortalError] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [pendingPortalCheckout, setPendingPortalCheckout] = useState<{ productType: string; chartId: string; reportId: string } | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -299,7 +301,7 @@ export default function MiCartaPage() {
                               type="button"
                               className="primaryButton"
                               disabled={checkoutLoading === item.key}
-                              onClick={() => handlePortalCheckout(item.key, portalData.chartId, portalData.reportId)}
+                              onClick={() => setPendingPortalCheckout({ productType: item.key, chartId: portalData.chartId, reportId: portalData.reportId })}
                             >
                               {checkoutLoading === item.key ? "Redirigiendo..." : `${item.name} · ${item.price}`}
                             </button>
@@ -316,6 +318,18 @@ export default function MiCartaPage() {
       </main>
 
       <SiteFooter lang={lang} />
+
+      {pendingPortalCheckout && (
+        <ConsentModal
+          lang={lang}
+          onConfirm={() => {
+            const args = pendingPortalCheckout;
+            setPendingPortalCheckout(null);
+            handlePortalCheckout(args.productType, args.chartId, args.reportId);
+          }}
+          onCancel={() => setPendingPortalCheckout(null)}
+        />
+      )}
     </div>
   );
 }
