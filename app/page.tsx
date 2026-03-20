@@ -92,6 +92,7 @@ export default function Page() {
   const [birthCity, setBirthCity] = useState("");
   const [birthCountry, setBirthCountry] = useState("");
 
+  const [purchasedProducts, setPurchasedProducts] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [pendingProductType, setPendingProductType] = useState<"CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION" | null>(null);
@@ -113,6 +114,15 @@ export default function Page() {
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("kc_purchased");
+      if (raw) setPurchasedProducts(new Set(JSON.parse(raw)));
+    } catch {
+      // localStorage unavailable or malformed — ignore
+    }
   }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -298,52 +308,60 @@ export default function Page() {
                 {
                   item: t.products.items[1],
                   productType: "CHIRON" as const,
+                  requiresKey: null,
+                  lockedNote: null,
                   btnLabel: lang === "en" ? "The Wound and the Gift · €19" : "La Herida y el Don · 19€",
-                  note: null,
                 },
                 {
                   item: t.products.items[2],
                   productType: "NATAL_CHART" as const,
-                  btnLabel: lang === "en" ? "Unlock · €39" : "Desbloquear · 39€",
-                  note: lang === "en" ? "Requires The Wound and the Gift" : "Requiere La Herida y el Don",
+                  requiresKey: "CHIRON",
+                  lockedNote: lang === "en" ? "Requires The Wound and the Gift" : "Requiere La Herida y el Don",
+                  btnLabel: lang === "en" ? "Tu Mapa Interior · €39" : "Tu Mapa Interior · 39€",
                 },
                 {
                   item: t.products.items[3],
                   productType: "COMPATIBILITY" as const,
-                  btnLabel: lang === "en" ? "Unlock · €59" : "Desbloquear · 59€",
-                  note: lang === "en" ? "Requires Your Inner Map" : "Requiere Tu Mapa Interior",
+                  requiresKey: "NATAL_CHART",
+                  lockedNote: lang === "en" ? "Requires Your Inner Map" : "Requiere Tu Mapa Interior",
+                  btnLabel: lang === "en" ? "El Vínculo · €59" : "El Vínculo · 59€",
                 },
                 {
                   item: t.products.items[4],
                   productType: "SUBSCRIPTION" as const,
+                  requiresKey: null,
+                  lockedNote: null,
                   btnLabel: lang === "en" ? "Subscribe · €9/mo" : "Suscribirse · 9€/mes",
-                  note: null,
                 },
               ] as const
-            ).map((product) => (
-              <article key={product.productType} className="insightCard">
-                <h3>{product.item.name}</h3>
-                <p>{product.item.description}</p>
-                <p className="miniLabel" style={{ marginTop: "12px", marginBottom: "16px" }}>{product.item.price}</p>
-                <button
-                  type="button"
-                  className="primaryButton"
-                  disabled={checkoutLoading}
-                  onClick={() => {
-                    setPendingProductType(product.productType);
-                    if (product.productType === "COMPATIBILITY") setVinculoStep(true);
-                  }}
-                  style={{ width: "100%" }}
-                >
-                  {checkoutLoading ? (lang === "en" ? "Redirecting..." : "Redirigiendo...") : product.btnLabel}
-                </button>
-                {product.note && (
-                  <p style={{ margin: "8px 0 0", fontSize: "12px", color: "var(--text-faint)", textAlign: "center" }}>
-                    {product.note}
-                  </p>
-                )}
-              </article>
-            ))}
+            ).map((product) => {
+              const isLocked = product.requiresKey !== null && !purchasedProducts.has(product.requiresKey);
+              return (
+                <article key={product.productType} className="insightCard">
+                  <h3>{product.item.name}</h3>
+                  <p>{product.item.description}</p>
+                  <p className="miniLabel" style={{ marginTop: "12px", marginBottom: "16px" }}>{product.item.price}</p>
+                  <button
+                    type="button"
+                    className="primaryButton"
+                    disabled={checkoutLoading || isLocked}
+                    onClick={() => {
+                      if (isLocked) return;
+                      setPendingProductType(product.productType);
+                      if (product.productType === "COMPATIBILITY") setVinculoStep(true);
+                    }}
+                    style={{ width: "100%", opacity: isLocked ? 0.4 : 1, cursor: isLocked ? "not-allowed" : "pointer" }}
+                  >
+                    {checkoutLoading ? (lang === "en" ? "Redirecting..." : "Redirigiendo...") : product.btnLabel}
+                  </button>
+                  {isLocked && product.lockedNote && (
+                    <p style={{ margin: "8px 0 0", fontSize: "12px", color: "var(--text-faint)", textAlign: "center" }}>
+                      {product.lockedNote}
+                    </p>
+                  )}
+                </article>
+              );
+            })}
           </div>
         </section>
 

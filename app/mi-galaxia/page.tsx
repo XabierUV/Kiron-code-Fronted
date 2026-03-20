@@ -79,7 +79,11 @@ export default function MiCartaPage() {
       setToken(t);
       setPortalLoading(true);
       fetchCustomerPortal(t)
-        .then((data) => setPortalData(data))
+        .then((data) => {
+          setPortalData(data);
+          const keys = (data.products as { productType: string }[]).map((p) => p.productType);
+          localStorage.setItem("kc_purchased", JSON.stringify(keys));
+        })
         .catch((err) =>
           setPortalError(
             err instanceof Error ? err.message : "No se pudo cargar tu carta."
