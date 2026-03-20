@@ -324,17 +324,15 @@ export default function Page() {
                 )}
                 <p style={{ margin: "10px 0 0", fontSize: "11px", color: "var(--text-faint)", textAlign: "center", lineHeight: 1.5 }}>
                   {lang === "en" ? (
-                    <>By completing your purchase you accept our{" "}
+                    <>I understand this is a digital product delivered immediately. By completing the purchase I waive my 14-day withdrawal right. I accept the{" "}
                       <a href="/terminos-y-condiciones" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Terms and Conditions</a>{" "}
-                      and{" "}
-                      <a href="/politica-de-privacidad" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Privacy Policy</a>.
-                      Your report will be sent to the email used during checkout.</>
+                      and the{" "}
+                      <a href="/politica-de-privacidad" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Privacy Policy</a>.</>
                   ) : (
-                    <>Al completar tu compra aceptas nuestros{" "}
+                    <>Entiendo que este es un producto digital que se entrega de forma inmediata. Al completar la compra pierdo mi derecho de desistimiento de 14 días conforme al artículo 103.m) del Real Decreto Legislativo 1/2007. Acepto los{" "}
                       <a href="/terminos-y-condiciones" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Términos y Condiciones</a>{" "}
-                      y{" "}
-                      <a href="/politica-de-privacidad" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Política de Privacidad</a>.
-                      Tu informe se enviará al email usado durante el pago.</>
+                      y la{" "}
+                      <a href="/politica-de-privacidad" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Política de Privacidad</a>.</>
                   )}
                 </p>
               </article>
