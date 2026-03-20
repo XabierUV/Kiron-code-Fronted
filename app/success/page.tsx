@@ -35,7 +35,7 @@ function formatTime(seconds: number) {
 export default function SuccessPage() {
   const [lang, setLang] = useState<Lang>("es");
   const [scrolled, setScrolled] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState<UnlockedReportState | null>(null);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
@@ -102,43 +102,42 @@ export default function SuccessPage() {
             <>
               <div className="sectionIntro">
                 <p className="sectionLabel">Pago completado</p>
-                <h1 className="sectionTitle">Generando tu informe.</h1>
-                <p className="sectionText">
-                  En los próximos 10 minutos recibirás tu informe en el email que proporcionaste durante el pago.
-                </p>
-                <p style={{ marginTop: "24px" }}>
-                  <Link href="/" style={{ textDecoration: "underline", color: "var(--text-soft)" }}>
-                    Volver al inicio
-                  </Link>
-                </p>
+                <h1 className="sectionTitle">Tu informe está siendo generado.</h1>
               </div>
 
               <div className="resultsPanel">
-                {loading ? (
-                  <article className="insightCard">
-                    <h3>Validando pago...</h3>
-                    <p>Estamos verificando tu pago y preparando tu informe.</p>
-                  </article>
-                ) : error ? (
+                {error ? (
                   <article className="insightCard">
                     <h3>No se pudo cargar el informe</h3>
                     <p>{error}</p>
                   </article>
                 ) : (
-                  <article className="insightCard">
-                    <h3>Tu informe está en camino</h3>
-                    <p>Lo recibirás en tu email en menos de 10 minutos.</p>
-                    <p style={{
-                      marginTop: "20px",
-                      fontSize: "42px",
-                      fontWeight: "700",
-                      letterSpacing: "-0.04em",
-                      color: "var(--text)",
-                      lineHeight: 1,
-                    }}>
-                      {formatTime(countdown)}
+                  <>
+                    <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
+                      <p style={{
+                        margin: 0,
+                        fontSize: "clamp(64px, 14vw, 96px)",
+                        fontWeight: "700",
+                        letterSpacing: "-0.05em",
+                        lineHeight: 1,
+                        color: "var(--text)",
+                      }}>
+                        {formatTime(countdown)}
+                      </p>
+                    </div>
+
+                    <article className="insightCard">
+                      <p style={{ margin: 0 }}>
+                        En los próximos minutos recibirás tu informe en el email que proporcionaste durante el pago.
+                      </p>
+                    </article>
+
+                    <p style={{ marginTop: "8px" }}>
+                      <Link href="/" className="secondaryButton" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
+                        Volver al inicio
+                      </Link>
                     </p>
-                  </article>
+                  </>
                 )}
               </div>
             </>
