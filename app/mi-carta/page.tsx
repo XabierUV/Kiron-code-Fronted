@@ -6,12 +6,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { sendMagicLink, fetchCustomerPortal } from "@/lib/api";
 import type { Lang } from "@/types/chart";
 
-type Product = {
-  id: string;
-  name: string;
-  price: string;
-  purchased: boolean;
+type PurchasedProduct = {
+  productType: string;
   pdfUrl?: string | null;
+  avatarUrl?: string | null;
+  chartUrl?: string | null;
 };
 
 type PortalData = {
@@ -21,8 +20,30 @@ type PortalData = {
     house: number;
     degree: number;
   };
-  products: Product[];
+  products: PurchasedProduct[];
 };
+
+type CatalogItem = {
+  key: string;
+  name: string;
+  price: string;
+  requiresKey: string | null;
+};
+
+const CATALOG: CatalogItem[] = [
+  { key: "CHIRON",        name: "La Herida y el Don",  price: "19€",     requiresKey: null },
+  { key: "NATAL_CHART",   name: "Tu Mapa Interior",    price: "39€",     requiresKey: "CHIRON" },
+  { key: "COMPATIBILITY", name: "El Vínculo",          price: "59€",     requiresKey: null },
+  { key: "SUBSCRIPTION",  name: "Kiron Vivo",          price: "9€/mes",  requiresKey: null },
+];
+
+function dedupe(products: PurchasedProduct[]): Map<string, PurchasedProduct> {
+  const map = new Map<string, PurchasedProduct>();
+  for (const p of products) {
+    if (!map.has(p.productType)) map.set(p.productType, p);
+  }
+  return map;
+}
 
 export default function MiCartaPage() {
   const [lang, setLang] = useState<Lang>("es");
@@ -137,11 +158,7 @@ export default function MiCartaPage() {
                         </p>
                       )}
                       <div>
-                        <button
-                          type="submit"
-                          className="primaryButton"
-                          disabled={sending}
-                        >
+                        <button type="submit" className="primaryButton" disabled={sending}>
                           {sending ? "Enviando..." : "Acceder a mi carta"}
                         </button>
                       </div>
@@ -151,7 +168,7 @@ export default function MiCartaPage() {
               </>
             )}
 
-            {/* ── Token present: loading ── */}
+            {/* ── Token: loading ── */}
             {token && portalLoading && (
               <article className="insightCard">
                 <h3>Cargando tu carta...</h3>
@@ -159,7 +176,7 @@ export default function MiCartaPage() {
               </article>
             )}
 
-            {/* ── Token present: error ── */}
+            {/* ── Token: error ── */}
             {token && portalError && (
               <article className="insightCard">
                 <h3>No se pudo acceder</h3>
@@ -177,73 +194,97 @@ export default function MiCartaPage() {
               </article>
             )}
 
-            {/* ── Token present: portal data ── */}
-            {token && portalData && (
-              <>
-                <article className="insightCard">
-                  <h3>Hola, {portalData.name}.</h3>
-                  <p>
-                    Tu <strong>Quirón</strong> está en{" "}
-                    <strong>{portalData.chiron.sign}</strong>, Casa {portalData.chiron.house},{" "}
-                    a {portalData.chiron.degree.toFixed(1)}°.
-                  </p>
-                </article>
+            {/* ── Token: portal data ── */}
+            {token && portalData && (() => {
+              const purchased = dedupe(portalData.products);
 
-                {portalData.products.map((product) => (
-                  <article key={product.id} className="insightCard">
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
-                      <div>
-                        <h3 style={{ marginBottom: "6px" }}>{product.name}</h3>
-                        <p style={{ margin: 0 }}>
-                          {product.purchased
-                            ? "Informe disponible."
-                            : `Desbloquea este informe por ${product.price}.`}
-                        </p>
-                      </div>
-                      <span
-                        style={{
-                          flexShrink: 0,
-                          padding: "4px 10px",
-                          border: "1px solid var(--line)",
-                          borderRadius: "999px",
-                          fontSize: "12px",
-                          color: product.purchased ? "rgba(100,220,130,0.9)" : "var(--text-faint)",
-                          letterSpacing: "0.06em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {product.purchased ? "Comprado" : "No comprado"}
-                      </span>
-                    </div>
-
-                    {product.purchased && product.pdfUrl && (
-                      <a
-                        href={product.pdfUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        download
-                        style={{
-                          display: "inline-block",
-                          marginTop: "14px",
-                          textDecoration: "underline",
-                          fontSize: "14px",
-                        }}
-                      >
-                        Descargar PDF
-                      </a>
-                    )}
-
-                    {!product.purchased && (
-                      <div style={{ marginTop: "14px" }}>
-                        <button type="button" className="primaryButton">
-                          Obtener {product.name} · {product.price}
-                        </button>
-                      </div>
-                    )}
+              return (
+                <>
+                  <article className="insightCard">
+                    <h3>Hola, {portalData.name}.</h3>
+                    <p>
+                      Tu <strong>Quirón</strong> está en{" "}
+                      <strong>{portalData.chiron.sign}</strong>, Casa {portalData.chiron.house},{" "}
+                      a {portalData.chiron.degree.toFixed(1)}°.
+                    </p>
                   </article>
-                ))}
-              </>
-            )}
+
+                  {CATALOG.map((item) => {
+                    const p = purchased.get(item.key);
+                    const isPurchased = Boolean(p);
+                    const isBlocked = !isPurchased && item.requiresKey !== null && !purchased.has(item.requiresKey);
+                    const isAvailable = !isPurchased && !isBlocked;
+                    const isMapaInterior = item.key === "NATAL_CHART";
+
+                    let badge: { label: string; color: string } | null = null;
+                    if (isPurchased) badge = { label: "Comprado", color: "rgba(100,220,130,0.9)" };
+                    else if (isBlocked) badge = { label: "Bloqueado", color: "var(--text-faint)" };
+
+                    return (
+                      <article key={item.key} className="insightCard">
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
+                          <div>
+                            <h3 style={{ marginBottom: "6px" }}>{item.name}</h3>
+                            <p style={{ margin: 0 }}>
+                              {isPurchased
+                                ? "Informe disponible."
+                                : isBlocked
+                                ? "Requiere La Herida y el Don."
+                                : `Desbloquea este informe por ${item.price}.`}
+                            </p>
+                          </div>
+                          {badge && (
+                            <span style={{
+                              flexShrink: 0,
+                              padding: "4px 10px",
+                              border: "1px solid var(--line)",
+                              borderRadius: "999px",
+                              fontSize: "12px",
+                              color: badge.color,
+                              letterSpacing: "0.06em",
+                              textTransform: "uppercase",
+                            }}>
+                              {badge.label}
+                            </span>
+                          )}
+                        </div>
+
+                        {isPurchased && (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginTop: "14px" }}>
+                            {p?.pdfUrl && (
+                              <a href={p.pdfUrl} target="_blank" rel="noreferrer" download
+                                style={{ textDecoration: "underline", fontSize: "14px" }}>
+                                Descargar PDF
+                              </a>
+                            )}
+                            {isMapaInterior && p?.avatarUrl && (
+                              <a href={p.avatarUrl} target="_blank" rel="noreferrer" download
+                                style={{ textDecoration: "underline", fontSize: "14px" }}>
+                                Descargar Avatar
+                              </a>
+                            )}
+                            {isMapaInterior && p?.chartUrl && (
+                              <a href={p.chartUrl} target="_blank" rel="noreferrer" download
+                                style={{ textDecoration: "underline", fontSize: "14px" }}>
+                                Descargar Carta Astral
+                              </a>
+                            )}
+                          </div>
+                        )}
+
+                        {isAvailable && (
+                          <div style={{ marginTop: "14px" }}>
+                            <button type="button" className="primaryButton">
+                              {item.name} · {item.price}
+                            </button>
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })}
+                </>
+              );
+            })()}
           </div>
         </section>
       </main>
