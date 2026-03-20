@@ -7,7 +7,7 @@ import {
   verifyCheckoutSession,
   createCheckout,
 } from "@/lib/api";
-import { ConsentModal } from "@/components/consent-modal";
+import { ConsentModal, type ConsentData } from "@/components/consent-modal";
 import type { Lang, PremiumReport } from "@/types/chart";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -120,7 +120,7 @@ export default function SuccessPage() {
   };
   const upsell = data?.order?.productType ? UPSELL_MAP[data.order.productType] ?? null : null;
 
-  async function handleUpsell() {
+  async function handleUpsell(consentData?: ConsentData) {
     if (!upsell || !data) return;
     setUpsellLoading(true);
     try {
@@ -128,6 +128,8 @@ export default function SuccessPage() {
         chartId: data.report.chartId,
         reportId: data.report.id,
         productType: upsell.productType,
+        deliveryEmail: consentData?.deliveryEmail,
+        marketingConsent: consentData?.marketingConsent,
       });
       if (checkout.checkoutUrl) window.location.href = checkout.checkoutUrl;
     } catch (err) {
@@ -261,9 +263,9 @@ export default function SuccessPage() {
       {showUpsellModal && (
         <ConsentModal
           lang={lang}
-          onConfirm={() => {
+          onConfirm={(data) => {
             setShowUpsellModal(false);
-            handleUpsell();
+            handleUpsell(data);
           }}
           onCancel={() => setShowUpsellModal(false)}
         />

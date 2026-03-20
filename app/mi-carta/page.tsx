@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { sendMagicLink, fetchCustomerPortal, createCheckout } from "@/lib/api";
 import type { Lang } from "@/types/chart";
-import { ConsentModal } from "@/components/consent-modal";
+import { ConsentModal, type ConsentData } from "@/components/consent-modal";
 
 type PurchasedProduct = {
   productType: string;
@@ -103,13 +103,15 @@ export default function MiCartaPage() {
     }
   }
 
-  async function handlePortalCheckout(productType: string, chartId: string, reportId: string) {
+  async function handlePortalCheckout(productType: string, chartId: string, reportId: string, consentData?: ConsentData) {
     setCheckoutLoading(productType);
     try {
       const checkout = await createCheckout({
         chartId,
         reportId,
         productType: productType as "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION",
+        deliveryEmail: consentData?.deliveryEmail,
+        marketingConsent: consentData?.marketingConsent,
       });
       if (checkout.checkoutUrl) {
         window.location.href = checkout.checkoutUrl;
@@ -322,10 +324,10 @@ export default function MiCartaPage() {
       {pendingPortalCheckout && (
         <ConsentModal
           lang={lang}
-          onConfirm={() => {
+          onConfirm={(data) => {
             const args = pendingPortalCheckout;
             setPendingPortalCheckout(null);
-            handlePortalCheckout(args.productType, args.chartId, args.reportId);
+            handlePortalCheckout(args.productType, args.chartId, args.reportId, data);
           }}
           onCancel={() => setPendingPortalCheckout(null)}
         />

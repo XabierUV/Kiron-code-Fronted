@@ -6,7 +6,7 @@ import { HeroSection } from "@/components/hero-section";
 import { ChartForm } from "@/components/chart-form";
 import { PreviewSection } from "@/components/preview-section";
 import { SiteFooter } from "@/components/site-footer";
-import { ConsentModal } from "@/components/consent-modal";
+import { ConsentModal, type ConsentData } from "@/components/consent-modal";
 import { copy } from "@/lib/copy";
 import { createCheckout, fetchChart } from "@/lib/api";
 import type {
@@ -157,7 +157,8 @@ export default function Page() {
   }
 
   async function handleCheckout(
-    productType: "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION" = "CHIRON"
+    productType: "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION" = "CHIRON",
+    consentData?: ConsentData
   ) {
     try {
       console.log("handleCheckout start", { chartId, reportId, productType });
@@ -178,6 +179,8 @@ export default function Page() {
         chartId,
         reportId,
         productType,
+        deliveryEmail: consentData?.deliveryEmail,
+        marketingConsent: consentData?.marketingConsent,
       });
 
       console.log("checkout response", checkout);
@@ -350,10 +353,10 @@ export default function Page() {
       {pendingProductType && (
         <ConsentModal
           lang={lang}
-          onConfirm={() => {
+          onConfirm={(data) => {
             const pt = pendingProductType;
             setPendingProductType(null);
-            handleCheckout(pt);
+            handleCheckout(pt, data);
           }}
           onCancel={() => setPendingProductType(null)}
         />
