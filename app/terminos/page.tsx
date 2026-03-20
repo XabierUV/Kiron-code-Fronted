@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import type { Lang } from "@/types/chart";
 
 export default function TerminosPage() {
+  const router = useRouter();
   const [lang, setLang] = useState<Lang>("es");
   const [scrolled, setScrolled] = useState(false);
 
@@ -28,6 +30,13 @@ export default function TerminosPage() {
       <main className="pageContent">
         <section className="contentSection">
           <div className="sectionIntro">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              style={{ background: "none", border: "none", color: "var(--text-faint)", fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", padding: "0 0 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+            >
+              ← Volver
+            </button>
             <p className="sectionLabel">Legal</p>
             <h1 className="sectionTitle">Términos y Condiciones</h1>
             <p className="sectionText">Última actualización: marzo 2025</p>
