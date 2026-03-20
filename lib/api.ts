@@ -94,7 +94,7 @@ export async function sendMagicLink(email: string): Promise<{ ok: boolean; error
 
 export async function fetchCustomerPortal(token: string) {
   const response = await fetch(
-    `${API_BASE}/magic-link/verify?token=${encodeURIComponent(token)}`,
+    `${API_BASE}/customer/portal?token=${encodeURIComponent(token)}`,
     { method: "GET" }
   );
   const data = await response.json();
