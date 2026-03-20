@@ -132,6 +132,18 @@ export default function SuccessPage() {
                       </p>
                     </article>
 
+                    <p style={{ margin: "12px 0 0", color: "var(--text-faint)", fontSize: "13px", lineHeight: 1.6 }}>
+                      {lang === "en" ? (
+                        <>If you leave this page, you&apos;ll find your report in{" "}
+                          <Link href="/mi-carta" style={{ color: "var(--text-soft)", textDecoration: "underline" }}>MY CHART</Link>{" "}
+                          using your email.</>
+                      ) : (
+                        <>Si sales de esta página, encontrarás tu informe en{" "}
+                          <Link href="/mi-carta" style={{ color: "var(--text-soft)", textDecoration: "underline" }}>MI CARTA</Link>{" "}
+                          usando tu email.</>
+                      )}
+                    </p>
+
                     <p style={{ marginTop: "8px" }}>
                       <Link href="/" className="secondaryButton" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
                         Volver al inicio
