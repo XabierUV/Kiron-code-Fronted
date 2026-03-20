@@ -105,6 +105,36 @@ export const copy = {
         },
       ],
     },
+    faq: {
+      sectionLabel: "FAQ",
+      title: "Preguntas frecuentes.",
+      items: [
+        {
+          q: "¿Qué es Quirón y por qué es importante?",
+          a: "Quirón es un asteroide que en astrología psicológica representa la herida más profunda que llevamos, pero también el don que emerge cuando la trabajamos. No es magia — es un lenguaje para nombrar patrones que ya conoces de ti mismo.",
+        },
+        {
+          q: "¿Necesito saber astrología para entender el informe?",
+          a: "No. El informe está escrito en lenguaje psicológico, no esotérico. No necesitas ningún conocimiento previo de astrología.",
+        },
+        {
+          q: "¿Cómo se genera mi informe?",
+          a: "Calculamos tu carta natal con la mayor precisión astronómica existente. A partir de esos datos, generamos un informe personalizado único para tu combinación exacta de signo, casa y aspectos.",
+        },
+        {
+          q: "¿Cuándo recibiré mi informe?",
+          a: "En menos de 10 minutos tras el pago. Te llegará directamente a tu email en formato PDF.",
+        },
+        {
+          q: "¿Es realmente personalizado?",
+          a: "Sí. Cada informe se genera específicamente para tu carta natal — no es un texto genérico por signo solar. Usa los datos reales de tu fecha, hora y lugar exactos de nacimiento.",
+        },
+        {
+          q: "¿Puedo acceder a mi informe más adelante?",
+          a: "Sí. Desde MI CARTA puedes acceder siempre que quieras a todos tus informes con tu email.",
+        },
+      ],
+    },
     footer: {
       text: "Tu destino, explicado con claridad.",
       rights: `© ${new Date().getFullYear()} Kiron Code. Todos los derechos reservados.`,
@@ -214,6 +244,36 @@ export const copy = {
           name: "Chiron Alive · €9/mo",
           description: "Monthly Chiron transits. What activates in you each month, when your moments of greatest growth are and how to navigate them.",
           price: "€9/MO · CANCEL ANYTIME",
+        },
+      ],
+    },
+    faq: {
+      sectionLabel: "FAQ",
+      title: "Frequently asked questions.",
+      items: [
+        {
+          q: "What is Chiron and why does it matter?",
+          a: "Chiron is an asteroid that in psychological astrology represents our deepest wound — and the gift that emerges when we work through it. It's not magic — it's a language for naming patterns you already know about yourself.",
+        },
+        {
+          q: "Do I need to know astrology to understand the report?",
+          a: "No. The report is written in psychological language, not esoteric terms. No prior knowledge of astrology is needed.",
+        },
+        {
+          q: "How is my report generated?",
+          a: "We calculate your birth chart with the highest astronomical precision in existence. From that data, we generate a unique personalised report for your exact combination of sign, house and aspects.",
+        },
+        {
+          q: "When will I receive my report?",
+          a: "Within 10 minutes of payment. It will be sent directly to your email as a PDF.",
+        },
+        {
+          q: "Is it really personalised?",
+          a: "Yes. Each report is generated specifically for your birth chart — not a generic sun sign text. It uses the real data from your exact date, time and place of birth.",
+        },
+        {
+          q: "Can I access my report later?",
+          a: "Yes. From MY CHART you can access all your reports whenever you want using your email.",
         },
       ],
     },

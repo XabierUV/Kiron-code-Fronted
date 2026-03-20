@@ -16,6 +16,63 @@ import type {
   PremiumReport,
 } from "@/types/chart";
 
+function FaqSection({ t }: { t: typeof copy["es"] | typeof copy["en"] }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const faq = t.faq;
+
+  return (
+    <section className="contentSection">
+      <div className="sectionIntro">
+        <p className="sectionLabel">{faq.sectionLabel}</p>
+        <h2 className="sectionTitle">{faq.title}</h2>
+      </div>
+
+      <div style={{ minWidth: 0 }}>
+        {faq.items.map((item: { q: string; a: string }, i: number) => (
+          <div
+            key={i}
+            style={{
+              borderBottom: "1px solid var(--line)",
+              cursor: "pointer",
+            }}
+            onClick={() => setOpen(open === i ? null : i)}
+          >
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "20px 0",
+              gap: "16px",
+            }}>
+              <span style={{ fontSize: "clamp(16px, 2vw, 20px)", letterSpacing: "-0.02em" }}>
+                {item.q}
+              </span>
+              <span style={{
+                flexShrink: 0,
+                fontSize: "20px",
+                color: "var(--text-faint)",
+                transition: "transform 200ms ease",
+                transform: open === i ? "rotate(45deg)" : "none",
+              }}>+</span>
+            </div>
+            {open === i && (
+              <p style={{
+                margin: "0 0 20px",
+                color: "var(--text-soft)",
+                fontSize: "16px",
+                lineHeight: "1.7",
+                maxWidth: "68ch",
+              }}>
+                {item.a}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function scrollToId(id: string) {
   const element = document.getElementById(id);
   if (element) {
@@ -217,6 +274,7 @@ export default function Page() {
           </div>
         </section>
 
+        <FaqSection t={t} />
       </main>
 
       <SiteFooter lang={lang} />
