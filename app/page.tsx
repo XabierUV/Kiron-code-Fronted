@@ -285,36 +285,36 @@ export default function Page() {
           </div>
 
           <div className="resultsPanel">
+            {/* Tu Quirón — incluido, sin botón de compra */}
+            <article className="insightCard">
+              <h3>{t.products.items[0].name}</h3>
+              <p>{t.products.items[0].description}</p>
+              <p className="miniLabel" style={{ marginTop: "12px" }}>{t.products.items[0].price}</p>
+            </article>
+
+            {/* Productos de pago */}
             {(
               [
                 {
-                  name: t.products.items[0].name,
-                  description: t.products.items[0].description,
-                  price: t.products.items[0].price,
+                  item: t.products.items[1],
                   productType: "CHIRON" as const,
                   btnLabel: lang === "en" ? "Get started · €19" : "Comenzar · 19€",
                   note: null,
                 },
                 {
-                  name: t.products.items[1].name,
-                  description: t.products.items[1].description,
-                  price: t.products.items[1].price,
+                  item: t.products.items[2],
                   productType: "NATAL_CHART" as const,
                   btnLabel: lang === "en" ? "Unlock · €39" : "Desbloquear · 39€",
                   note: lang === "en" ? "Requires The Wound and the Gift" : "Requiere La Herida y el Don",
                 },
                 {
-                  name: t.products.items[2].name,
-                  description: t.products.items[2].description,
-                  price: t.products.items[2].price,
+                  item: t.products.items[3],
                   productType: "COMPATIBILITY" as const,
                   btnLabel: lang === "en" ? "Unlock · €59" : "Desbloquear · 59€",
                   note: lang === "en" ? "Requires Your Inner Map" : "Requiere Tu Mapa Interior",
                 },
                 {
-                  name: t.products.items[3].name,
-                  description: t.products.items[3].description,
-                  price: t.products.items[3].price,
+                  item: t.products.items[4],
                   productType: "SUBSCRIPTION" as const,
                   btnLabel: lang === "en" ? "Subscribe · €9/mo" : "Suscribirse · 9€/mes",
                   note: null,
@@ -322,9 +322,9 @@ export default function Page() {
               ] as const
             ).map((product) => (
               <article key={product.productType} className="insightCard">
-                <h3>{product.name}</h3>
-                <p>{product.description}</p>
-                <p className="miniLabel" style={{ marginTop: "12px", marginBottom: "16px" }}>{product.price}</p>
+                <h3>{product.item.name}</h3>
+                <p>{product.item.description}</p>
+                <p className="miniLabel" style={{ marginTop: "12px", marginBottom: "16px" }}>{product.item.price}</p>
                 <button
                   type="button"
                   className="primaryButton"
