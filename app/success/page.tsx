@@ -48,40 +48,64 @@ export default function SuccessPage() {
   }, []);
 
   useEffect(() => {
-    async function loadReport() {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id");
+    if (!sessionId) {
+      setError("No se encontró session_id en la URL.");
+      setLoading(false);
+      return;
+    }
+
+    let active = true;
+
+    async function tryFetch() {
       try {
-        const params = new URLSearchParams(window.location.search);
-        const sessionId = params.get("session_id");
-
-        if (!sessionId) {
-          setError("No se encontró session_id en la URL.");
-          return;
-        }
-
-        await verifyCheckoutSession(sessionId);
-        const result = await fetchUnlockedReportBySession(sessionId);
-        setData(result);
+        const result = await fetchUnlockedReportBySession(sessionId!);
+        if (active) setData(result);
       } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "No se pudo recuperar el informe desbloqueado."
-        );
-      } finally {
-        setLoading(false);
+        const msg = err instanceof Error ? err.message.toLowerCase() : "";
+        // "not delivered yet" is normal during generation — keep polling silently
+        if (active && !msg.includes("not delivered")) {
+          // unexpected error — still keep polling, timeout will handle it
+        }
       }
     }
 
-    loadReport();
+    async function init() {
+      try {
+        await verifyCheckoutSession(sessionId!);
+      } catch {
+        // non-fatal — continue to polling
+      }
+      if (active) setLoading(false);
+      tryFetch();
+    }
+
+    init();
+    const pollId = setInterval(tryFetch, 10_000);
+
+    return () => {
+      active = false;
+      clearInterval(pollId);
+    };
   }, []);
 
-  // Countdown — only ticks while PDF is not yet available
+  // Countdown — ticks while PDF not yet available
   useEffect(() => {
     if (data?.report?.pdfUrl) return;
     if (countdown <= 0) return;
     const id = setInterval(() => setCountdown((c) => c - 1), 1000);
     return () => clearInterval(id);
   }, [data?.report?.pdfUrl, countdown]);
+
+  // Show error only after timeout (10 min elapsed, still no PDF)
+  useEffect(() => {
+    if (countdown === 0 && !data?.report?.pdfUrl) {
+      setError(
+        "El informe está tardando más de lo esperado. Revisa tu email o accede desde MI CARTA."
+      );
+    }
+  }, [countdown, data?.report?.pdfUrl]);
 
   const hasPdf = Boolean(data?.report?.pdfUrl);
 
