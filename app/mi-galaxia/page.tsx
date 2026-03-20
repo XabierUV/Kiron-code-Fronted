@@ -136,7 +136,7 @@ export default function MiCartaPage() {
         <section className="contentSection">
           <div className="sectionIntro">
             <p className="sectionLabel">Portal</p>
-            <h1 className="sectionTitle">Mi carta.</h1>
+            <h1 className="sectionTitle">Mi galaxia.</h1>
             <p className="sectionText">
               {token
                 ? "Tu carta natal y tus informes."
@@ -157,7 +157,7 @@ export default function MiCartaPage() {
                   </article>
                 ) : (
                   <article className="insightCard">
-                    <h3>Acceder a mi carta</h3>
+                    <h3>Acceder a mi galaxia</h3>
                     <p style={{ marginBottom: "20px" }}>
                       Introduce el email que usaste al generar tu carta natal. Te enviaremos un enlace de acceso directo.
                     </p>
@@ -184,7 +184,7 @@ export default function MiCartaPage() {
                       )}
                       <div>
                         <button type="submit" className="primaryButton" disabled={sending}>
-                          {sending ? "Enviando..." : "Acceder a mi carta"}
+                          {sending ? "Enviando..." : "Acceder a mi galaxia"}
                         </button>
                       </div>
                     </form>
@@ -210,7 +210,7 @@ export default function MiCartaPage() {
                   <button
                     type="button"
                     className="secondaryButton"
-                    onClick={() => { window.location.href = "/mi-carta"; }}
+                    onClick={() => { window.location.href = "/mi-galaxia"; }}
                     style={{ minHeight: "40px", padding: "0 16px", fontSize: "14px" }}
                   >
                     Volver a acceder

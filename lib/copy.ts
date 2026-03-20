@@ -6,7 +6,7 @@ export const copy = {
       chart: "Carta",
       results: "Resultados",
       premium: "Productos",
-      myChart: "Mi carta",
+      myChart: "Mi galaxia",
     },
     hero: {
       eyebrow: "Precisión astronómica. Diseño radical.",
@@ -131,7 +131,7 @@ export const copy = {
         },
         {
           q: "¿Puedo acceder a mi informe más adelante?",
-          a: "Sí. Desde MI CARTA puedes acceder siempre que quieras a todos tus informes con tu email.",
+          a: "Sí. Desde MI GALAXIA puedes acceder siempre que quieras a todos tus informes con tu email.",
         },
       ],
     },
@@ -145,7 +145,7 @@ export const copy = {
       chart: "Chart",
       results: "Results",
       premium: "Products",
-      myChart: "My chart",
+      myChart: "My galaxy",
     },
     hero: {
       eyebrow: "Astronomical precision. Radical design.",
@@ -273,7 +273,7 @@ export const copy = {
         },
         {
           q: "Can I access my report later?",
-          a: "Yes. From MY CHART you can access all your reports whenever you want using your email.",
+          a: "Yes. From MY GALAXY you can access all your reports whenever you want using your email.",
         },
       ],
     },

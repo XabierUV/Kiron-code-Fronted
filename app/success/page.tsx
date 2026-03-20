@@ -107,7 +107,7 @@ export default function SuccessPage() {
   useEffect(() => {
     if (countdown === 0 && !data?.report?.pdfUrl) {
       setError(
-        "El informe está tardando más de lo esperado. Revisa tu email o accede desde MI CARTA."
+        "El informe está tardando más de lo esperado. Revisa tu email o accede desde MI GALAXIA."
       );
     }
   }, [countdown, data?.report?.pdfUrl]);
@@ -184,10 +184,10 @@ export default function SuccessPage() {
                       <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
                         {lang === "en" ? (
                           <>Your report will arrive in the email you used during checkout within the next few minutes. If you leave this page, you can access it anytime from{" "}
-                            <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MY CHART</Link>.</>
+                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>.</>
                         ) : (
                           <>En los próximos minutos recibirás tu informe en el email que usaste durante el pago. Si sales de esta página, puedes acceder a él en cualquier momento desde{" "}
-                            <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MI CARTA</Link>.</>
+                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>.</>
                         )}
                       </p>
                     </article>
