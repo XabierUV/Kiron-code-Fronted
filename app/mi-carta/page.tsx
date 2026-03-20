@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { sendMagicLink, fetchCustomerPortal } from "@/lib/api";
+import { sendMagicLink, fetchCustomerPortal, createCheckout } from "@/lib/api";
 import type { Lang } from "@/types/chart";
 
 type PurchasedProduct = {
@@ -15,6 +15,8 @@ type PurchasedProduct = {
 
 type PortalData = {
   name: string;
+  chartId: string;
+  reportId: string;
   chiron: {
     sign: string;
     house: number;
@@ -33,7 +35,7 @@ type CatalogItem = {
 const CATALOG: CatalogItem[] = [
   { key: "CHIRON",        name: "La Herida y el Don",  price: "19€",     requiresKey: null },
   { key: "NATAL_CHART",   name: "Tu Mapa Interior",    price: "39€",     requiresKey: "CHIRON" },
-  { key: "COMPATIBILITY", name: "El Vínculo",          price: "59€",     requiresKey: null },
+  { key: "COMPATIBILITY", name: "El Vínculo",          price: "59€",     requiresKey: "NATAL_CHART" },
   { key: "SUBSCRIPTION",  name: "Kiron Vivo",          price: "9€/mes",  requiresKey: null },
 ];
 
@@ -56,6 +58,7 @@ export default function MiCartaPage() {
   const [portalData, setPortalData] = useState<PortalData | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [portalError, setPortalError] = useState("");
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -95,6 +98,24 @@ export default function MiCartaPage() {
       );
     } finally {
       setSending(false);
+    }
+  }
+
+  async function handlePortalCheckout(productType: string, chartId: string, reportId: string) {
+    setCheckoutLoading(productType);
+    try {
+      const checkout = await createCheckout({
+        chartId,
+        reportId,
+        productType: productType as "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION",
+      });
+      if (checkout.checkoutUrl) {
+        window.location.href = checkout.checkoutUrl;
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Error iniciando el pago.");
+    } finally {
+      setCheckoutLoading(null);
     }
   }
 
@@ -274,8 +295,13 @@ export default function MiCartaPage() {
 
                         {isAvailable && (
                           <div style={{ marginTop: "14px" }}>
-                            <button type="button" className="primaryButton">
-                              {item.name} · {item.price}
+                            <button
+                              type="button"
+                              className="primaryButton"
+                              disabled={checkoutLoading === item.key}
+                              onClick={() => handlePortalCheckout(item.key, portalData.chartId, portalData.reportId)}
+                            >
+                              {checkoutLoading === item.key ? "Redirigiendo..." : `${item.name} · ${item.price}`}
                             </button>
                           </div>
                         )}

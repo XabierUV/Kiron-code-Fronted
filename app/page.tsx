@@ -154,15 +154,19 @@ export default function Page() {
     }
   }
 
-  async function handleCheckout() {
+  async function handleCheckout(
+    productType: "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION" = "CHIRON"
+  ) {
     try {
-      console.log("handleCheckout start", { chartId, reportId });
+      console.log("handleCheckout start", { chartId, reportId, productType });
 
       if (!chartId || !reportId) {
-        const msg = "Primero genera una carta antes de pasar a Premium.";
-        console.error(msg);
+        const msg = lang === "en"
+          ? "Generate your birth chart first before purchasing."
+          : "Primero genera una carta antes de pasar a Premium.";
         alert(msg);
         setFormMessage(msg);
+        scrollToId("chart");
         return;
       }
 
@@ -171,7 +175,7 @@ export default function Page() {
       const checkout = await createCheckout({
         chartId,
         reportId,
-        productType: "CHIRON",
+        productType,
       });
 
       console.log("checkout response", checkout);
@@ -231,7 +235,7 @@ export default function Page() {
           resolvedLocation={resolvedLocation}
           hasPremiumReport={Boolean(premiumReport)}
           onPremiumClick={() =>
-            premiumReport ? scrollToId("full-report") : handleCheckout()
+            premiumReport ? scrollToId("full-report") : handleCheckout("CHIRON")
           }
         />
 
@@ -264,11 +268,75 @@ export default function Page() {
           </div>
 
           <div className="resultsPanel">
-            {t.products.items.map((product: { name: string; description: string; price: string }) => (
-              <article key={product.name} className="insightCard">
+            {(
+              [
+                {
+                  name: t.products.items[0].name,
+                  description: t.products.items[0].description,
+                  price: t.products.items[0].price,
+                  productType: "CHIRON" as const,
+                  btnLabel: lang === "en" ? "Get started · €19" : "Comenzar · 19€",
+                  note: null,
+                },
+                {
+                  name: t.products.items[1].name,
+                  description: t.products.items[1].description,
+                  price: t.products.items[1].price,
+                  productType: "NATAL_CHART" as const,
+                  btnLabel: lang === "en" ? "Unlock · €39" : "Desbloquear · 39€",
+                  note: lang === "en" ? "Requires The Wound and the Gift" : "Requiere La Herida y el Don",
+                },
+                {
+                  name: t.products.items[2].name,
+                  description: t.products.items[2].description,
+                  price: t.products.items[2].price,
+                  productType: "COMPATIBILITY" as const,
+                  btnLabel: lang === "en" ? "Unlock · €59" : "Desbloquear · 59€",
+                  note: lang === "en" ? "Requires Your Inner Map" : "Requiere Tu Mapa Interior",
+                },
+                {
+                  name: t.products.items[3].name,
+                  description: t.products.items[3].description,
+                  price: t.products.items[3].price,
+                  productType: "SUBSCRIPTION" as const,
+                  btnLabel: lang === "en" ? "Subscribe · €9/mo" : "Suscribirse · 9€/mes",
+                  note: null,
+                },
+              ] as const
+            ).map((product) => (
+              <article key={product.productType} className="insightCard">
                 <h3>{product.name}</h3>
                 <p>{product.description}</p>
-                <p className="miniLabel" style={{ marginTop: "12px", marginBottom: 0 }}>{product.price}</p>
+                <p className="miniLabel" style={{ marginTop: "12px", marginBottom: "16px" }}>{product.price}</p>
+                <button
+                  type="button"
+                  className="primaryButton"
+                  disabled={checkoutLoading}
+                  onClick={() => handleCheckout(product.productType)}
+                  style={{ width: "100%" }}
+                >
+                  {checkoutLoading ? (lang === "en" ? "Redirecting..." : "Redirigiendo...") : product.btnLabel}
+                </button>
+                {product.note && (
+                  <p style={{ margin: "8px 0 0", fontSize: "12px", color: "var(--text-faint)", textAlign: "center" }}>
+                    {product.note}
+                  </p>
+                )}
+                <p style={{ margin: "10px 0 0", fontSize: "11px", color: "var(--text-faint)", textAlign: "center", lineHeight: 1.5 }}>
+                  {lang === "en" ? (
+                    <>By completing your purchase you accept our{" "}
+                      <a href="/terminos-y-condiciones" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Terms and Conditions</a>{" "}
+                      and{" "}
+                      <a href="/politica-de-privacidad" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Privacy Policy</a>.
+                      Your report will be sent to the email used during checkout.</>
+                  ) : (
+                    <>Al completar tu compra aceptas nuestros{" "}
+                      <a href="/terminos-y-condiciones" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Términos y Condiciones</a>{" "}
+                      y{" "}
+                      <a href="/politica-de-privacidad" style={{ color: "var(--text-faint)", textDecoration: "underline" }}>Política de Privacidad</a>.
+                      Tu informe se enviará al email usado durante el pago.</>
+                  )}
+                </p>
               </article>
             ))}
           </div>

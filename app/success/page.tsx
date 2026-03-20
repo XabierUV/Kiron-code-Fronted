@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   fetchUnlockedReportBySession,
   verifyCheckoutSession,
+  createCheckout,
 } from "@/lib/api";
 import type { Lang, PremiumReport } from "@/types/chart";
 import { SiteHeader } from "@/components/site-header";
@@ -15,6 +16,7 @@ const COUNTDOWN_SECONDS = 10 * 60;
 type UnlockedReportState = {
   report: {
     id: string;
+    chartId: string;
     status: string;
     reportJson: PremiumReport | null;
     pdfUrl: string | null;
@@ -39,6 +41,7 @@ export default function SuccessPage() {
   const [error, setError] = useState("");
   const [data, setData] = useState<UnlockedReportState | null>(null);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const [upsellLoading, setUpsellLoading] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -108,6 +111,29 @@ export default function SuccessPage() {
   }, [countdown, data?.report?.pdfUrl]);
 
   const hasPdf = Boolean(data?.report?.pdfUrl);
+
+  const UPSELL_MAP: Record<string, { productType: "NATAL_CHART" | "COMPATIBILITY"; label: string; labelEn: string }> = {
+    CHIRON:      { productType: "NATAL_CHART",   label: "Descubrir Tu Mapa Interior · 39€", labelEn: "Discover Your Inner Map · €39" },
+    NATAL_CHART: { productType: "COMPATIBILITY", label: "Descubrir El Vínculo · 59€",       labelEn: "Discover The Bond · €59" },
+  };
+  const upsell = data?.order?.productType ? UPSELL_MAP[data.order.productType] ?? null : null;
+
+  async function handleUpsell() {
+    if (!upsell || !data) return;
+    setUpsellLoading(true);
+    try {
+      const checkout = await createCheckout({
+        chartId: data.report.chartId,
+        reportId: data.report.id,
+        productType: upsell.productType,
+      });
+      if (checkout.checkoutUrl) window.location.href = checkout.checkoutUrl;
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Error iniciando el pago.");
+    } finally {
+      setUpsellLoading(false);
+    }
+  }
 
   return (
     <div className="pageShell" id="top">
@@ -206,11 +232,21 @@ export default function SuccessPage() {
                   </article>
                 ))}
 
-                <div style={{ marginTop: "8px" }}>
-                  <button type="button" className="primaryButton" style={{ width: "100%", minHeight: "64px", fontSize: "17px" }}>
-                    Descubrir Tu Mapa Interior · 39€
-                  </button>
-                </div>
+                {upsell && (
+                  <div style={{ marginTop: "8px" }}>
+                    <button
+                      type="button"
+                      className="primaryButton"
+                      style={{ width: "100%", minHeight: "64px", fontSize: "17px" }}
+                      disabled={upsellLoading}
+                      onClick={handleUpsell}
+                    >
+                      {upsellLoading
+                        ? (lang === "en" ? "Redirecting..." : "Redirigiendo...")
+                        : (lang === "en" ? upsell.labelEn : upsell.label)}
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           )}

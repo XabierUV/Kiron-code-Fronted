@@ -43,7 +43,7 @@ export async function fetchReport(reportId: string): Promise<ReportRecordRespons
 export async function createCheckout(payload: {
   chartId: string;
   reportId: string;
-  productType: "CHIRON" | "NATAL_CHART" | "COMPATIBILITY";
+  productType: "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION";
 }): Promise<{ ok: boolean; checkoutUrl?: string; sessionId?: string; error?: string }> {
   console.log("[createCheckout] API_BASE:", API_BASE);
   const response = await fetch(`${API_BASE}/checkout`, {
