@@ -152,12 +152,13 @@ export default function SuccessPage() {
 
                     <article className="insightCard">
                       <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
-                        En los próximos minutos recibirás tu informe en el email que usaste durante el pago. Si sales de esta página, puedes acceder a él en cualquier momento desde{" "}
-                        <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MI CARTA</Link>.
-                      </p>
-                      <p style={{ margin: "16px 0 0", fontWeight: 700, lineHeight: 1.7 }}>
-                        Your report will arrive in the email you used during checkout within the next few minutes. If you leave this page, you can access it anytime from{" "}
-                        <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MY CHART</Link>.
+                        {lang === "en" ? (
+                          <>Your report will arrive in the email you used during checkout within the next few minutes. If you leave this page, you can access it anytime from{" "}
+                            <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MY CHART</Link>.</>
+                        ) : (
+                          <>En los próximos minutos recibirás tu informe en el email que usaste durante el pago. Si sales de esta página, puedes acceder a él en cualquier momento desde{" "}
+                            <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MI CARTA</Link>.</>
+                        )}
                       </p>
                     </article>
 
