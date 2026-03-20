@@ -151,21 +151,14 @@ export default function SuccessPage() {
                     </div>
 
                     <article className="insightCard">
-                      {lang === "en" ? (
-                        <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
-                          You will receive your report in the email you provided during payment within the next few minutes.<br /><br />
-                          If you leave this page, you&apos;ll find your report in{" "}
-                          <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MY CHART</Link>{" "}
-                          using your email.
-                        </p>
-                      ) : (
-                        <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
-                          En los próximos minutos recibirás tu informe en el email que proporcionaste durante el pago.<br /><br />
-                          Si sales de esta página, encontrarás tu informe en{" "}
-                          <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MI CARTA</Link>{" "}
-                          usando tu email.
-                        </p>
-                      )}
+                      <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
+                        En los próximos minutos recibirás tu informe en el email que usaste durante el pago. Si sales de esta página, puedes acceder a él en cualquier momento desde{" "}
+                        <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MI CARTA</Link>.
+                      </p>
+                      <p style={{ margin: "16px 0 0", fontWeight: 700, lineHeight: 1.7 }}>
+                        Your report will arrive in the email you used during checkout within the next few minutes. If you leave this page, you can access it anytime from{" "}
+                        <Link href="/mi-carta" style={{ color: "var(--text)", textDecoration: "underline" }}>MY CHART</Link>.
+                      </p>
                     </article>
 
                     <p style={{ marginTop: "8px" }}>
