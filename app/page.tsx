@@ -298,7 +298,7 @@ export default function Page() {
                 {
                   item: t.products.items[1],
                   productType: "CHIRON" as const,
-                  btnLabel: lang === "en" ? "Get started · €19" : "Comenzar · 19€",
+                  btnLabel: lang === "en" ? "The Wound and the Gift · €19" : "La Herida y el Don · 19€",
                   note: null,
                 },
                 {

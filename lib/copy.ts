@@ -100,7 +100,7 @@ export const copy = {
         },
         {
           name: "Kiron Vivo · 9€/mes",
-          description: "Tránsitos mensuales de Quirón. Qué se activa en ti cada mes, cuándo son tus momentos de mayor crecimiento y cómo navegarlos.",
+          description: "Cada mes, un análisis personalizado de los tránsitos que afectan a tu carta. Contenido premium astrológico adaptado a ti.",
           price: "9€/MES · CANCELA CUANDO QUIERAS",
         },
       ],
