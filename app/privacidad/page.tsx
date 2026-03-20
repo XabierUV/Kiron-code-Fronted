@@ -33,13 +33,13 @@ export default function PrivacidadPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              style={{ background: "none", border: "none", color: "var(--text-faint)", fontSize: "13px", letterSpacing: "0.08em", textTransform: "uppercase", padding: "0 0 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+              style={{ background: "none", border: "1px solid var(--line)", color: "var(--text-soft)", fontSize: "12px", letterSpacing: "0.1em", textTransform: "uppercase", padding: "8px 14px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", marginBottom: "18px", borderRadius: "4px" }}
             >
               ← Volver
             </button>
             <p className="sectionLabel">Legal</p>
             <h1 className="sectionTitle">Política de Privacidad</h1>
-            <p className="sectionText">Última actualización: marzo 2025</p>
+            <p className="sectionText">Última actualización: marzo 2026</p>
           </div>
 
           <div className="resultsPanel">
