@@ -8,6 +8,7 @@ type SiteHeaderProps = {
   setLang: React.Dispatch<React.SetStateAction<Lang>>;
   scrolled: boolean;
   onNavigate: (id: string) => void;
+  loggedInName?: string | null;
 };
 
 export function SiteHeader({
@@ -15,6 +16,7 @@ export function SiteHeader({
   setLang,
   scrolled,
   onNavigate,
+  loggedInName,
 }: SiteHeaderProps) {
   const t = copy[lang];
   const [menuOpen, setMenuOpen] = useState(false);
@@ -47,7 +49,7 @@ export function SiteHeader({
           {t.nav.premium}
         </button>
         <a href="/mi-galaxia" className="navAction" style={{ textDecoration: "none" }}>
-          {t.nav.myChart}
+          {loggedInName ? loggedInName : t.nav.myChart}
         </a>
       </nav>
 
@@ -94,7 +96,7 @@ export function SiteHeader({
             style={{ textDecoration: "none" }}
             onClick={() => setMenuOpen(false)}
           >
-            {t.nav.myChart}
+            {loggedInName ? loggedInName : t.nav.myChart}
           </a>
         </div>
       )}

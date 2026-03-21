@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ConsentModal, type ConsentData } from "@/components/consent-modal";
 import { VinculoConfigModal, type VinculoData } from "@/components/vinculo-config-modal";
 import { copy } from "@/lib/copy";
-import { createCheckout, fetchChart } from "@/lib/api";
+import { createCheckout, fetchChart, fetchPortal } from "@/lib/api";
 import type {
   ChartData,
   Lang,
@@ -93,6 +93,7 @@ export default function Page() {
   const [birthCountry, setBirthCountry] = useState("");
 
   const [purchasedProducts, setPurchasedProducts] = useState<Set<string>>(new Set());
+  const [loggedInName, setLoggedInName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [pendingProductType, setPendingProductType] = useState<"CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION" | null>(null);
@@ -117,11 +118,27 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("kc_purchased");
-      if (raw) setPurchasedProducts(new Set(JSON.parse(raw)));
-    } catch {
-      // localStorage unavailable or malformed — ignore
+    const token = localStorage.getItem("kc_token");
+    if (token) {
+      fetchPortal(token)
+        .then((portal) => {
+          const types = portal.products.map((p) => p.productType);
+          setPurchasedProducts(new Set(types));
+          localStorage.setItem("kc_purchased", JSON.stringify(types));
+          setLoggedInName(portal.name || portal.email);
+        })
+        .catch(() => {
+          // Token expired or invalid — fall back to cached list
+          try {
+            const raw = localStorage.getItem("kc_purchased");
+            if (raw) setPurchasedProducts(new Set(JSON.parse(raw)));
+          } catch { /* ignore */ }
+        });
+    } else {
+      try {
+        const raw = localStorage.getItem("kc_purchased");
+        if (raw) setPurchasedProducts(new Set(JSON.parse(raw)));
+      } catch { /* ignore */ }
     }
   }, []);
 
@@ -233,6 +250,7 @@ export default function Page() {
         setLang={setLang}
         scrolled={scrolled}
         onNavigate={scrollToId}
+        loggedInName={loggedInName}
       />
 
       <main className="pageContent">
