@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   fetchUnlockedReportBySession,
   verifyCheckoutSession,
@@ -43,6 +43,7 @@ export default function SuccessPage() {
   const [error, setError] = useState("");
   const [data, setData] = useState<UnlockedReportState | null>(null);
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const startTimeRef = useRef<number | null>(null);
   const [upsellLoading, setUpsellLoading] = useState(false);
   const [showUpsellModal, setShowUpsellModal] = useState(false);
   const [upsellVinculoStep, setUpsellVinculoStep] = useState(false);
@@ -98,13 +99,18 @@ export default function SuccessPage() {
     };
   }, []);
 
-  // Countdown — ticks while PDF not yet available
+  // Countdown — uses Date.now() so it keeps running when tab is hidden
   useEffect(() => {
     if (data?.report?.pdfUrl) return;
-    if (countdown <= 0) return;
-    const id = setInterval(() => setCountdown((c) => c - 1), 1000);
+    if (!startTimeRef.current) startTimeRef.current = Date.now();
+    const TOTAL_MS = COUNTDOWN_SECONDS * 1000;
+    const id = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current!;
+      const remaining = Math.max(0, Math.ceil((TOTAL_MS - elapsed) / 1000));
+      setCountdown(remaining);
+    }, 1000);
     return () => clearInterval(id);
-  }, [data?.report?.pdfUrl, countdown]);
+  }, [data?.report?.pdfUrl]);
 
   // Show error only after timeout (10 min elapsed, still no PDF)
   useEffect(() => {
@@ -180,6 +186,9 @@ export default function SuccessPage() {
                 ) : (
                   <>
                     <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
+                      <p className="miniLabel" style={{ textAlign: "center", marginBottom: "8px" }}>
+                        {lang === "en" ? "ESTIMATED TIME" : "TIEMPO ESTIMADO"}
+                      </p>
                       <p style={{
                         margin: 0,
                         fontSize: "clamp(64px, 14vw, 96px)",
