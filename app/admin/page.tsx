@@ -47,6 +47,7 @@ export default function AdminPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [sendError, setSendError] = useState<Record<string, string>>({});
+  const [resetting, setResetting] = useState<Record<string, boolean>>({});
   const [timers, setTimers] = useState<Record<string, TimerState>>({});
   const [, setTick] = useState(0);
 
@@ -151,6 +152,28 @@ export default function AdminPage() {
     setOrders([]);
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
     await fetchOrders(false);
+  }
+
+  async function handleReset(orderId: string) {
+    if (!confirm(`¿Resetear orden ${orderId}?\n\nEsto pondrá paymentStatus a PENDING y desvinculará el report.`)) return;
+    setResetting((prev) => ({ ...prev, [orderId]: true }));
+    try {
+      const res = await fetch(`${API_BASE}/admin/reset-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, secret }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Error");
+      await fetchOrders(true);
+    } catch (err) {
+      setSendError((prev) => ({
+        ...prev,
+        [orderId]: err instanceof Error ? err.message : "error",
+      }));
+    } finally {
+      setResetting((prev) => { const n = { ...prev }; delete n[orderId]; return n; });
+    }
   }
 
   async function handleTrigger(orderId: string) {
@@ -267,13 +290,20 @@ export default function AdminPage() {
                 </div>
 
                 <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                     <button
                       onClick={() => handleTrigger(o.orderId)}
                       style={{ ...btnStyle, opacity: isRunning ? 0.4 : 1, cursor: isRunning ? "not-allowed" : "pointer" }}
                       disabled={isRunning}
                     >
                       Regenerar PDF
+                    </button>
+                    <button
+                      onClick={() => handleReset(o.orderId)}
+                      style={{ ...btnStyle, background: "#fb923c", opacity: resetting[o.orderId] ? 0.4 : 1, cursor: resetting[o.orderId] ? "not-allowed" : "pointer" }}
+                      disabled={Boolean(resetting[o.orderId])}
+                    >
+                      {resetting[o.orderId] ? "Reseteando..." : "Resetear orden"}
                     </button>
                     {netError && !timer && (
                       <span style={{ fontSize: "13px", color: "#f87171" }}>✗ {netError}</span>
