@@ -47,11 +47,13 @@ const PRODUCT_CONFIG: Record<string, {
   countdownSec: number | null;
   waitingTitle: string;
   waitingTitleEn: string;
+  productTitle: string;
+  productTitleEn: string;
 }> = {
-  CHIRON:        { countdownSec: 10 * 60, waitingTitle: "Tu informe está listo.",          waitingTitleEn: "Your report is ready." },
-  NATAL_CHART:   { countdownSec: 15 * 60, waitingTitle: "Tu Mapa Interior está en camino.", waitingTitleEn: "Your Inner Map is on its way." },
-  COMPATIBILITY: { countdownSec: 20 * 60, waitingTitle: "El Vínculo está en camino.",       waitingTitleEn: "The Bond is on its way." },
-  SUBSCRIPTION:  { countdownSec: null,    waitingTitle: "Bienvenido a Kiron Vivo.",         waitingTitleEn: "Welcome to Kiron Vivo." },
+  CHIRON:        { countdownSec: 10 * 60, waitingTitle: "Tu informe está listo.",          waitingTitleEn: "Your report is ready.",        productTitle: "La Herida y el Don", productTitleEn: "The Wound and the Gift" },
+  NATAL_CHART:   { countdownSec: 15 * 60, waitingTitle: "Tu Mapa Interior está en camino.", waitingTitleEn: "Your Inner Map is on its way.", productTitle: "Tu Mapa Interior",   productTitleEn: "Your Inner Map"         },
+  COMPATIBILITY: { countdownSec: 20 * 60, waitingTitle: "El Vínculo está en camino.",       waitingTitleEn: "The Bond is on its way.",       productTitle: "El Vínculo",         productTitleEn: "The Bond"               },
+  SUBSCRIPTION:  { countdownSec: null,    waitingTitle: "Bienvenido a Kiron Vivo.",         waitingTitleEn: "Welcome to Kiron Vivo.",        productTitle: "Kiron Vivo",         productTitleEn: "Kiron Vivo"             },
 };
 
 const UPSELL_MAP: Record<string, { productType: "NATAL_CHART" | "COMPATIBILITY"; label: string; labelEn: string }> = {
@@ -206,7 +208,7 @@ export default function SuccessPage() {
               <div className="sectionIntro">
                 <p className="sectionLabel">Pago completado</p>
                 <h1 className="sectionTitle">
-                  {lang === "en" ? cfg.waitingTitleEn : cfg.waitingTitle}
+                  {lang === "en" ? cfg.productTitleEn : cfg.productTitle}
                 </h1>
               </div>
 
@@ -216,58 +218,61 @@ export default function SuccessPage() {
                     <h3>No se pudo cargar el informe</h3>
                     <p>{error}</p>
                   </article>
+                ) : productType === "SUBSCRIPTION" ? (
+                  <article className="insightCard">
+                    <p style={{ margin: "0 0 12px", fontWeight: 700, lineHeight: 1.7 }}>
+                      {lang === "en" ? "Welcome to your personal space." : "Bienvenido a tu espacio personal."}
+                    </p>
+                    <p style={{ margin: "0 0 12px", lineHeight: 1.7 }}>
+                      {lang === "en"
+                        ? `Your first delivery will arrive on ${firstDayNextMonth()}.`
+                        : `Tu primera entrega llegará el ${firstDayNextMonth()}.`}
+                    </p>
+                    <p style={{ margin: "0 0 12px", lineHeight: 1.7 }}>
+                      {lang === "en" ? (
+                        <>You can find your products in{" "}
+                          <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>, your personal space.</>
+                      ) : (
+                        <>Puedes encontrar tus productos en{" "}
+                          <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, tu espacio personal.</>
+                      )}
+                    </p>
+                    <p style={{ margin: 0, lineHeight: 1.7 }}>
+                      {lang === "en" ? "Thank you for your purchase." : "Muchas gracias por tu compra."}
+                    </p>
+                  </article>
                 ) : (
                   <>
-                    {/* Timer — solo si no es SUBSCRIPTION */}
-                    {cfg.countdownSec !== null && (
-                      <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
-                        <p className="miniLabel" style={{ textAlign: "center", marginBottom: "8px" }}>
-                          {lang === "en" ? "ESTIMATED TIME" : "TIEMPO ESTIMADO"}
-                        </p>
-                        <p style={{
-                          margin: 0,
-                          fontSize: "clamp(64px, 14vw, 96px)",
-                          fontWeight: "700",
-                          letterSpacing: "-0.05em",
-                          lineHeight: 1,
-                          color: "var(--text)",
-                        }}>
-                          {formatTime(countdown)}
-                        </p>
-                      </div>
-                    )}
+                    <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
+                      <p className="miniLabel" style={{ textAlign: "center", marginBottom: "8px" }}>
+                        {lang === "en" ? "ESTIMATED TIME" : "TIEMPO ESTIMADO"}
+                      </p>
+                      <p style={{
+                        margin: 0,
+                        fontSize: "clamp(64px, 14vw, 96px)",
+                        fontWeight: "700",
+                        letterSpacing: "-0.05em",
+                        lineHeight: 1,
+                        color: "var(--text)",
+                      }}>
+                        {formatTime(countdown)}
+                      </p>
+                    </div>
 
-                    {/* Texto SUBSCRIPTION */}
-                    {productType === "SUBSCRIPTION" && (
-                      <article className="insightCard">
-                        <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
-                          {lang === "en"
-                            ? `Your first delivery will arrive on the 1st of next month.`
-                            : `Tu primera entrega llegará el ${firstDayNextMonth()}.`}
-                        </p>
-                      </article>
-                    )}
-
-                    {/* Texto estándar */}
-                    {productType !== "SUBSCRIPTION" && (
-                      <article className="insightCard">
-                        <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
-                          {lang === "en" ? (
-                            <>Your report will arrive in the email you used during checkout within the next few minutes. If you leave this page, you can access it anytime from{" "}
-                              <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>.</>
-                          ) : (
-                            <>En los próximos minutos recibirás tu informe en el email que usaste durante el pago. Si sales de esta página, puedes acceder a él en cualquier momento desde{" "}
-                              <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>.</>
-                          )}
-                        </p>
-                      </article>
-                    )}
-
-                    <p style={{ marginTop: "8px" }}>
-                      <Link href="/" className="secondaryButton" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
-                        Volver al inicio
-                      </Link>
-                    </p>
+                    <article className="insightCard">
+                      <p style={{ margin: "0 0 12px", lineHeight: 1.7 }}>
+                        {lang === "en" ? (
+                          <>You can find your products in{" "}
+                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>, your personal space.</>
+                        ) : (
+                          <>Puedes encontrar tus productos en{" "}
+                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, tu espacio personal.</>
+                        )}
+                      </p>
+                      <p className="sectionText" style={{ margin: 0 }}>
+                        {lang === "en" ? "Thank you for your purchase." : "Muchas gracias por tu compra."}
+                      </p>
+                    </article>
                   </>
                 )}
               </div>
