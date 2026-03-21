@@ -13,8 +13,6 @@ import type { Lang, PremiumReport } from "@/types/chart";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
-const COUNTDOWN_SECONDS = 10 * 60;
-
 type UnlockedReportState = {
   report: {
     id: string;
@@ -36,18 +34,47 @@ function formatTime(seconds: number) {
   return `${m}:${s}`;
 }
 
+function firstDayNextMonth() {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth() + 1, 1).toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+const PRODUCT_CONFIG: Record<string, {
+  countdownSec: number | null;
+  waitingTitle: string;
+  waitingTitleEn: string;
+}> = {
+  CHIRON:        { countdownSec: 10 * 60, waitingTitle: "Tu informe está listo.",          waitingTitleEn: "Your report is ready." },
+  NATAL_CHART:   { countdownSec: 15 * 60, waitingTitle: "Tu Mapa Interior está en camino.", waitingTitleEn: "Your Inner Map is on its way." },
+  COMPATIBILITY: { countdownSec: 20 * 60, waitingTitle: "El Vínculo está en camino.",       waitingTitleEn: "The Bond is on its way." },
+  SUBSCRIPTION:  { countdownSec: null,    waitingTitle: "Bienvenido a Kiron Vivo.",         waitingTitleEn: "Welcome to Kiron Vivo." },
+};
+
+const UPSELL_MAP: Record<string, { productType: "NATAL_CHART" | "COMPATIBILITY"; label: string; labelEn: string }> = {
+  CHIRON:      { productType: "NATAL_CHART",   label: "Tu Mapa Interior · 39€", labelEn: "Your Inner Map · €39" },
+  NATAL_CHART: { productType: "COMPATIBILITY", label: "El Vínculo · 59€",       labelEn: "The Bond · €59" },
+};
+
 export default function SuccessPage() {
   const [lang, setLang] = useState<Lang>("es");
   const [scrolled, setScrolled] = useState(false);
   const [, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState<UnlockedReportState | null>(null);
-  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const [countdown, setCountdown] = useState(10 * 60);
   const startTimeRef = useRef<number | null>(null);
   const [upsellLoading, setUpsellLoading] = useState(false);
   const [showUpsellModal, setShowUpsellModal] = useState(false);
   const [upsellVinculoStep, setUpsellVinculoStep] = useState(false);
   const [upsellVinculoData, setUpsellVinculoData] = useState<VinculoData | null>(null);
+
+  const productType = data?.order?.productType ?? "CHIRON";
+  const cfg = PRODUCT_CONFIG[productType] ?? PRODUCT_CONFIG.CHIRON;
+  const upsell = UPSELL_MAP[productType] ?? null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -73,9 +100,8 @@ export default function SuccessPage() {
         if (active) setData(result);
       } catch (err) {
         const msg = err instanceof Error ? err.message.toLowerCase() : "";
-        // "not delivered yet" is normal during generation — keep polling silently
         if (active && !msg.includes("not delivered")) {
-          // unexpected error — still keep polling, timeout will handle it
+          // unexpected error — keep polling, timeout will handle it
         }
       }
     }
@@ -84,7 +110,7 @@ export default function SuccessPage() {
       try {
         await verifyCheckoutSession(sessionId!);
       } catch {
-        // non-fatal — continue to polling
+        // non-fatal
       }
       if (active) setLoading(false);
       tryFetch();
@@ -102,32 +128,28 @@ export default function SuccessPage() {
   // Countdown — uses Date.now() so it keeps running when tab is hidden
   useEffect(() => {
     if (data?.report?.pdfUrl) return;
+    if (cfg.countdownSec === null) return;
     if (!startTimeRef.current) startTimeRef.current = Date.now();
-    const TOTAL_MS = COUNTDOWN_SECONDS * 1000;
+    const TOTAL_MS = cfg.countdownSec * 1000;
     const id = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current!;
       const remaining = Math.max(0, Math.ceil((TOTAL_MS - elapsed) / 1000));
       setCountdown(remaining);
     }, 1000);
     return () => clearInterval(id);
-  }, [data?.report?.pdfUrl]);
+  }, [data?.report?.pdfUrl, cfg.countdownSec]);
 
-  // Show error only after timeout (10 min elapsed, still no PDF)
+  // Show error only after timeout
   useEffect(() => {
+    if (cfg.countdownSec === null) return;
     if (countdown === 0 && !data?.report?.pdfUrl) {
       setError(
         "El informe está tardando más de lo esperado. Revisa tu email o accede desde MI GALAXIA."
       );
     }
-  }, [countdown, data?.report?.pdfUrl]);
+  }, [countdown, data?.report?.pdfUrl, cfg.countdownSec]);
 
   const hasPdf = Boolean(data?.report?.pdfUrl);
-
-  const UPSELL_MAP: Record<string, { productType: "NATAL_CHART" | "COMPATIBILITY"; label: string; labelEn: string }> = {
-    CHIRON:      { productType: "NATAL_CHART",   label: "Descubrir Tu Mapa Interior · 39€", labelEn: "Discover Your Inner Map · €39" },
-    NATAL_CHART: { productType: "COMPATIBILITY", label: "Descubrir El Vínculo · 59€",       labelEn: "Discover The Bond · €59" },
-  };
-  const upsell = data?.order?.productType ? UPSELL_MAP[data.order.productType] ?? null : null;
 
   async function handleUpsell(consentData?: ConsentData) {
     if (!upsell || !data) return;
@@ -169,12 +191,14 @@ export default function SuccessPage() {
       <main className="pageContent">
         <section className="contentSection">
 
-          {/* ── ESTADO 1: informe en generación ── */}
+          {/* ── ESTADO 1: generando ── */}
           {!hasPdf && (
             <>
               <div className="sectionIntro">
                 <p className="sectionLabel">Pago completado</p>
-                <h1 className="sectionTitle">Tu informe está siendo generado.</h1>
+                <h1 className="sectionTitle">
+                  {lang === "en" ? cfg.waitingTitleEn : cfg.waitingTitle}
+                </h1>
               </div>
 
               <div className="resultsPanel">
@@ -185,33 +209,50 @@ export default function SuccessPage() {
                   </article>
                 ) : (
                   <>
-                    <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
-                      <p className="miniLabel" style={{ textAlign: "center", marginBottom: "8px" }}>
-                        {lang === "en" ? "ESTIMATED TIME" : "TIEMPO ESTIMADO"}
-                      </p>
-                      <p style={{
-                        margin: 0,
-                        fontSize: "clamp(64px, 14vw, 96px)",
-                        fontWeight: "700",
-                        letterSpacing: "-0.05em",
-                        lineHeight: 1,
-                        color: "var(--text)",
-                      }}>
-                        {formatTime(countdown)}
-                      </p>
-                    </div>
+                    {/* Timer — solo si no es SUBSCRIPTION */}
+                    {cfg.countdownSec !== null && (
+                      <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
+                        <p className="miniLabel" style={{ textAlign: "center", marginBottom: "8px" }}>
+                          {lang === "en" ? "ESTIMATED TIME" : "TIEMPO ESTIMADO"}
+                        </p>
+                        <p style={{
+                          margin: 0,
+                          fontSize: "clamp(64px, 14vw, 96px)",
+                          fontWeight: "700",
+                          letterSpacing: "-0.05em",
+                          lineHeight: 1,
+                          color: "var(--text)",
+                        }}>
+                          {formatTime(countdown)}
+                        </p>
+                      </div>
+                    )}
 
-                    <article className="insightCard">
-                      <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
-                        {lang === "en" ? (
-                          <>Your report will arrive in the email you used during checkout within the next few minutes. If you leave this page, you can access it anytime from{" "}
-                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>.</>
-                        ) : (
-                          <>En los próximos minutos recibirás tu informe en el email que usaste durante el pago. Si sales de esta página, puedes acceder a él en cualquier momento desde{" "}
-                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>.</>
-                        )}
-                      </p>
-                    </article>
+                    {/* Texto SUBSCRIPTION */}
+                    {productType === "SUBSCRIPTION" && (
+                      <article className="insightCard">
+                        <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
+                          {lang === "en"
+                            ? `Your first delivery will arrive on the 1st of next month.`
+                            : `Tu primera entrega llegará el ${firstDayNextMonth()}.`}
+                        </p>
+                      </article>
+                    )}
+
+                    {/* Texto estándar */}
+                    {productType !== "SUBSCRIPTION" && (
+                      <article className="insightCard">
+                        <p style={{ margin: 0, fontWeight: 700, lineHeight: 1.7 }}>
+                          {lang === "en" ? (
+                            <>Your report will arrive in the email you used during checkout within the next few minutes. If you leave this page, you can access it anytime from{" "}
+                              <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>.</>
+                          ) : (
+                            <>En los próximos minutos recibirás tu informe en el email que usaste durante el pago. Si sales de esta página, puedes acceder a él en cualquier momento desde{" "}
+                              <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>.</>
+                          )}
+                        </p>
+                      </article>
+                    )}
 
                     <p style={{ marginTop: "8px" }}>
                       <Link href="/" className="secondaryButton" style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}>
@@ -229,7 +270,9 @@ export default function SuccessPage() {
             <>
               <div className="sectionIntro">
                 <p className="sectionLabel">Pago completado</p>
-                <h1 className="sectionTitle">Tu informe está listo.</h1>
+                <h1 className="sectionTitle">
+                  {lang === "en" ? cfg.waitingTitleEn : cfg.waitingTitle}
+                </h1>
                 <p className="sectionText">
                   Aquí tienes tu informe premium desbloqueado.
                 </p>
