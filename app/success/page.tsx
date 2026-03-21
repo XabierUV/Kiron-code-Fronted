@@ -277,7 +277,7 @@ export default function SuccessPage() {
                     <p style={{ margin: "0 0 12px", lineHeight: 1.7 }}>
                       {lang === "en" ? (
                         <>You can find your products in{" "}
-                          <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>, your personal space.</>
+                          <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, your personal space.</>
                       ) : (
                         <>Puedes encontrar tus productos en{" "}
                           <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, tu espacio personal.</>
@@ -309,7 +309,7 @@ export default function SuccessPage() {
                       <p style={{ margin: "0 0 12px", lineHeight: 1.7, textAlign: "center" }}>
                         {lang === "en" ? (
                           <>You can find your downloaded products in{" "}
-                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>, your personal space.</>
+                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, your personal space.</>
                         ) : (
                           <>Puedes encontrar tus productos descargados en{" "}
                             <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, tu espacio personal.</>

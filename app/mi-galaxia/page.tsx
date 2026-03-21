@@ -173,7 +173,7 @@ export default function MiCartaPage() {
                   </article>
                 ) : (
                   <article className="insightCard">
-                    <h3>Acceder a mi galaxia</h3>
+                    <h3>Acceder a MI GALAXIA</h3>
                     <p style={{ marginBottom: "20px" }}>
                       Introduce el email que usaste al generar tu carta natal. Te enviaremos un enlace de acceso directo.
                     </p>
@@ -200,7 +200,7 @@ export default function MiCartaPage() {
                       )}
                       <div>
                         <button type="submit" className="primaryButton" disabled={sending}>
-                          {sending ? "Enviando..." : "Acceder a mi galaxia"}
+                          {sending ? "Enviando..." : "Acceder a MI GALAXIA"}
                         </button>
                       </div>
                     </form>

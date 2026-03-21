@@ -6,7 +6,7 @@ export const copy = {
       chart: "Carta",
       results: "Resultados",
       premium: "Productos",
-      myChart: "Mi galaxia",
+      myChart: "MI GALAXIA",
     },
     hero: {
       eyebrow: "Precisión astronómica. Diseño radical.",
@@ -145,7 +145,7 @@ export const copy = {
       chart: "Chart",
       results: "Results",
       premium: "Products",
-      myChart: "My galaxy",
+      myChart: "MI GALAXIA",
     },
     hero: {
       eyebrow: "Astronomical precision. Radical design.",
@@ -273,7 +273,7 @@ export const copy = {
         },
         {
           q: "Can I access my report later?",
-          a: "Yes. From MY GALAXY you can access all your reports whenever you want using your email.",
+          a: "Yes. From MI GALAXIA you can access all your reports whenever you want using your email.",
         },
       ],
     },
