@@ -353,29 +353,43 @@ export default function Page() {
                 },
               ] as const
             ).map((product) => {
-              const isLocked = product.requiresKey !== null && !purchasedProducts.has(product.requiresKey);
+              const isPurchased = purchasedProducts.has(product.productType);
+              const isLocked = !isPurchased && product.requiresKey !== null && !purchasedProducts.has(product.requiresKey);
               return (
                 <article key={product.productType} className="insightCard">
-                  <h3>{product.item.name}</h3>
-                  <p>{product.item.description}</p>
-                  <p className="miniLabel" style={{ marginTop: "12px", marginBottom: "16px" }}>{product.item.price}</p>
-                  <button
-                    type="button"
-                    className="primaryButton"
-                    disabled={checkoutLoading || isLocked}
-                    onClick={() => {
-                      if (isLocked) return;
-                      setPendingProductType(product.productType);
-                      if (product.productType === "COMPATIBILITY") setVinculoStep(true);
-                    }}
-                    style={{ width: "100%", opacity: isLocked ? 0.4 : 1, cursor: isLocked ? "not-allowed" : "pointer" }}
-                  >
-                    {checkoutLoading ? (lang === "en" ? "Redirecting..." : "Redirigiendo...") : product.btnLabel}
-                  </button>
-                  {isLocked && product.lockedNote && (
-                    <p style={{ margin: "8px 0 0", fontSize: "12px", color: "var(--text-faint)", textAlign: "center" }}>
-                      {product.lockedNote}
-                    </p>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
+                    <div>
+                      <h3 style={{ marginBottom: "6px" }}>{product.item.name}</h3>
+                      <p style={{ margin: 0 }}>{product.item.description}</p>
+                      <p className="miniLabel" style={{ marginTop: "12px" }}>{product.item.price}</p>
+                    </div>
+                    {isPurchased && (
+                      <span style={{ flexShrink: 0, padding: "4px 10px", border: "1px solid var(--line)", borderRadius: "999px", fontSize: "12px", color: "rgba(100,220,130,0.9)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                        {lang === "en" ? "✓ Acquired" : "✓ Adquirido"}
+                      </span>
+                    )}
+                  </div>
+                  {!isPurchased && (
+                    <div style={{ marginTop: "16px" }}>
+                      <button
+                        type="button"
+                        className="primaryButton"
+                        disabled={checkoutLoading || isLocked}
+                        onClick={() => {
+                          if (isLocked) return;
+                          setPendingProductType(product.productType);
+                          if (product.productType === "COMPATIBILITY") setVinculoStep(true);
+                        }}
+                        style={{ width: "100%", opacity: isLocked ? 0.4 : 1, cursor: isLocked ? "not-allowed" : "pointer" }}
+                      >
+                        {checkoutLoading ? (lang === "en" ? "Redirecting..." : "Redirigiendo...") : product.btnLabel}
+                      </button>
+                      {isLocked && product.lockedNote && (
+                        <p style={{ margin: "8px 0 0", fontSize: "12px", color: "var(--text-faint)", textAlign: "center" }}>
+                          {product.lockedNote}
+                        </p>
+                      )}
+                    </div>
                   )}
                 </article>
               );
