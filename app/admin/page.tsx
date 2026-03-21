@@ -46,7 +46,6 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [sendingIds, setSendingIds] = useState<Set<string>>(new Set());
   const [sendError, setSendError] = useState<Record<string, string>>({});
   const [timers, setTimers] = useState<Record<string, TimerState>>({});
   const [, setTick] = useState(0);
@@ -155,7 +154,8 @@ export default function AdminPage() {
   }
 
   async function handleTrigger(orderId: string) {
-    setSendingIds((s) => new Set(s).add(orderId));
+    // Start timer immediately on click
+    setTimers((prev) => ({ ...prev, [orderId]: { startMs: Date.now(), final: null } }));
     setSendError((prev) => { const n = { ...prev }; delete n[orderId]; return n; });
     try {
       const res = await fetch(`${API_BASE}/admin/trigger-pdf`, {
@@ -165,15 +165,14 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Error");
-      // Start the per-order timer
-      setTimers((prev) => ({ ...prev, [orderId]: { startMs: Date.now(), final: null } }));
+      // Timer keeps running — stops only when polling detects DELIVERED or ERROR
     } catch (err) {
+      // Network/API error: stop timer and show message
+      setTimers((prev) => { const n = { ...prev }; delete n[orderId]; return n; });
       setSendError((prev) => ({
         ...prev,
         [orderId]: err instanceof Error ? err.message : "error",
       }));
-    } finally {
-      setSendingIds((s) => { const n = new Set(s); n.delete(orderId); return n; });
     }
   }
 
@@ -246,7 +245,6 @@ export default function AdminPage() {
             const elapsedSec = timer && !timer.final
               ? Math.floor((Date.now() - timer.startMs) / 1000)
               : 0;
-            const isSending = sendingIds.has(o.orderId);
             const netError = sendError[o.orderId];
 
             return (
@@ -272,10 +270,10 @@ export default function AdminPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                     <button
                       onClick={() => handleTrigger(o.orderId)}
-                      style={{ ...btnStyle, opacity: (isRunning || isSending) ? 0.4 : 1, cursor: (isRunning || isSending) ? "not-allowed" : "pointer" }}
-                      disabled={isRunning || isSending}
+                      style={{ ...btnStyle, opacity: isRunning ? 0.4 : 1, cursor: isRunning ? "not-allowed" : "pointer" }}
+                      disabled={isRunning}
                     >
-                      {isSending ? "Enviando..." : "Regenerar PDF"}
+                      Regenerar PDF
                     </button>
                     {netError && !timer && (
                       <span style={{ fontSize: "13px", color: "#f87171" }}>✗ {netError}</span>
