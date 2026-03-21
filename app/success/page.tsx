@@ -43,22 +43,57 @@ function firstDayNextMonth() {
   });
 }
 
-const PRODUCT_CONFIG: Record<string, {
+type ProductCfg = {
   countdownSec: number | null;
   waitingTitle: string;
   waitingTitleEn: string;
   productTitle: string;
   productTitleEn: string;
-}> = {
-  CHIRON:        { countdownSec: 10 * 60, waitingTitle: "Tu informe está listo.",          waitingTitleEn: "Your report is ready.",        productTitle: "La Herida y el Don", productTitleEn: "The Wound and the Gift" },
-  NATAL_CHART:   { countdownSec: 15 * 60, waitingTitle: "Tu Mapa Interior está en camino.", waitingTitleEn: "Your Inner Map is on its way.", productTitle: "Tu Mapa Interior",   productTitleEn: "Your Inner Map"         },
-  COMPATIBILITY: { countdownSec: 20 * 60, waitingTitle: "El Vínculo está en camino.",       waitingTitleEn: "The Bond is on its way.",       productTitle: "El Vínculo",         productTitleEn: "The Bond"               },
-  SUBSCRIPTION:  { countdownSec: null,    waitingTitle: "Bienvenido a Kiron Vivo.",         waitingTitleEn: "Welcome to Kiron Vivo.",        productTitle: "Kiron Vivo",         productTitleEn: "Kiron Vivo"             },
+  upsellProductType: string | null;
+  upsellTitle: string | null;
+  upsellTitleEn: string | null;
+  upsellDesc: string | null;
+  upsellDescEn: string | null;
 };
 
-const UPSELL_MAP: Record<string, { productType: "NATAL_CHART" | "COMPATIBILITY"; label: string; labelEn: string }> = {
-  CHIRON:      { productType: "NATAL_CHART",   label: "Tu Mapa Interior · 39€", labelEn: "Your Inner Map · €39" },
-  NATAL_CHART: { productType: "COMPATIBILITY", label: "El Vínculo · 59€",       labelEn: "The Bond · €59" },
+const PRODUCT_CONFIG: Record<string, ProductCfg> = {
+  CHIRON: {
+    countdownSec: 10 * 60,
+    waitingTitle: "Tu informe está listo.", waitingTitleEn: "Your report is ready.",
+    productTitle: "La Herida y el Don",     productTitleEn: "The Wound and the Gift",
+    upsellProductType: "NATAL_CHART",
+    upsellTitle:    "Tu Mapa Interior · 39€",
+    upsellTitleEn:  "Your Inner Map · €39",
+    upsellDesc:   "Tu carta natal completa. Sol, Luna, Saturno, Nodo Norte y todos los aspectos que definen quién eres y hacia dónde vas.",
+    upsellDescEn: "Your complete birth chart. Sun, Moon, Saturn, North Node and all the aspects that define who you are and where you're going.",
+  },
+  NATAL_CHART: {
+    countdownSec: 15 * 60,
+    waitingTitle: "Tu Mapa Interior está en camino.", waitingTitleEn: "Your Inner Map is on its way.",
+    productTitle: "Tu Mapa Interior",                productTitleEn: "Your Inner Map",
+    upsellProductType: "COMPATIBILITY",
+    upsellTitle:    "El Vínculo · 59€",
+    upsellTitleEn:  "The Bond · €59",
+    upsellDesc:   "Dos cartas comparadas. Descubre por qué te enganchas a ciertas personas, qué activan en tu herida y qué podéis construir juntos.",
+    upsellDescEn: "Two charts compared. Discover why you get attached to certain people, what they activate in your wound and what you can build together.",
+  },
+  COMPATIBILITY: {
+    countdownSec: 20 * 60,
+    waitingTitle: "El Vínculo está en camino.", waitingTitleEn: "The Bond is on its way.",
+    productTitle: "El Vínculo",                productTitleEn: "The Bond",
+    upsellProductType: "SUBSCRIPTION",
+    upsellTitle:    "Kiron Vivo · 9€/mes",
+    upsellTitleEn:  "Kiron Vivo · €9/mo",
+    upsellDesc:   "Cada mes, un análisis personalizado de los tránsitos que afectan a tu carta. Contenido premium adaptado a ti.",
+    upsellDescEn: "Each month, a personalized analysis of the transits affecting your chart. Premium content adapted to you.",
+  },
+  SUBSCRIPTION: {
+    countdownSec: null,
+    waitingTitle: "Bienvenido a Kiron Vivo.", waitingTitleEn: "Welcome to Kiron Vivo.",
+    productTitle: "Kiron Vivo",              productTitleEn: "Kiron Vivo",
+    upsellProductType: null,
+    upsellTitle: null, upsellTitleEn: null, upsellDesc: null, upsellDescEn: null,
+  },
 };
 
 function getUrlProductType(): string | null {
@@ -78,6 +113,7 @@ export default function SuccessPage() {
     return PRODUCT_CONFIG[pt ?? ""]?.countdownSec ?? 10 * 60;
   });
   const startTimeRef = useRef<number | null>(null);
+  const [purchasedProducts, setPurchasedProducts] = useState<Set<string>>(new Set());
   const [upsellLoading, setUpsellLoading] = useState(false);
   const [showUpsellModal, setShowUpsellModal] = useState(false);
   const [upsellVinculoStep, setUpsellVinculoStep] = useState(false);
@@ -85,13 +121,23 @@ export default function SuccessPage() {
 
   const productType = data?.order?.productType ?? urlProductType ?? "CHIRON";
   const cfg = PRODUCT_CONFIG[productType] ?? PRODUCT_CONFIG.CHIRON;
-  const upsell = UPSELL_MAP[productType] ?? null;
+  const showUpsell = Boolean(cfg.upsellTitle) &&
+    !(cfg.upsellProductType === "SUBSCRIPTION" && purchasedProducts.has("SUBSCRIPTION"));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("kc_purchased");
+      if (raw) setPurchasedProducts(new Set(JSON.parse(raw)));
+    } catch {
+      // ignore
+    }
   }, []);
 
   useEffect(() => {
@@ -163,14 +209,14 @@ export default function SuccessPage() {
   const hasPdf = Boolean(data?.report?.pdfUrl);
 
   async function handleUpsell(consentData?: ConsentData) {
-    if (!upsell || !data) return;
+    if (!cfg.upsellProductType || !data) return;
     setUpsellLoading(true);
     const vd = upsellVinculoData;
     try {
       const checkout = await createCheckout({
         chartId: data.report.chartId,
         reportId: data.report.id,
-        productType: upsell.productType,
+        productType: cfg.upsellProductType as "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION",
         deliveryEmail: consentData?.deliveryEmail,
         marketingConsent: consentData?.marketingConsent,
         ...(vd && {
@@ -308,22 +354,16 @@ export default function SuccessPage() {
                   </a>
                 </article>
 
-                {upsell && (
+                {showUpsell && (
                   <article className="insightCard">
                     <p className="miniLabel" style={{ marginBottom: "10px" }}>
                       {lang === "en" ? "NEXT LEVEL" : "SIGUIENTE NIVEL"}
                     </p>
                     <h3 style={{ marginBottom: "10px" }}>
-                      {lang === "en" ? upsell.labelEn : upsell.label}
+                      {lang === "en" ? cfg.upsellTitleEn : cfg.upsellTitle}
                     </h3>
                     <p style={{ marginBottom: "20px", lineHeight: 1.7 }}>
-                      {upsell.productType === "COMPATIBILITY"
-                        ? (lang === "en"
-                            ? "Two charts compared. Discover why you get attached to certain people, what they activate in your wound and what you can build together."
-                            : "Dos cartas comparadas. Descubre por qué te enganchas a ciertas personas, qué activan en tu herida y qué podéis construir juntos.")
-                        : (lang === "en"
-                            ? "Your complete natal chart. Sun, Moon, Saturn, North Node and all the aspects that define who you are and where you're going."
-                            : "Tu carta natal completa. Sol, Luna, Saturno, Nodo Norte y todos los aspectos que definen quién eres y hacia dónde vas.")}
+                      {lang === "en" ? cfg.upsellDescEn : cfg.upsellDesc}
                     </p>
                     <button
                       type="button"
@@ -331,7 +371,7 @@ export default function SuccessPage() {
                       style={{ width: "100%", minHeight: "56px", fontSize: "16px" }}
                       disabled={upsellLoading}
                       onClick={() => {
-                        if (upsell.productType === "COMPATIBILITY") {
+                        if (cfg.upsellProductType === "COMPATIBILITY") {
                           setUpsellVinculoStep(true);
                         } else {
                           setShowUpsellModal(true);
@@ -340,7 +380,9 @@ export default function SuccessPage() {
                     >
                       {upsellLoading
                         ? (lang === "en" ? "Redirecting..." : "Redirigiendo...")
-                        : (lang === "en" ? `Discover ${upsell.labelEn}` : `Descubrir ${upsell.label}`)}
+                        : (lang === "en"
+                            ? `Discover ${cfg.upsellTitleEn}`
+                            : `Descubrir ${cfg.upsellTitle}`)}
                     </button>
                   </article>
                 )}
