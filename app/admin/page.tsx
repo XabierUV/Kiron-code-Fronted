@@ -206,15 +206,13 @@ export default function AdminPage() {
                 </div>
               </div>
               <div style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px" }}>
-                {o.reportStatus !== "DELIVERED" && (
-                  <button
-                    onClick={() => handleTrigger(o.orderId)}
-                    style={btnStyle}
-                    disabled={triggerStatus[o.orderId] === "enviando..."}
-                  >
-                    Regenerar PDF
-                  </button>
-                )}
+                <button
+                  onClick={() => handleTrigger(o.orderId)}
+                  style={btnStyle}
+                  disabled={triggerStatus[o.orderId] === "enviando..."}
+                >
+                  Regenerar PDF
+                </button>
                 {triggerStatus[o.orderId] && (
                   <span style={{ fontSize: "13px", color: triggerStatus[o.orderId].startsWith("✓") ? "#86efac" : "#f87171" }}>
                     {triggerStatus[o.orderId]}
