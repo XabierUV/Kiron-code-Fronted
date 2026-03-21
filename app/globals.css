@@ -171,6 +171,51 @@ button {
   color: var(--text);
 }
 
+.hamburgerButton {
+  display: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  padding: 8px;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+  transition: color 160ms ease;
+}
+
+.hamburgerButton:hover {
+  color: var(--text);
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 10px;
+  background: rgba(10, 10, 10, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 101;
+}
+
+.mobileMenu .navAction {
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 6px;
+}
+
+.mobileMenu .navAction:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .langSwitch {
   display: inline-flex;
   align-items: center;
@@ -641,13 +686,17 @@ button {
 
   .siteHeader {
     width: calc(100% - 20px);
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     gap: 12px;
     padding: 12px 14px;
   }
 
   .siteNav {
     display: none;
+  }
+
+  .hamburgerButton {
+    display: flex;
   }
 
   .heroSection {

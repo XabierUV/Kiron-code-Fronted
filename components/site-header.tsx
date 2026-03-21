@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import type { Lang } from "@/types/chart";
 import { copy } from "@/lib/copy";
 
@@ -17,13 +17,19 @@ export function SiteHeader({
   onNavigate,
 }: SiteHeaderProps) {
   const t = copy[lang];
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  function handleNav(id: string) {
+    setMenuOpen(false);
+    onNavigate(id);
+  }
 
   return (
     <header className={`siteHeader ${scrolled ? "siteHeaderScrolled" : ""}`}>
       <button
         type="button"
         className="brandButton"
-        onClick={() => onNavigate("top")}
+        onClick={() => handleNav("top")}
         aria-label="Kiron Code"
       >
         <span className="brandMark">K</span>
@@ -31,31 +37,28 @@ export function SiteHeader({
       </button>
 
       <nav className="siteNav" aria-label="Primary">
-        <button
-          type="button"
-          className="navAction"
-          onClick={() => onNavigate("chart")}
-        >
+        <button type="button" className="navAction" onClick={() => handleNav("chart")}>
           {t.nav.chart}
         </button>
-        <button
-          type="button"
-          className="navAction"
-          onClick={() => onNavigate("results")}
-        >
+        <button type="button" className="navAction" onClick={() => handleNav("results")}>
           {t.nav.results}
         </button>
-        <button
-          type="button"
-          className="navAction"
-          onClick={() => onNavigate("productos")}
-        >
+        <button type="button" className="navAction" onClick={() => handleNav("productos")}>
           {t.nav.premium}
         </button>
         <a href="/mi-galaxia" className="navAction" style={{ textDecoration: "none" }}>
           {t.nav.myChart}
         </a>
       </nav>
+
+      <button
+        type="button"
+        className="hamburgerButton"
+        onClick={() => setMenuOpen((o) => !o)}
+        aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+      >
+        {menuOpen ? "✕" : "☰"}
+      </button>
 
       <div className="langSwitch" role="group" aria-label="Language switch">
         <button
@@ -73,6 +76,28 @@ export function SiteHeader({
           EN
         </button>
       </div>
+
+      {menuOpen && (
+        <div className="mobileMenu">
+          <button type="button" className="navAction" onClick={() => handleNav("chart")}>
+            {t.nav.chart}
+          </button>
+          <button type="button" className="navAction" onClick={() => handleNav("results")}>
+            {t.nav.results}
+          </button>
+          <button type="button" className="navAction" onClick={() => handleNav("productos")}>
+            {t.nav.premium}
+          </button>
+          <a
+            href="/mi-galaxia"
+            className="navAction"
+            style={{ textDecoration: "none" }}
+            onClick={() => setMenuOpen(false)}
+          >
+            {t.nav.myChart}
+          </a>
+        </div>
+      )}
     </header>
   );
 }
