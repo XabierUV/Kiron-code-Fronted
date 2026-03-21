@@ -59,20 +59,29 @@ const UPSELL_MAP: Record<string, { productType: "NATAL_CHART" | "COMPATIBILITY";
   NATAL_CHART: { productType: "COMPATIBILITY", label: "El Vínculo · 59€",       labelEn: "The Bond · €59" },
 };
 
+function getUrlProductType(): string | null {
+  if (typeof window === "undefined") return null;
+  return new URLSearchParams(window.location.search).get("product_type");
+}
+
 export default function SuccessPage() {
   const [lang, setLang] = useState<Lang>("es");
   const [scrolled, setScrolled] = useState(false);
   const [, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState<UnlockedReportState | null>(null);
-  const [countdown, setCountdown] = useState(10 * 60);
+  const [urlProductType] = useState<string | null>(getUrlProductType);
+  const [countdown, setCountdown] = useState(() => {
+    const pt = getUrlProductType();
+    return PRODUCT_CONFIG[pt ?? ""]?.countdownSec ?? 10 * 60;
+  });
   const startTimeRef = useRef<number | null>(null);
   const [upsellLoading, setUpsellLoading] = useState(false);
   const [showUpsellModal, setShowUpsellModal] = useState(false);
   const [upsellVinculoStep, setUpsellVinculoStep] = useState(false);
   const [upsellVinculoData, setUpsellVinculoData] = useState<VinculoData | null>(null);
 
-  const productType = data?.order?.productType ?? "CHIRON";
+  const productType = data?.order?.productType ?? urlProductType ?? "CHIRON";
   const cfg = PRODUCT_CONFIG[productType] ?? PRODUCT_CONFIG.CHIRON;
   const upsell = UPSELL_MAP[productType] ?? null;
 
