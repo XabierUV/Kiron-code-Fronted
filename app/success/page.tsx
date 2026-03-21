@@ -306,16 +306,16 @@ export default function SuccessPage() {
                     </div>
 
                     <article className="insightCard">
-                      <p style={{ margin: "0 0 12px", lineHeight: 1.7 }}>
+                      <p style={{ margin: "0 0 12px", lineHeight: 1.7, textAlign: "center" }}>
                         {lang === "en" ? (
-                          <>You can find your products in{" "}
+                          <>You can find your downloaded products in{" "}
                             <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MY GALAXY</Link>, your personal space.</>
                         ) : (
-                          <>Puedes encontrar tus productos en{" "}
+                          <>Puedes encontrar tus productos descargados en{" "}
                             <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, tu espacio personal.</>
                         )}
                       </p>
-                      <p className="sectionText" style={{ margin: 0 }}>
+                      <p className="sectionText" style={{ margin: 0, textAlign: "center" }}>
                         {lang === "en" ? "Thank you for your purchase." : "Muchas gracias por tu compra."}
                       </p>
                     </article>
