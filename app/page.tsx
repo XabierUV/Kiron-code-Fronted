@@ -171,7 +171,8 @@ export default function Page() {
 
   async function handleCheckout(
     productType: "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION" = "CHIRON",
-    consentData?: ConsentData
+    consentData?: ConsentData,
+    vd?: VinculoData | null
   ) {
     try {
       console.log("handleCheckout start", { chartId, reportId, productType });
@@ -188,7 +189,6 @@ export default function Page() {
 
       setCheckoutLoading(true);
 
-      const vd = vinculoData;
       const checkout = await createCheckout({
         chartId,
         reportId,
@@ -386,9 +386,10 @@ export default function Page() {
           lang={lang}
           onConfirm={(data) => {
             const pt = pendingProductType;
+            const vd = vinculoData;
             setPendingProductType(null);
             setVinculoData(null);
-            handleCheckout(pt, data);
+            handleCheckout(pt, data, vd);
           }}
           onCancel={() => { setPendingProductType(null); setVinculoData(null); }}
         />
