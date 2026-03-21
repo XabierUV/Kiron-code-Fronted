@@ -15,12 +15,23 @@ type OrderRow = {
   createdAt: string;
 };
 
+type TimerState = {
+  startMs: number;
+  final: null | { elapsed: string; success: boolean };
+};
+
 const PRODUCT_LABELS: Record<string, string> = {
   CHIRON: "La Herida y el Don",
   NATAL_CHART: "Tu Mapa Interior",
   COMPATIBILITY: "El Vínculo",
   SUBSCRIPTION: "Kiron Vivo",
 };
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
 
 function hasPendingOrders(orders: OrderRow[]): boolean {
   return orders.some(
@@ -35,13 +46,28 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [triggerStatus, setTriggerStatus] = useState<Record<string, string>>({});
+  const [sendingIds, setSendingIds] = useState<Set<string>>(new Set());
+  const [sendError, setSendError] = useState<Record<string, string>>({});
+  const [timers, setTimers] = useState<Record<string, TimerState>>({});
+  const [, setTick] = useState(0);
+
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const secretRef = useRef(secret);
   const emailRef = useRef(email);
+  const timersRef = useRef(timers);
 
   useEffect(() => { secretRef.current = secret; }, [secret]);
   useEffect(() => { emailRef.current = email; }, [email]);
+  useEffect(() => { timersRef.current = timers; }, [timers]);
+
+  const hasRunningTimers = Object.values(timers).some((t) => t.final === null);
+
+  // Tick every second while timers are running
+  useEffect(() => {
+    if (!hasRunningTimers) return;
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, [hasRunningTimers]);
 
   const fetchOrders = useCallback(async (isAuto = false) => {
     if (isAuto) setRefreshing(true);
@@ -64,13 +90,43 @@ export default function AdminPage() {
     }
   }, []);
 
-  // Start/stop auto-refresh based on pending orders
+  // Finalize timers when orders update (only orders in deps — use ref for timers)
+  useEffect(() => {
+    if (Object.keys(timersRef.current).length === 0) return;
+    setTimers((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const [orderId, timer] of Object.entries(prev)) {
+        if (timer.final !== null) continue;
+        const order = orders.find((o) => o.orderId === orderId);
+        if (!order) continue;
+        const done =
+          order.reportStatus === "DELIVERED" ||
+          order.reportStatus === "ERROR" ||
+          order.reportStatus === "FAILED";
+        if (done) {
+          const elapsed = formatTime(Math.floor((Date.now() - timer.startMs) / 1000));
+          next[orderId] = { ...timer, final: { elapsed, success: order.reportStatus === "DELIVERED" } };
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [orders]);
+
+  // Poll every 5s while timers are running (faster than regular auto-refresh)
+  useEffect(() => {
+    if (!hasRunningTimers) return;
+    const id = setInterval(() => fetchOrders(true), 5000);
+    return () => clearInterval(id);
+  }, [hasRunningTimers, fetchOrders]);
+
+  // Start/stop 30s auto-refresh based on pending orders
   useEffect(() => {
     if (orders.length === 0) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
-
     if (hasPendingOrders(orders)) {
       if (!intervalRef.current) {
         intervalRef.current = setInterval(async () => {
@@ -85,7 +141,6 @@ export default function AdminPage() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
@@ -99,12 +154,9 @@ export default function AdminPage() {
     await fetchOrders(false);
   }
 
-  async function handleRefreshNow() {
-    await fetchOrders(true);
-  }
-
   async function handleTrigger(orderId: string) {
-    setTriggerStatus((s) => ({ ...s, [orderId]: "enviando..." }));
+    setSendingIds((s) => new Set(s).add(orderId));
+    setSendError((prev) => { const n = { ...prev }; delete n[orderId]; return n; });
     try {
       const res = await fetch(`${API_BASE}/admin/trigger-pdf`, {
         method: "POST",
@@ -113,16 +165,19 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Error");
-      setTriggerStatus((s) => ({ ...s, [orderId]: `✓ disparado (${data.productType})` }));
+      // Start the per-order timer
+      setTimers((prev) => ({ ...prev, [orderId]: { startMs: Date.now(), final: null } }));
     } catch (err) {
-      setTriggerStatus((s) => ({
-        ...s,
-        [orderId]: `✗ ${err instanceof Error ? err.message : "error"}`,
+      setSendError((prev) => ({
+        ...prev,
+        [orderId]: err instanceof Error ? err.message : "error",
       }));
+    } finally {
+      setSendingIds((s) => { const n = new Set(s); n.delete(orderId); return n; });
     }
   }
 
-  const autoRefreshActive = orders.length > 0 && hasPendingOrders(orders);
+  const autoRefreshActive = orders.length > 0 && (hasPendingOrders(orders) || hasRunningTimers);
 
   return (
     <div style={{
@@ -167,7 +222,7 @@ export default function AdminPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "8px", flexWrap: "wrap" }}>
             <p style={{ color: "#888", fontSize: "13px", margin: 0 }}>
-              {orders.length} orden(es) encontrada(s) para <strong style={{ color: "#fff" }}>{email}</strong>
+              {orders.length} orden(es) — <strong style={{ color: "#fff" }}>{email}</strong>
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               {autoRefreshActive && (
@@ -176,7 +231,7 @@ export default function AdminPage() {
                 </span>
               )}
               <button
-                onClick={handleRefreshNow}
+                onClick={() => fetchOrders(true)}
                 disabled={refreshing}
                 style={{ ...btnStyle, padding: "4px 12px", fontSize: "12px", opacity: refreshing ? 0.6 : 1 }}
               >
@@ -185,42 +240,71 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {orders.map((o) => (
-            <div key={o.orderId} style={cardStyle}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <span style={{ color: "#fff", fontWeight: 700 }}>
-                    {PRODUCT_LABELS[o.productType] ?? o.productType}
-                  </span>
-                  <span style={{ fontSize: "12px", color: "#888" }}>
-                    {o.orderId}
-                  </span>
-                  <span style={{ fontSize: "12px", color: "#888" }}>
-                    {new Date(o.createdAt).toLocaleString("es-ES")}
-                  </span>
+          {orders.map((o) => {
+            const timer = timers[o.orderId];
+            const isRunning = Boolean(timer && timer.final === null);
+            const elapsedSec = timer && !timer.final
+              ? Math.floor((Date.now() - timer.startMs) / 1000)
+              : 0;
+            const isSending = sendingIds.has(o.orderId);
+            const netError = sendError[o.orderId];
+
+            return (
+              <div key={o.orderId} style={cardStyle}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <span style={{ color: "#fff", fontWeight: 700 }}>
+                      {PRODUCT_LABELS[o.productType] ?? o.productType}
+                    </span>
+                    <span style={{ fontSize: "12px", color: "#888" }}>{o.orderId}</span>
+                    <span style={{ fontSize: "12px", color: "#888" }}>
+                      {new Date(o.createdAt).toLocaleString("es-ES")}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", textAlign: "right" }}>
+                    <Badge label={o.paymentStatus} color={paymentColor(o.paymentStatus)} />
+                    <Badge label={o.reportStatus ?? "sin report"} color={reportColor(o.reportStatus)} />
+                    {o.pdfUrl && <Badge label="PDF ✓" color="#86efac" />}
+                  </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px", textAlign: "right" }}>
-                  <Badge label={o.paymentStatus} color={paymentColor(o.paymentStatus)} />
-                  <Badge label={o.reportStatus ?? "sin report"} color={reportColor(o.reportStatus)} />
-                  {o.pdfUrl && <Badge label="PDF ✓" color="#86efac" />}
+
+                <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <button
+                      onClick={() => handleTrigger(o.orderId)}
+                      style={{ ...btnStyle, opacity: (isRunning || isSending) ? 0.4 : 1, cursor: (isRunning || isSending) ? "not-allowed" : "pointer" }}
+                      disabled={isRunning || isSending}
+                    >
+                      {isSending ? "Enviando..." : "Regenerar PDF"}
+                    </button>
+                    {netError && !timer && (
+                      <span style={{ fontSize: "13px", color: "#f87171" }}>✗ {netError}</span>
+                    )}
+                  </div>
+
+                  {/* Timer: running */}
+                  {isRunning && (
+                    <div style={{ fontSize: "15px", fontWeight: 700, color: "#fbbf24", letterSpacing: "0.05em" }}>
+                      {formatTime(elapsedSec)}
+                    </div>
+                  )}
+
+                  {/* Timer: final result */}
+                  {timer?.final && (
+                    <div style={{
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: timer.final.success ? "#86efac" : "#f87171",
+                    }}>
+                      {timer.final.success
+                        ? `✓ Completado en ${timer.final.elapsed}`
+                        : `❌ Falló en ${timer.final.elapsed}`}
+                    </div>
+                  )}
                 </div>
               </div>
-              <div style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px" }}>
-                <button
-                  onClick={() => handleTrigger(o.orderId)}
-                  style={btnStyle}
-                  disabled={triggerStatus[o.orderId] === "enviando..."}
-                >
-                  Regenerar PDF
-                </button>
-                {triggerStatus[o.orderId] && (
-                  <span style={{ fontSize: "13px", color: triggerStatus[o.orderId].startsWith("✓") ? "#86efac" : "#f87171" }}>
-                    {triggerStatus[o.orderId]}
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
