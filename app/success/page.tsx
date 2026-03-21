@@ -25,6 +25,7 @@ type UnlockedReportState = {
     id: string;
     productType: string;
     paymentStatus: string;
+    customerEmail?: string | null;
   };
 };
 
@@ -320,6 +321,22 @@ export default function SuccessPage() {
                       </p>
                     </article>
                   </>
+                )}
+
+                {/* Botón Crea tu acceso a MI GALAXIA */}
+                {data?.order?.customerEmail && (
+                  <article className="insightCard" style={{ textAlign: "center" }}>
+                    <p style={{ margin: "0 0 14px", color: "var(--text-faint)", fontSize: "14px" }}>
+                      {lang === "en" ? "Save your access for later" : "Guarda tu acceso para más adelante"}
+                    </p>
+                    <Link
+                      href={`/mi-galaxia?email=${encodeURIComponent(data.order.customerEmail)}`}
+                      className="secondaryButton"
+                      style={{ display: "inline-flex", alignItems: "center", textDecoration: "none" }}
+                    >
+                      {lang === "en" ? "Create your MY GALAXY access" : "Crea tu acceso a MI GALAXIA"}
+                    </Link>
+                  </article>
                 )}
               </div>
             </>
