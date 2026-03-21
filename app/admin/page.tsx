@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
@@ -22,31 +22,85 @@ const PRODUCT_LABELS: Record<string, string> = {
   SUBSCRIPTION: "Kiron Vivo",
 };
 
+function hasPendingOrders(orders: OrderRow[]): boolean {
+  return orders.some(
+    (o) => o.reportStatus === "PENDING" || o.reportStatus === "GENERATED"
+  );
+}
+
 export default function AdminPage() {
   const [secret, setSecret] = useState("");
   const [email, setEmail] = useState("");
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [triggerStatus, setTriggerStatus] = useState<Record<string, string>>({});
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const secretRef = useRef(secret);
+  const emailRef = useRef(email);
+
+  useEffect(() => { secretRef.current = secret; }, [secret]);
+  useEffect(() => { emailRef.current = email; }, [email]);
+
+  const fetchOrders = useCallback(async (isAuto = false) => {
+    if (isAuto) setRefreshing(true);
+    else setLoading(true);
+    try {
+      const res = await fetch(
+        `${API_BASE}/admin/orders?email=${encodeURIComponent(emailRef.current)}&secret=${encodeURIComponent(secretRef.current)}`
+      );
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Error al buscar");
+      setOrders(data.orders);
+      setError("");
+      return data.orders as OrderRow[];
+    } catch (err) {
+      if (!isAuto) setError(err instanceof Error ? err.message : "Error desconocido");
+      return null;
+    } finally {
+      if (isAuto) setRefreshing(false);
+      else setLoading(false);
+    }
+  }, []);
+
+  // Start/stop auto-refresh based on pending orders
+  useEffect(() => {
+    if (orders.length === 0) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      return;
+    }
+
+    if (hasPendingOrders(orders)) {
+      if (!intervalRef.current) {
+        intervalRef.current = setInterval(async () => {
+          const updated = await fetchOrders(true);
+          if (updated && !hasPendingOrders(updated)) {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }, 30000);
+      }
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [orders, fetchOrders]);
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setOrders([]);
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${API_BASE}/admin/orders?email=${encodeURIComponent(email)}&secret=${encodeURIComponent(secret)}`
-      );
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || "Error al buscar");
-      setOrders(data.orders);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido");
-    } finally {
-      setLoading(false);
-    }
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+    await fetchOrders(false);
+  }
+
+  async function handleRefreshNow() {
+    await fetchOrders(true);
   }
 
   async function handleTrigger(orderId: string) {
@@ -67,6 +121,8 @@ export default function AdminPage() {
       }));
     }
   }
+
+  const autoRefreshActive = orders.length > 0 && hasPendingOrders(orders);
 
   return (
     <div style={{
@@ -109,9 +165,26 @@ export default function AdminPage() {
 
       {orders.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <p style={{ color: "#888", fontSize: "13px", margin: "0 0 8px" }}>
-            {orders.length} orden(es) encontrada(s) para <strong style={{ color: "#fff" }}>{email}</strong>
-          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "8px", flexWrap: "wrap" }}>
+            <p style={{ color: "#888", fontSize: "13px", margin: 0 }}>
+              {orders.length} orden(es) encontrada(s) para <strong style={{ color: "#fff" }}>{email}</strong>
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {autoRefreshActive && (
+                <span style={{ fontSize: "12px", color: "#fbbf24" }}>
+                  {refreshing ? "🔄 Actualizando..." : "🔄 Actualizando automáticamente..."}
+                </span>
+              )}
+              <button
+                onClick={handleRefreshNow}
+                disabled={refreshing}
+                style={{ ...btnStyle, padding: "4px 12px", fontSize: "12px", opacity: refreshing ? 0.6 : 1 }}
+              >
+                Actualizar ahora
+              </button>
+            </div>
+          </div>
+
           {orders.map((o) => (
             <div key={o.orderId} style={cardStyle}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", flexWrap: "wrap" }}>
@@ -127,19 +200,21 @@ export default function AdminPage() {
                   </span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px", textAlign: "right" }}>
-                  <Badge label={o.paymentStatus} color={statusColor(o.paymentStatus)} />
-                  <Badge label={o.reportStatus ?? "sin report"} color={statusColor(o.reportStatus)} />
+                  <Badge label={o.paymentStatus} color={paymentColor(o.paymentStatus)} />
+                  <Badge label={o.reportStatus ?? "sin report"} color={reportColor(o.reportStatus)} />
                   {o.pdfUrl && <Badge label="PDF ✓" color="#86efac" />}
                 </div>
               </div>
               <div style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px" }}>
-                <button
-                  onClick={() => handleTrigger(o.orderId)}
-                  style={btnStyle}
-                  disabled={triggerStatus[o.orderId] === "enviando..."}
-                >
-                  Regenerar PDF
-                </button>
+                {o.reportStatus !== "DELIVERED" && (
+                  <button
+                    onClick={() => handleTrigger(o.orderId)}
+                    style={btnStyle}
+                    disabled={triggerStatus[o.orderId] === "enviando..."}
+                  >
+                    Regenerar PDF
+                  </button>
+                )}
                 {triggerStatus[o.orderId] && (
                   <span style={{ fontSize: "13px", color: triggerStatus[o.orderId].startsWith("✓") ? "#86efac" : "#f87171" }}>
                     {triggerStatus[o.orderId]}
@@ -176,14 +251,24 @@ function Badge({ label, color }: { label: string; color: string }) {
   );
 }
 
-function statusColor(status: string | null): string {
+function paymentColor(status: string | null): string {
   switch (status) {
     case "PAID":      return "#86efac";
-    case "DELIVERED": return "#6ee7b7";
-    case "PENDING":   return "#fde68a";
-    case "FAILED":    return "#f87171";
+    case "DELIVERED": return "#86efac";
     case "REFUNDED":  return "#c4b5fd";
+    case "FAILED":    return "#f87171";
+    case "PENDING":
+    default:          return "#6b7280";
+  }
+}
+
+function reportColor(status: string | null): string {
+  switch (status) {
+    case "DELIVERED": return "#86efac";
     case "GENERATED": return "#93c5fd";
+    case "PENDING":   return "#fb923c";
+    case "ERROR":
+    case "FAILED":    return "#f87171";
     default:          return "#6b7280";
   }
 }
