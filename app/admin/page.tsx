@@ -282,10 +282,14 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  {/* Timer: running */}
+                  {/* Timer: running — show badges + elapsed together */}
                   {isRunning && (
-                    <div style={{ fontSize: "15px", fontWeight: 700, color: "#fbbf24", letterSpacing: "0.05em" }}>
-                      {formatTime(elapsedSec)}
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                      <Badge label={o.paymentStatus} color={paymentColor(o.paymentStatus)} />
+                      <Badge label={o.reportStatus ?? "sin report"} color={reportColor(o.reportStatus)} />
+                      <span style={{ fontSize: "15px", fontWeight: 700, color: "#fbbf24", letterSpacing: "0.05em" }}>
+                        {formatTime(elapsedSec)}
+                      </span>
                     </div>
                   )}
 
