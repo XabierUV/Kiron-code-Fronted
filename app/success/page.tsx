@@ -287,42 +287,51 @@ export default function SuccessPage() {
                 <h1 className="sectionTitle">
                   {lang === "en" ? cfg.waitingTitleEn : cfg.waitingTitle}
                 </h1>
-                <p className="sectionText">
-                  Aquí tienes tu informe premium desbloqueado.
-                </p>
               </div>
 
               <div className="resultsPanel">
                 <article className="insightCard">
-                  <h3>Tu informe en PDF</h3>
-                  <p>Descárgalo ahora y tenlo siempre disponible.</p>
+                  <h3>{lang === "en" ? `${cfg.productTitleEn} — PDF` : `${cfg.productTitle} — PDF`}</h3>
+                  <p style={{ margin: "8px 0 16px" }}>
+                    {lang === "en"
+                      ? "Your personalised report is ready. Download it and keep it forever."
+                      : "Tu informe personalizado está listo. Descárgalo y tenlo siempre disponible."}
+                  </p>
                   <a
                     href={data!.report.pdfUrl!}
                     target="_blank"
                     rel="noreferrer"
                     download="kiron-report.pdf"
-                    style={{ textDecoration: "underline", marginTop: "12px", display: "inline-block" }}
+                    style={{ textDecoration: "underline", display: "inline-block" }}
                   >
                     Abrir PDF
                   </a>
                 </article>
 
-                {data?.report?.reportJson?.sections.map((section, index) => (
-                  <article key={index} className="insightCard" style={{ paddingTop: "28px", paddingBottom: "28px" }}>
-                    <h3 style={{ fontSize: "20px", marginBottom: "12px" }}>{section.title}</h3>
-                    <p style={{ lineHeight: "1.8" }}>{section.text}</p>
-                  </article>
-                ))}
-
                 {upsell && (
-                  <div style={{ marginTop: "8px" }}>
+                  <article className="insightCard">
+                    <p className="miniLabel" style={{ marginBottom: "10px" }}>
+                      {lang === "en" ? "NEXT LEVEL" : "SIGUIENTE NIVEL"}
+                    </p>
+                    <h3 style={{ marginBottom: "10px" }}>
+                      {lang === "en" ? upsell.labelEn : upsell.label}
+                    </h3>
+                    <p style={{ marginBottom: "20px", lineHeight: 1.7 }}>
+                      {upsell.productType === "COMPATIBILITY"
+                        ? (lang === "en"
+                            ? "Two charts compared. Discover why you get attached to certain people, what they activate in your wound and what you can build together."
+                            : "Dos cartas comparadas. Descubre por qué te enganchas a ciertas personas, qué activan en tu herida y qué podéis construir juntos.")
+                        : (lang === "en"
+                            ? "Your complete natal chart. Sun, Moon, Saturn, North Node and all the aspects that define who you are and where you're going."
+                            : "Tu carta natal completa. Sol, Luna, Saturno, Nodo Norte y todos los aspectos que definen quién eres y hacia dónde vas.")}
+                    </p>
                     <button
                       type="button"
                       className="primaryButton"
-                      style={{ width: "100%", minHeight: "64px", fontSize: "17px" }}
+                      style={{ width: "100%", minHeight: "56px", fontSize: "16px" }}
                       disabled={upsellLoading}
                       onClick={() => {
-                        if (upsell?.productType === "COMPATIBILITY") {
+                        if (upsell.productType === "COMPATIBILITY") {
                           setUpsellVinculoStep(true);
                         } else {
                           setShowUpsellModal(true);
@@ -331,9 +340,9 @@ export default function SuccessPage() {
                     >
                       {upsellLoading
                         ? (lang === "en" ? "Redirecting..." : "Redirigiendo...")
-                        : (lang === "en" ? upsell.labelEn : upsell.label)}
+                        : (lang === "en" ? `Discover ${upsell.labelEn}` : `Descubrir ${upsell.label}`)}
                     </button>
-                  </div>
+                  </article>
                 )}
               </div>
             </>
