@@ -45,7 +45,8 @@ export function VinculoConfigModal({ lang, onConfirm, onCancel }: VinculoConfigM
   const [person2Name, setPerson2Name] = useState("");
   const [person2BirthDate, setPerson2BirthDate] = useState("");
   const [person2BirthTime, setPerson2BirthTime] = useState("");
-  const [person2BirthCity, setPerson2BirthCity] = useState("");
+  const [person2City, setPerson2City] = useState("");
+  const [person2Country, setPerson2Country] = useState("");
   const [consentConfirmed, setConsentConfirmed] = useState(false);
 
   const isFormValid =
@@ -53,7 +54,7 @@ export function VinculoConfigModal({ lang, onConfirm, onCancel }: VinculoConfigM
     useGalaxyId !== null &&
     (useGalaxyId
       ? personBId.trim().length > 0
-      : person2Name.trim() && person2BirthDate && person2BirthCity.trim()) &&
+      : person2Name.trim() && person2BirthDate && person2City.trim()) &&
     consentConfirmed;
 
   const personName = person2Name.trim() || (lang === "en" ? "this person" : "esta persona");
@@ -72,7 +73,9 @@ export function VinculoConfigModal({ lang, onConfirm, onCancel }: VinculoConfigM
         birthDate: "Date of birth",
         birthTime: "Time of birth",
         birthCity: "City of birth",
-        birthCityPlaceholder: "City, Country",
+        birthCityPlaceholder: "e.g. London",
+        birthCountry: "Country of birth",
+        birthCountryPlaceholder: "e.g. United Kingdom",
         consentText: (name: string) =>
           `I confirm I have ${name}'s consent to use their birth data for this analysis.`,
         confirm: "Continue",
@@ -91,7 +94,9 @@ export function VinculoConfigModal({ lang, onConfirm, onCancel }: VinculoConfigM
         birthDate: "Fecha de nacimiento",
         birthTime: "Hora de nacimiento",
         birthCity: "Ciudad de nacimiento",
-        birthCityPlaceholder: "Ciudad, País",
+        birthCityPlaceholder: "Ej. Madrid",
+        birthCountry: "País de nacimiento",
+        birthCountryPlaceholder: "Ej. España",
         consentText: (name: string) =>
           `Confirmo que tengo el consentimiento de ${name} para usar sus datos de nacimiento en este análisis.`,
         confirm: "Continuar",
@@ -106,7 +111,9 @@ export function VinculoConfigModal({ lang, onConfirm, onCancel }: VinculoConfigM
       person2Name: !useGalaxyId && person2Name.trim() ? person2Name.trim() : undefined,
       person2BirthDate: !useGalaxyId ? person2BirthDate : undefined,
       person2BirthTime: !useGalaxyId && person2BirthTime ? person2BirthTime : undefined,
-      person2BirthCity: !useGalaxyId && person2BirthCity.trim() ? person2BirthCity.trim() : undefined,
+      person2BirthCity: !useGalaxyId && person2City.trim()
+        ? [person2City.trim(), person2Country.trim()].filter(Boolean).join(", ")
+        : undefined,
       consentConfirmed: true,
     });
   }
@@ -216,8 +223,18 @@ export function VinculoConfigModal({ lang, onConfirm, onCancel }: VinculoConfigM
                   type="text"
                   className="fieldInput"
                   placeholder={t.birthCityPlaceholder}
-                  value={person2BirthCity}
-                  onChange={(e) => setPerson2BirthCity(e.target.value)}
+                  value={person2City}
+                  onChange={(e) => setPerson2City(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="fieldLabel">{t.birthCountry}</label>
+                <input
+                  type="text"
+                  className="fieldInput"
+                  placeholder={t.birthCountryPlaceholder}
+                  value={person2Country}
+                  onChange={(e) => setPerson2Country(e.target.value)}
                 />
               </div>
             </div>
