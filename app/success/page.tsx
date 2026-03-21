@@ -291,12 +291,12 @@ export default function SuccessPage() {
                 ) : (
                   <>
                     <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
-                      <p className="miniLabel" style={{ textAlign: "center", marginBottom: "8px" }}>
+                      <p className="miniLabel" style={{ textAlign: "center", marginBottom: "8px", fontSize: "1.4rem", letterSpacing: "0.25em" }}>
                         {lang === "en" ? "ESTIMATED TIME" : "TIEMPO ESTIMADO"}
                       </p>
                       <p style={{
                         margin: 0,
-                        fontSize: "clamp(64px, 14vw, 96px)",
+                        fontSize: "8rem",
                         fontWeight: "700",
                         letterSpacing: "-0.05em",
                         lineHeight: 1,
@@ -306,8 +306,8 @@ export default function SuccessPage() {
                       </p>
                     </div>
 
-                    <article className="insightCard">
-                      <p style={{ margin: "0 0 12px", lineHeight: 1.7, textAlign: "center" }}>
+                    <article className="insightCard" style={{ textAlign: "center" }}>
+                      <p style={{ margin: "0 0 12px", lineHeight: 1.7, textAlign: "center", fontSize: "1.2rem" }}>
                         {lang === "en" ? (
                           <>You can find your downloaded products in{" "}
                             <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, your personal space.</>
@@ -316,7 +316,7 @@ export default function SuccessPage() {
                             <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, tu espacio personal.</>
                         )}
                       </p>
-                      <p className="sectionText" style={{ margin: 0, textAlign: "center" }}>
+                      <p className="sectionText" style={{ margin: 0, textAlign: "center", fontSize: "1.2rem" }}>
                         {lang === "en" ? "Thank you for your purchase." : "Muchas gracias por tu compra."}
                       </p>
                     </article>
