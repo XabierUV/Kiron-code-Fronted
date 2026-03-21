@@ -659,6 +659,7 @@ export default function MiGalaxiaPage() {
                   return CATALOG.map((item) => {
                     const purchased = purchasedMap.get(item.key);
                     const isPurchased = Boolean(purchased);
+                    const hasPdf = Boolean(purchased?.pdfUrl);
                     const isBlocked = !isPurchased && item.requiresKey !== null && !purchasedMap.has(item.requiresKey);
                     const isAvailable = !isPurchased && !isBlocked;
                     return (
@@ -667,16 +668,23 @@ export default function MiGalaxiaPage() {
                           <div>
                             <h3 style={{ marginBottom: "6px" }}>{lang === "en" ? item.nameEn : item.name}</h3>
                             <p style={{ margin: 0 }}>
-                              {isPurchased
+                              {isPurchased && hasPdf
                                 ? (lang === "en" ? "Report available." : "Informe disponible.")
+                                : isPurchased
+                                ? (lang === "en" ? "Processing your report..." : "Procesando tu informe...")
                                 : isBlocked
                                 ? (lang === "en" ? "Requires The Wound and the Gift." : "Requiere La Herida y el Don.")
                                 : (lang === "en" ? `Unlock for ${item.price}.` : `Desbloquea por ${item.price}.`)}
                             </p>
                           </div>
-                          {isPurchased && (
+                          {isPurchased && hasPdf && (
                             <span style={{ flexShrink: 0, padding: "4px 10px", border: "1px solid var(--line)", borderRadius: "999px", fontSize: "12px", color: "rgba(100,220,130,0.9)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
                               {lang === "en" ? "Purchased" : "Comprado"}
+                            </span>
+                          )}
+                          {isPurchased && !hasPdf && (
+                            <span style={{ flexShrink: 0, padding: "4px 10px", border: "1px solid var(--line)", borderRadius: "999px", fontSize: "12px", color: "rgba(251,191,36,0.9)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                              {lang === "en" ? "Processing" : "Procesando"}
                             </span>
                           )}
                           {isBlocked && (
