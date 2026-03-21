@@ -295,11 +295,11 @@ export default function MiGalaxiaPage() {
     productType: string,
     chartId: string,
     reportId: string,
-    consentData?: ConsentData
+    consentData?: ConsentData,
+    vd?: VinculoData | null
   ) {
     setCheckoutLoading(productType);
     try {
-      const vd = vinculoData;
       const checkout = await createCheckout({
         chartId,
         reportId,
@@ -310,9 +310,9 @@ export default function MiGalaxiaPage() {
           vinculoRelationship: vd.relationship,
           vinculoPersonBId: vd.personBId,
           vinculoPerson2Name: vd.person2Name,
-          vinculoPerson2BirthDate: vd.person2BirthDate,
-          vinculoPerson2BirthTime: vd.person2BirthTime,
-          vinculoPerson2BirthCity: vd.person2BirthCity,
+          vinculoPerson2Date: vd.person2BirthDate,
+          vinculoPerson2Time: vd.person2BirthTime,
+          vinculoPerson2City: vd.person2BirthCity,
         }),
       });
       if (checkout.checkoutUrl) window.location.href = checkout.checkoutUrl;
@@ -754,9 +754,10 @@ export default function MiGalaxiaPage() {
           lang={lang}
           onConfirm={(data) => {
             const args = pendingCheckout;
+            const vd = vinculoData;
             setPendingCheckout(null);
             setVinculoData(null);
-            handlePortalCheckout(args.productType, args.chartId, args.reportId, data);
+            handlePortalCheckout(args.productType, args.chartId, args.reportId, data, vd);
           }}
           onCancel={() => { setPendingCheckout(null); setVinculoData(null); }}
         />
