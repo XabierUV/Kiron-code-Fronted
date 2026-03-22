@@ -212,6 +212,9 @@ export default function Page() {
         productType,
         deliveryEmail: consentData?.deliveryEmail,
         marketingConsent: consentData?.marketingConsent,
+        ...(productType === "SUBSCRIPTION" && {
+          subscriberTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
         ...(vd && {
           vinculoRelationship: vd.relationship,
           vinculoPersonBId: vd.personBId,

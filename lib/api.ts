@@ -28,10 +28,11 @@ export async function fetchReport(reportId: string): Promise<ReportRecordRespons
 
 export async function createCheckout(payload: {
   chartId: string;
-  reportId: string;
+  reportId?: string;
   productType: "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION";
   deliveryEmail?: string;
   marketingConsent?: boolean;
+  subscriberTimezone?: string;
   vinculoRelationship?: string;
   vinculoPersonBId?: string;
   vinculoPerson2Name?: string;
@@ -149,14 +150,15 @@ export async function fetchPortal(jwt: string) {
     chiron: { sign: string; house: number; degree: number };
     chartId: string | null;
     reportId: string | null;
-    products: Array<{ productType: string; name: string; pdfUrl: string | null; subscriptionStatus?: string | null; subscriptionRenewsAt?: string | null }>;
+    products: Array<{ productType: string; name: string; pdfUrl: string | null; subscriptionStatus?: string | null; subscriptionRenewsAt?: string | null; stripeCustomerId?: string | null }>;
   };
 }
 
-export async function fetchSubscriptionPortalUrl(jwt: string): Promise<string> {
-  const response = await fetch(`${API_BASE}/customer/subscription-portal`, {
-    method: "GET",
-    headers: { Authorization: `Bearer ${jwt}` },
+export async function fetchSubscriptionPortalUrl(stripeCustomerId: string): Promise<string> {
+  const response = await fetch(`${API_BASE}/stripe/portal-session`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ stripeCustomerId }),
   });
   const data = await response.json();
   if (!response.ok || !data.ok) throw new Error(data.error || "Portal request failed");
