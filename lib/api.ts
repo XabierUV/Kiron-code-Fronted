@@ -137,7 +137,7 @@ export async function authChangePassword(
 export async function fetchPortal(jwt: string) {
   const response = await fetch(`${API_BASE}/customer/portal`, {
     method: "GET",
-    headers: { Authorization: `Bearer ${jwt}` },
+    headers: { Authorization: `Bearer ${jwt}`, Pragma: "no-cache" },
     cache: "no-store",
   });
   const data = await response.json();

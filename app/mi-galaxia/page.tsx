@@ -186,6 +186,7 @@ export default function MiGalaxiaPage() {
     }
     const stored = localStorage.getItem("kc_token");
     if (stored) {
+      localStorage.removeItem("kc_purchased");
       setJwt(stored);
       loadPortal(stored);
     }
