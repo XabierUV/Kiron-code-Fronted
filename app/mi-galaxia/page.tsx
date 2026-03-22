@@ -813,6 +813,17 @@ export default function MiGalaxiaPage() {
                   >
                     {lang === "en" ? "Connect with Telegram" : "Conectar con Telegram"}
                   </a>
+                  <p style={{ margin: "14px 0 6px", fontSize: "13px", color: "var(--text-faint)" }}>
+                    {lang === "en" ? "Want free weekly content?" : "¿Quieres contenido semanal gratuito?"}
+                  </p>
+                  <a
+                    href="https://t.me/Kiron_Code"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ fontSize: "13px", color: "#C9A96E", textDecoration: "underline" }}
+                  >
+                    {lang === "en" ? "Join our channel →" : "Únete a nuestro canal →"}
+                  </a>
                 </article>
 
                 <article className="insightCard" style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>

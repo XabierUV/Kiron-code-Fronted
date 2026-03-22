@@ -398,6 +398,31 @@ export default function Page() {
               );
             })}
           </div>
+
+          {/* Canal de Telegram */}
+          <article className="insightCard" style={{ marginTop: "14px", background: "rgba(201,169,110,0.04)", border: "1px solid rgba(201,169,110,0.18)" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
+              <span style={{ fontSize: "28px", flexShrink: 0, lineHeight: 1 }}>✈</span>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ marginBottom: "6px" }}>
+                  {lang === "en" ? "Join our community" : "Únete a nuestra comunidad"}
+                </h3>
+                <p style={{ margin: "0 0 14px", color: "var(--text-soft)", fontSize: "15px", lineHeight: "1.6" }}>
+                  {lang === "en"
+                    ? "Weekly astrology content, transit analysis and early access to new products. Free, always."
+                    : "Contenido astrológico semanal, análisis de tránsitos y acceso anticipado a nuevos productos. Gratis, siempre."}
+                </p>
+                <a
+                  href="https://t.me/Kiron_Code"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 20px", background: "rgba(201,169,110,0.10)", border: "1px solid rgba(201,169,110,0.35)", borderRadius: "6px", color: "#C9A96E", fontSize: "14px", fontWeight: 600, textDecoration: "none", letterSpacing: "0.03em", transition: "background 200ms" }}
+                >
+                  {lang === "en" ? "Join the channel →" : "Unirse al canal →"}
+                </a>
+              </div>
+            </div>
+          </article>
         </section>
 
         <FaqSection t={t} />
