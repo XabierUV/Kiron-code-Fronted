@@ -149,6 +149,16 @@ export async function fetchPortal(jwt: string) {
     chiron: { sign: string; house: number; degree: number };
     chartId: string | null;
     reportId: string | null;
-    products: Array<{ productType: string; name: string; pdfUrl: string | null }>;
+    products: Array<{ productType: string; name: string; pdfUrl: string | null; subscriptionStatus?: string | null; subscriptionRenewsAt?: string | null }>;
   };
+}
+
+export async function fetchSubscriptionPortalUrl(jwt: string): Promise<string> {
+  const response = await fetch(`${API_BASE}/customer/subscription-portal`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${jwt}` },
+  });
+  const data = await response.json();
+  if (!response.ok || !data.ok) throw new Error(data.error || "Portal request failed");
+  return data.url as string;
 }

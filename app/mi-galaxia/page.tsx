@@ -11,6 +11,7 @@ import {
   authChangePassword,
   fetchPortal,
   createCheckout,
+  fetchSubscriptionPortalUrl,
 } from "@/lib/api";
 import type { Lang } from "@/types/chart";
 import { ConsentModal, type ConsentData } from "@/components/consent-modal";
@@ -25,7 +26,7 @@ type PortalData = {
   chiron: { sign: string; house: number; degree: number };
   chartId: string | null;
   reportId: string | null;
-  products: Array<{ productType: string; name: string; pdfUrl: string | null }>;
+  products: Array<{ productType: string; name: string; pdfUrl: string | null; subscriptionStatus?: string | null; subscriptionRenewsAt?: string | null }>;
 };
 
 type PwReqs = {
@@ -662,6 +663,75 @@ export default function MiGalaxiaPage() {
                     const hasPdf = Boolean(purchased?.pdfUrl);
                     const isBlocked = !isPurchased && item.requiresKey !== null && !purchasedMap.has(item.requiresKey);
                     const isAvailable = !isPurchased && !isBlocked;
+
+                    if (item.key === "SUBSCRIPTION" && isPurchased) {
+                      const subStatus = (purchased as any).subscriptionStatus as string | null;
+                      const renewsAt = (purchased as any).subscriptionRenewsAt as string | null;
+
+                      // Calculate next Sunday
+                      const nextSunday = (() => {
+                        const now = new Date();
+                        const day = now.getDay(); // 0=Sun
+                        const daysUntilSunday = day === 0 ? 7 : 7 - day;
+                        const next = new Date(now);
+                        next.setDate(now.getDate() + daysUntilSunday);
+                        return next.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+                      })();
+
+                      return (
+                        <article key={item.key} className="insightCard">
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
+                            <div>
+                              <h3 style={{ marginBottom: "6px" }}>{lang === "en" ? item.nameEn : item.name}</h3>
+                              <p style={{ margin: 0 }}>
+                                {subStatus === "active"
+                                  ? (lang === "en" ? "Active subscription." : "Suscripción activa.")
+                                  : subStatus === "past_due"
+                                  ? (lang === "en" ? "Payment pending." : "Pago pendiente.")
+                                  : subStatus === "canceled"
+                                  ? (lang === "en" ? "Subscription canceled." : "Suscripción cancelada.")
+                                  : (lang === "en" ? "Subscription active." : "Suscripción activa.")}
+                              </p>
+                              {subStatus === "active" && (
+                                <p style={{ margin: "4px 0 0", fontSize: "13px", color: "var(--text-faint)" }}>
+                                  {lang === "en" ? `Next report: Sunday ${nextSunday}` : `Próximo informe: domingo ${nextSunday}`}
+                                </p>
+                              )}
+                            </div>
+                            <span style={{ flexShrink: 0, padding: "4px 10px", border: "1px solid var(--line)", borderRadius: "999px", fontSize: "12px", color: subStatus === "active" ? "rgba(100,220,130,0.9)" : subStatus === "past_due" ? "rgba(251,191,36,0.9)" : "var(--text-faint)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                              {subStatus === "active"
+                                ? (lang === "en" ? "Active" : "Activa")
+                                : subStatus === "past_due"
+                                ? (lang === "en" ? "Past due" : "Pendiente")
+                                : subStatus === "canceled"
+                                ? (lang === "en" ? "Canceled" : "Cancelada")
+                                : (lang === "en" ? "Active" : "Activa")}
+                            </span>
+                          </div>
+                          {(subStatus === "active" || !subStatus) && (
+                            <div style={{ marginTop: "14px" }}>
+                              <button
+                                type="button"
+                                className="secondaryButton"
+                                style={{ fontSize: "13px", minHeight: "40px", padding: "0 16px" }}
+                                onClick={async () => {
+                                  if (!jwt) return;
+                                  try {
+                                    const url = await fetchSubscriptionPortalUrl(jwt);
+                                    window.open(url, "_blank");
+                                  } catch (err) {
+                                    alert(err instanceof Error ? err.message : "Error");
+                                  }
+                                }}
+                              >
+                                {lang === "en" ? "Manage subscription" : "Gestionar suscripción"}
+                              </button>
+                            </div>
+                          )}
+                        </article>
+                      );
+                    }
+
                     return (
                       <article key={item.key} className="insightCard">
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
