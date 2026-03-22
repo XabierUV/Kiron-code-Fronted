@@ -796,6 +796,24 @@ export default function MiGalaxiaPage() {
                   });
                 })()}
 
+                <article className="insightCard">
+                  <h3 style={{ marginBottom: "6px" }}>{lang === "en" ? "Telegram notifications" : "Notificaciones por Telegram"}</h3>
+                  <p style={{ margin: "0 0 14px", fontSize: "14px", color: "var(--text-soft)" }}>
+                    {lang === "en"
+                      ? "Receive your reports directly on Telegram. Tap the button and send /start from the bot chat."
+                      : "Recibe tus informes directamente en Telegram. Pulsa el botón y envía /start desde el chat del bot."}
+                  </p>
+                  <a
+                    href={`https://t.me/kironcode_bot?start=${portalData.galaxyId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="secondaryButton"
+                    style={{ display: "inline-block", fontSize: "14px", minHeight: "40px", padding: "0 16px", lineHeight: "40px", textDecoration: "none" }}
+                  >
+                    {lang === "en" ? "Connect with Telegram" : "Conectar con Telegram"}
+                  </a>
+                </article>
+
                 <article className="insightCard" style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                   <button
                     type="button"
