@@ -26,7 +26,7 @@ type PortalData = {
   chiron: { sign: string; house: number; degree: number };
   chartId: string | null;
   reportId: string | null;
-  products: Array<{ productType: string; name: string; pdfUrl: string | null; subscriptionStatus?: string | null; subscriptionRenewsAt?: string | null }>;
+  products: Array<{ productType: string; name: string; pdfUrl: string | null; subscriptionStatus?: string | null; subscriptionRenewsAt?: string | null; stripeCustomerId?: string | null }>;
 };
 
 type PwReqs = {
@@ -307,6 +307,9 @@ export default function MiGalaxiaPage() {
         productType: productType as "CHIRON" | "NATAL_CHART" | "COMPATIBILITY" | "SUBSCRIPTION",
         deliveryEmail: consentData?.deliveryEmail,
         marketingConsent: consentData?.marketingConsent,
+        ...(productType === "SUBSCRIPTION" && {
+          subscriberTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
         ...(vd && {
           vinculoRelationship: vd.relationship,
           vinculoPersonBId: vd.personBId,
@@ -694,7 +697,7 @@ export default function MiGalaxiaPage() {
                               </p>
                               {subStatus === "active" && (
                                 <p style={{ margin: "4px 0 0", fontSize: "13px", color: "var(--text-faint)" }}>
-                                  {lang === "en" ? `Next report: Sunday ${nextSunday}` : `Próximo informe: domingo ${nextSunday}`}
+                                  {lang === "en" ? `Next report: Sunday ${nextSunday} at 17:00` : `Próximo informe: domingo ${nextSunday} a las 17:00`}
                                 </p>
                               )}
                             </div>
@@ -715,9 +718,10 @@ export default function MiGalaxiaPage() {
                                 className="secondaryButton"
                                 style={{ fontSize: "13px", minHeight: "40px", padding: "0 16px" }}
                                 onClick={async () => {
-                                  if (!jwt) return;
+                                  const customerId = (purchased as any).stripeCustomerId as string | null;
+                                  if (!customerId) { alert(lang === "en" ? "Subscription not linked yet." : "Suscripción no vinculada aún."); return; }
                                   try {
-                                    const url = await fetchSubscriptionPortalUrl(jwt);
+                                    const url = await fetchSubscriptionPortalUrl(customerId);
                                     window.open(url, "_blank");
                                   } catch (err) {
                                     alert(err instanceof Error ? err.message : "Error");
