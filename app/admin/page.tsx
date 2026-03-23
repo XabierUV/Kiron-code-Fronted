@@ -6,7 +6,8 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://luminous-patience-production.up.railway.app";
 
-const SECRET_KEY = "kc_admin_secret";
+const SECRET_KEY   = "kc_admin_secret";
+const DISMISSED_KEY = "kc_admin_dismissed";
 
 type OrderRow = {
   orderId: string;
@@ -22,7 +23,7 @@ type OrderRow = {
   subscriptionRenewsAt?: string | null;
 };
 
-type Tab = "search" | "subscriptions" | "failures";
+type Tab = "orders" | "subscriptions" | "failures";
 
 const PRODUCT_LABELS: Record<string, string> = {
   CHIRON:        "La Herida y el Don",
@@ -40,15 +41,38 @@ function elapsed(from: string): string {
   return `${h}h ${m}m`;
 }
 
-function isProblem(o: OrderRow): { yes: boolean; reason: string } {
+function problemKey(o: OrderRow): string | null {
   const ageMin = (Date.now() - new Date(o.createdAt).getTime()) / 60000;
-  if ((o.reportStatus === "PENDING" || o.reportStatus === "GENERATED") && ageMin > 30) {
-    return { yes: true, reason: `Report atascado ${Math.floor(ageMin)}min en ${o.reportStatus}` };
-  }
-  if (o.subscriptionStatus === "past_due") return { yes: true, reason: "Suscripción en past_due" };
-  if (o.subscriptionStatus === "canceled") return { yes: true, reason: "Suscripción cancelada" };
-  if (o.paymentStatus === "FAILED") return { yes: true, reason: "Pago fallido" };
-  return { yes: false, reason: "" };
+  if ((o.reportStatus === "PENDING" || o.reportStatus === "GENERATED") && ageMin > 30)
+    return `${o.orderId}:stuck-${o.reportStatus}-${Math.floor(ageMin / 10)}`;
+  if (o.subscriptionStatus === "past_due")  return `${o.orderId}:past_due`;
+  if (o.subscriptionStatus === "canceled")  return `${o.orderId}:canceled`;
+  if (o.paymentStatus === "FAILED")         return `${o.orderId}:payment_failed`;
+  if (o.reportStatus === "ERROR" || o.reportStatus === "FAILED")
+    return `${o.orderId}:report_error`;
+  return null;
+}
+
+function problemReason(o: OrderRow): string {
+  const ageMin = (Date.now() - new Date(o.createdAt).getTime()) / 60000;
+  if ((o.reportStatus === "PENDING" || o.reportStatus === "GENERATED") && ageMin > 30)
+    return `Report atascado ${Math.floor(ageMin)}min en ${o.reportStatus}`;
+  if (o.subscriptionStatus === "past_due")  return "Suscripción en past_due";
+  if (o.subscriptionStatus === "canceled")  return "Suscripción cancelada";
+  if (o.paymentStatus === "FAILED")         return "Pago fallido";
+  if (o.reportStatus === "ERROR" || o.reportStatus === "FAILED") return "Error en generación de PDF";
+  return "";
+}
+
+function loadDismissed(): Set<string> {
+  try {
+    const raw = localStorage.getItem(DISMISSED_KEY);
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch { return new Set(); }
+}
+
+function saveDismissed(set: Set<string>) {
+  localStorage.setItem(DISMISSED_KEY, JSON.stringify([...set]));
 }
 
 // ── Styles ──────────────────────────────────────────────────────────────────
@@ -111,25 +135,23 @@ const S = {
     alignItems: "center",
     flexWrap: "wrap" as const,
   },
-  label: { color: "#666", fontSize: "11px" } as React.CSSProperties,
-  value: { color: "#ccc", fontSize: "12px" } as React.CSSProperties,
 };
 
 function payColor(s: string | null) {
   if (s === "PAID" || s === "DELIVERED") return "#86efac";
   if (s === "REFUNDED") return "#c4b5fd";
-  if (s === "FAILED") return "#f87171";
+  if (s === "FAILED")   return "#f87171";
   return "#6b7280";
 }
 function repColor(s: string | null) {
   if (s === "DELIVERED") return "#86efac";
   if (s === "GENERATED") return "#93c5fd";
-  if (s === "PENDING") return "#fb923c";
+  if (s === "PENDING")   return "#fb923c";
   if (s === "ERROR" || s === "FAILED") return "#f87171";
   return "#6b7280";
 }
 function subColor(s: string | null) {
-  if (s === "active") return "#86efac";
+  if (s === "active")   return "#86efac";
   if (s === "past_due") return "#fb923c";
   if (s === "canceled") return "#f87171";
   return "#6b7280";
@@ -141,28 +163,27 @@ function OrderCard({
 }: { o: OrderRow; secret: string; onRefresh: () => void }) {
   const [, setTick] = useState(0);
   const [triggering, setTriggering] = useState(false);
-  const [resetting, setResetting] = useState(false);
-  const [err, setErr] = useState("");
+  const [resetting, setResetting]   = useState(false);
+  const [err, setErr]               = useState("");
   const [timerStart, setTimerStart] = useState<number | null>(null);
-  const [timerDone, setTimerDone] = useState<{ elapsed: string; ok: boolean } | null>(null);
+  const [timerDone, setTimerDone]   = useState<{ elapsed: string; ok: boolean } | null>(null);
 
   const isActive = o.reportStatus === "PENDING" || o.reportStatus === "GENERATED";
-  const ageMin = (Date.now() - new Date(o.createdAt).getTime()) / 60000;
-  const problem = isProblem(o);
 
-  // Tick every second for live timers
+  // Always tick for live elapsed + trigger timers
   useEffect(() => {
-    if (!isActive && timerStart === null) return;
     const id = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(id);
-  }, [isActive, timerStart]);
+  }, []);
 
-  // Stop timer when report is done
+  // Stop trigger timer when report finishes
   useEffect(() => {
     if (timerStart === null || timerDone) return;
     if (!isActive) {
+      const secs = Math.floor((Date.now() - timerStart) / 1000);
+      const m = Math.floor(secs / 60), s = secs % 60;
       setTimerDone({
-        elapsed: elapsed(new Date(Date.now() - timerStart).toISOString()),
+        elapsed: m > 0 ? `${m}m ${s}s` : `${s}s`,
         ok: o.reportStatus === "DELIVERED",
       });
     }
@@ -207,20 +228,22 @@ function OrderCard({
     }
   }
 
+  const pk = problemKey(o);
+
   return (
-    <div style={{ ...S.card, borderColor: problem.yes ? "#7f1d1d" : "#2a2a35" }}>
-      {/* Header row */}
+    <div style={{ ...S.card, borderColor: pk ? "#7f1d1d" : "#2a2a35" }}>
+      {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
           <span style={{ color: "#fff", fontWeight: 700, fontSize: "14px" }}>
             {PRODUCT_LABELS[o.productType] ?? o.productType}
           </span>
-          {o.customerName && <span style={{ color: "#a0a0b0", fontSize: "12px" }}>{o.customerName}</span>}
-          {o.customerEmail && <span style={{ color: "#888", fontSize: "12px" }}>{o.customerEmail}</span>}
-          {o.galaxyId && <span style={{ color: "#555", fontSize: "11px" }}>🌌 {o.galaxyId}</span>}
+          {o.customerName  && <span style={{ color: "#a0a0b0", fontSize: "12px" }}>{o.customerName}</span>}
+          {o.customerEmail && <span style={{ color: "#888",    fontSize: "12px" }}>{o.customerEmail}</span>}
+          {o.galaxyId      && <span style={{ color: "#555",    fontSize: "11px" }}>🌌 {o.galaxyId}</span>}
           <span style={{ color: "#444", fontSize: "11px" }}>{o.orderId}</span>
           <span style={{ color: "#555", fontSize: "11px" }}>
-            {new Date(o.createdAt).toLocaleString("es-ES")}
+            {new Date(o.createdAt).toLocaleString("es-ES")} — hace {elapsed(o.createdAt)}
           </span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "4px", alignItems: "flex-end" }}>
@@ -228,15 +251,13 @@ function OrderCard({
           <span style={S.badge(repColor(o.reportStatus))}>{o.reportStatus ?? "sin report"}</span>
           {o.hasPdf && <span style={S.badge("#86efac")}>PDF ✓</span>}
           {o.subscriptionStatus && <span style={S.badge(subColor(o.subscriptionStatus))}>{o.subscriptionStatus}</span>}
-          {problem.yes && <span style={{ fontSize: "10px", color: "#f87171" }}>⚠ {problem.reason}</span>}
         </div>
       </div>
 
-      {/* Live creation timer */}
+      {/* Pending age warning */}
       {isActive && timerStart === null && (
         <div style={{ fontSize: "12px", color: "#fbbf24" }}>
           ⏱ Pendiente hace {elapsed(o.createdAt)}
-          {ageMin > 30 && <span style={{ color: "#f87171", marginLeft: "8px" }}>— más de 30 min</span>}
         </div>
       )}
 
@@ -263,7 +284,6 @@ function OrderCard({
         {err && <span style={{ fontSize: "12px", color: "#f87171" }}>✗ {err}</span>}
       </div>
 
-      {/* Subscription renewal */}
       {o.subscriptionRenewsAt && (
         <div style={{ fontSize: "11px", color: "#666" }}>
           Próximo cobro: {new Date(o.subscriptionRenewsAt).toLocaleDateString("es-ES")}
@@ -275,21 +295,22 @@ function OrderCard({
 
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function AdminPage() {
-  const [secret, setSecret] = useState("");
-  const [authed, setAuthed] = useState(false);
-  const [tab, setTab] = useState<Tab>("search");
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<OrderRow[]>([]);
-  const [subs, setSubs] = useState<OrderRow[]>([]);
+  const [secret, setSecret]   = useState("");
+  const [authed, setAuthed]   = useState(false);
+  const [tab, setTab]         = useState<Tab>("orders");
+  const [orders, setOrders]   = useState<OrderRow[]>([]);
+  const [subs, setSubs]       = useState<OrderRow[]>([]);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError]     = useState("");
   const secretRef = useRef(secret);
   useEffect(() => { secretRef.current = secret; }, [secret]);
 
-  // Restore secret from localStorage
+  // Restore auth + dismissed from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(SECRET_KEY);
     if (saved) { setSecret(saved); setAuthed(true); }
+    setDismissed(loadDismissed());
   }, []);
 
   function handleLogin(e: React.FormEvent) {
@@ -300,13 +321,40 @@ export default function AdminPage() {
 
   function handleLogout() {
     localStorage.removeItem(SECRET_KEY);
-    setSecret(""); setAuthed(false); setResults([]); setSubs([]);
+    setSecret(""); setAuthed(false); setOrders([]); setSubs([]);
   }
+
+  function dismiss(key: string) {
+    setDismissed((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      saveDismissed(next);
+      return next;
+    });
+  }
+
+  const fetchOrders = useCallback(async () => {
+    setLoading(true); setError("");
+    try {
+      const res = await fetch(
+        `${API_BASE}/admin/recent-orders?secret=${encodeURIComponent(secretRef.current)}`
+      );
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Error");
+      setOrders(data.orders);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const fetchSubs = useCallback(async () => {
     setLoading(true); setError("");
     try {
-      const res = await fetch(`${API_BASE}/admin/subscriptions?secret=${encodeURIComponent(secretRef.current)}`);
+      const res = await fetch(
+        `${API_BASE}/admin/subscriptions?secret=${encodeURIComponent(secretRef.current)}`
+      );
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Error");
       setSubs(data.subscriptions);
@@ -317,29 +365,14 @@ export default function AdminPage() {
     }
   }, []);
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (!query.trim()) return;
-    setLoading(true); setError(""); setResults([]);
-    try {
-      const res = await fetch(
-        `${API_BASE}/admin/search?q=${encodeURIComponent(query.trim())}&secret=${encodeURIComponent(secret)}`
-      );
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error || "Error");
-      setResults(data.orders);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    if (authed && tab === "subscriptions") fetchSubs();
-  }, [authed, tab, fetchSubs]);
+    if (!authed) return;
+    if (tab === "orders")         fetchOrders();
+    if (tab === "subscriptions")  fetchSubs();
+    if (tab === "failures") { fetchOrders(); fetchSubs(); }
+  }, [authed, tab, fetchOrders, fetchSubs]);
 
-  // ── Login screen ───────────────────────────────────────────────────────────
+  // ── Login screen ──────────────────────────────────────────────────────────
   if (!authed) {
     return (
       <div style={{ ...S.page, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
@@ -362,12 +395,14 @@ export default function AdminPage() {
     );
   }
 
-  // ── Failures ───────────────────────────────────────────────────────────────
-  const allOrders = [...results, ...subs];
-  const failures = allOrders.filter((o) => isProblem(o).yes);
-  const uniqueFailures = [...new Map(failures.map((o) => [o.orderId, o])).values()];
+  // Compute failures from all loaded data
+  const allOrders = [...new Map([...orders, ...subs].map((o) => [o.orderId, o])).values()];
+  const failures = allOrders
+    .map((o) => ({ o, key: problemKey(o), reason: problemReason(o) }))
+    .filter(({ key }) => key !== null && !dismissed.has(key!))
+    .sort((a, b) => new Date(b.o.createdAt).getTime() - new Date(a.o.createdAt).getTime());
 
-  // ── Authenticated UI ───────────────────────────────────────────────────────
+  // ── Authenticated UI ──────────────────────────────────────────────────────
   return (
     <div style={S.page}>
       {/* Header */}
@@ -379,12 +414,12 @@ export default function AdminPage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: "4px", marginBottom: "24px", borderBottom: "1px solid #2a2a35", paddingBottom: "0" }}>
-        {(["search", "subscriptions", "failures"] as Tab[]).map((t) => {
+      <div style={{ display: "flex", gap: "4px", marginBottom: "24px", borderBottom: "1px solid #2a2a35" }}>
+        {(["orders", "subscriptions", "failures"] as Tab[]).map((t) => {
           const labels: Record<Tab, string> = {
-            search: "Búsqueda",
+            orders:        `Órdenes${orders.length ? ` (${orders.length})` : ""}`,
             subscriptions: `Kiron Vivo${subs.length ? ` (${subs.length})` : ""}`,
-            failures: `Ver Fallos${uniqueFailures.length ? ` 🔴${uniqueFailures.length}` : ""}`,
+            failures:      `Fallos${failures.length ? ` 🔴${failures.length}` : ""}`,
           };
           return (
             <button
@@ -411,39 +446,29 @@ export default function AdminPage() {
 
       {error && <p style={{ color: "#f87171", fontSize: "13px", marginBottom: "16px" }}>✗ {error}</p>}
 
-      {/* ── Búsqueda tab ─────────────────────────────────────────────────────── */}
-      {tab === "search" && (
+      {/* ── Órdenes ────────────────────────────────────────────────────────── */}
+      {tab === "orders" && (
         <div>
-          <form onSubmit={handleSearch} style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
-            <input
-              type="text"
-              placeholder="email, orderId, Galaxy ID, nombre..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              style={{ ...S.input, flex: 1 }}
-              autoFocus
-            />
-            <button type="submit" disabled={loading} style={S.btn()}>
-              {loading ? "Buscando..." : "Buscar"}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+            <p style={{ color: "#666", fontSize: "12px", margin: 0 }}>
+              {orders.length} orden(es) — más recientes primero
+            </p>
+            <button onClick={fetchOrders} disabled={loading} style={{ ...S.btn(), padding: "6px 12px", fontSize: "12px" }}>
+              {loading ? "Cargando..." : "Actualizar"}
             </button>
-          </form>
-          {results.length > 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <p style={{ color: "#666", fontSize: "12px", margin: "0 0 4px 0" }}>
-                {results.length} resultado(s)
-              </p>
-              {results.map((o) => (
-                <OrderCard key={o.orderId} o={o} secret={secret} onRefresh={() => handleSearch({ preventDefault: () => {} } as React.FormEvent)} />
-              ))}
-            </div>
-          )}
-          {results.length === 0 && !loading && query && (
-            <p style={{ color: "#555", fontSize: "13px" }}>Sin resultados.</p>
-          )}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {orders.map((o) => (
+              <OrderCard key={o.orderId} o={o} secret={secret} onRefresh={fetchOrders} />
+            ))}
+            {orders.length === 0 && !loading && (
+              <p style={{ color: "#555", fontSize: "13px" }}>Sin órdenes.</p>
+            )}
+          </div>
         </div>
       )}
 
-      {/* ── Kiron Vivo tab ───────────────────────────────────────────────────── */}
+      {/* ── Suscripciones ──────────────────────────────────────────────────── */}
       {tab === "subscriptions" && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
@@ -465,29 +490,44 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* ── Fallos tab ───────────────────────────────────────────────────────── */}
+      {/* ── Fallos ─────────────────────────────────────────────────────────── */}
       {tab === "failures" && (
         <div>
-          <p style={{ color: "#666", fontSize: "12px", marginBottom: "16px" }}>
-            Reports atascados &gt;30min, pagos fallidos, suscripciones con problemas.
-            <br />
-            <span style={{ color: "#555" }}>Busca primero en las otras pestañas para cargar datos.</span>
-          </p>
-          {uniqueFailures.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {uniqueFailures.map((o) => {
-                const { reason } = isProblem(o);
-                return (
-                  <div key={o.orderId}>
-                    <p style={{ color: "#f87171", fontSize: "11px", marginBottom: "4px" }}>⚠ {reason}</p>
-                    <OrderCard o={o} secret={secret} onRefresh={fetchSubs} />
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+            <p style={{ color: "#666", fontSize: "12px", margin: 0 }}>
+              Reports atascados &gt;30min · pagos fallidos · suscripciones con problemas
+            </p>
+            <button
+              onClick={() => { fetchOrders(); fetchSubs(); }}
+              disabled={loading}
+              style={{ ...S.btn(), padding: "6px 12px", fontSize: "12px" }}
+            >
+              {loading ? "Actualizando..." : "Actualizar"}
+            </button>
+          </div>
+
+          {failures.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              {failures.map(({ o, key, reason }) => (
+                <div key={key}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                    <span style={{ fontSize: "11px", color: "#f87171" }}>⚠ {reason}</span>
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "11px", color: "#666" }}>
+                      <input
+                        type="checkbox"
+                        onChange={() => dismiss(key!)}
+                        style={{ cursor: "pointer" }}
+                      />
+                      Marcar como visto
+                    </label>
                   </div>
-                );
-              })}
+                  <OrderCard o={o} secret={secret} onRefresh={() => { fetchOrders(); fetchSubs(); }} />
+                </div>
+              ))}
             </div>
           ) : (
             <p style={{ color: "#555", fontSize: "13px" }}>
-              {allOrders.length === 0 ? "Carga datos desde Búsqueda o Kiron Vivo primero." : "Sin fallos detectados."}
+              {allOrders.length === 0 ? "Cargando datos..." : "Sin fallos detectados."}
             </p>
           )}
         </div>
