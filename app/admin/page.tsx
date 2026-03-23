@@ -8,6 +8,7 @@ const API_BASE =
 
 type OrderRow = {
   orderId: string;
+  customerEmail: string | null;
   productType: string;
   paymentStatus: string;
   reportStatus: string | null;
@@ -277,6 +278,9 @@ export default function AdminPage() {
                     <span style={{ color: "#fff", fontWeight: 700 }}>
                       {PRODUCT_LABELS[o.productType] ?? o.productType}
                     </span>
+                    {o.customerEmail && (
+                      <span style={{ fontSize: "12px", color: "#a0a0b0" }}>{o.customerEmail}</span>
+                    )}
                     <span style={{ fontSize: "12px", color: "#888" }}>{o.orderId}</span>
                     <span style={{ fontSize: "12px", color: "#888" }}>
                       {new Date(o.createdAt).toLocaleString("es-ES")}
