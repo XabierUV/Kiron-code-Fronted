@@ -746,7 +746,7 @@ export default function MiGalaxiaPage() {
                               {isPurchased && hasPdf
                                 ? (lang === "en" ? "Report available." : "Informe disponible.")
                                 : isPurchased
-                                ? (lang === "en" ? "Processing your report..." : "Procesando tu informe...")
+                                ? (lang === "en" ? "Your report is being prepared. You will receive it in 24–72h." : "Tu informe está siendo elaborado. Lo recibirás en 24–72h.")
                                 : isBlocked
                                 ? (lang === "en" ? "Requires The Wound and the Gift." : "Requiere La Herida y el Don.")
                                 : (lang === "en" ? `Unlock for ${item.price}.` : `Desbloquea por ${item.price}.`)}

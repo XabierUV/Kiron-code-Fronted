@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   fetchUnlockedReportBySession,
   verifyCheckoutSession,
@@ -28,12 +28,6 @@ type UnlockedReportState = {
     customerEmail?: string | null;
   };
 };
-
-function formatTime(seconds: number) {
-  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
-  const s = (seconds % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
-}
 
 function firstDayNextMonth() {
   const d = new Date();
@@ -109,11 +103,6 @@ export default function SuccessPage() {
   const [error, setError] = useState("");
   const [data, setData] = useState<UnlockedReportState | null>(null);
   const [urlProductType] = useState<string | null>(getUrlProductType);
-  const [countdown, setCountdown] = useState(() => {
-    const pt = getUrlProductType();
-    return PRODUCT_CONFIG[pt ?? ""]?.countdownSec ?? 10 * 60;
-  });
-  const startTimeRef = useRef<number | null>(null);
   const [purchasedProducts, setPurchasedProducts] = useState<Set<string>>(new Set());
   const [upsellLoading, setUpsellLoading] = useState(false);
   const [showUpsellModal, setShowUpsellModal] = useState(false);
@@ -182,30 +171,6 @@ export default function SuccessPage() {
       clearInterval(pollId);
     };
   }, []);
-
-  // Countdown — uses Date.now() so it keeps running when tab is hidden
-  useEffect(() => {
-    if (data?.report?.pdfUrl) return;
-    if (cfg.countdownSec === null) return;
-    if (!startTimeRef.current) startTimeRef.current = Date.now();
-    const TOTAL_MS = cfg.countdownSec * 1000;
-    const id = setInterval(() => {
-      const elapsed = Date.now() - startTimeRef.current!;
-      const remaining = Math.max(0, Math.ceil((TOTAL_MS - elapsed) / 1000));
-      setCountdown(remaining);
-    }, 1000);
-    return () => clearInterval(id);
-  }, [data?.report?.pdfUrl, cfg.countdownSec]);
-
-  // Show error only after timeout
-  useEffect(() => {
-    if (cfg.countdownSec === null) return;
-    if (countdown === 0 && !data?.report?.pdfUrl) {
-      setError(
-        "El informe está tardando más de lo esperado. Revisa tu email o accede desde MI GALAXIA."
-      );
-    }
-  }, [countdown, data?.report?.pdfUrl, cfg.countdownSec]);
 
   const hasPdf = Boolean(data?.report?.pdfUrl);
 
@@ -289,38 +254,23 @@ export default function SuccessPage() {
                     </p>
                   </article>
                 ) : (
-                  <>
-                    <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
-                      <p className="miniLabel" style={{ textAlign: "center", marginBottom: "8px", fontSize: "1.4rem", letterSpacing: "0.25em" }}>
-                        {lang === "en" ? "ESTIMATED TIME" : "TIEMPO ESTIMADO"}
-                      </p>
-                      <p style={{
-                        margin: 0,
-                        fontSize: "8rem",
-                        fontWeight: "700",
-                        letterSpacing: "-0.05em",
-                        lineHeight: 1,
-                        color: "var(--text)",
-                      }}>
-                        {formatTime(countdown)}
-                      </p>
-                    </div>
-
-                    <article className="insightCard" style={{ textAlign: "center" }}>
-                      <p style={{ margin: "0 0 12px", lineHeight: 1.7, textAlign: "center", fontSize: "1.2rem" }}>
-                        {lang === "en" ? (
-                          <>You can find your downloaded products in{" "}
-                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, your personal space.</>
-                        ) : (
-                          <>Puedes encontrar tus productos descargados en{" "}
-                            <Link href="/mi-galaxia" style={{ color: "var(--text)", textDecoration: "underline" }}>MI GALAXIA</Link>, tu espacio personal.</>
-                        )}
-                      </p>
-                      <p className="sectionText" style={{ margin: 0, textAlign: "center", fontSize: "1.2rem" }}>
-                        {lang === "en" ? "Thank you for your purchase." : "Muchas gracias por tu compra."}
-                      </p>
-                    </article>
-                  </>
+                  <article className="insightCard">
+                    <p style={{ margin: "0 0 20px", fontWeight: 700, fontSize: "1.15rem", lineHeight: 1.5 }}>
+                      {lang === "en"
+                        ? "Your report is being prepared."
+                        : "Tu informe está siendo preparado."}
+                    </p>
+                    <p style={{ margin: "0 0 16px", lineHeight: 1.8, color: "var(--text-faint)" }}>
+                      {lang === "en"
+                        ? "Our team is working on your personalised analysis. Kiron Code reports are crafted with real astronomical precision and psychological content adapted to your unique birth chart."
+                        : "Nuestro equipo está trabajando en tu análisis personalizado. Los informes de Kiron Code se elaboran con precisión astronómica real y contenido psicológico adaptado a tu carta natal única."}
+                    </p>
+                    <p style={{ margin: 0, lineHeight: 1.8, color: "var(--text-faint)" }}>
+                      {lang === "en"
+                        ? "You will receive your complete report with audio included within 24 to 72 hours."
+                        : "Recibirás tu informe completo con audio incluido en un plazo de 24 a 72 horas."}
+                    </p>
+                  </article>
                 )}
 
                 {/* Botón Crea tu acceso a MI GALAXIA */}
