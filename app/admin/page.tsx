@@ -23,7 +23,16 @@ type OrderRow = {
   subscriptionRenewsAt?: string | null;
 };
 
-type Tab = "orders" | "subscriptions" | "failures";
+type Tab = "orders" | "subscriptions" | "failures" | "vip";
+
+type VipRow = OrderRow & { isVip?: boolean };
+
+const VIP_PRODUCT_OPTIONS = [
+  { key: "CHIRON",        label: "La Herida y el Don" },
+  { key: "NATAL_CHART",   label: "Tu Mapa Interior" },
+  { key: "COMPATIBILITY", label: "El Vínculo" },
+  { key: "SUBSCRIPTION",  label: "Kiron Vivo" },
+];
 
 const PRODUCT_LABELS: Record<string, string> = {
   CHIRON:        "La Herida y el Don",
@@ -300,9 +309,17 @@ export default function AdminPage() {
   const [tab, setTab]         = useState<Tab>("orders");
   const [orders, setOrders]   = useState<OrderRow[]>([]);
   const [subs, setSubs]       = useState<OrderRow[]>([]);
+  const [vips, setVips]       = useState<VipRow[]>([]);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
+  // VIP form
+  const [vipEmail, setVipEmail]       = useState("");
+  const [vipName, setVipName]         = useState("");
+  const [vipProducts, setVipProducts] = useState<string[]>(["CHIRON"]);
+  const [vipLoading, setVipLoading]   = useState(false);
+  const [vipResult, setVipResult]     = useState<{ galaxyId: string; tempPassword: string | null; isNewAccount: boolean } | null>(null);
+  const [vipError, setVipError]       = useState("");
   const secretRef = useRef(secret);
   useEffect(() => { secretRef.current = secret; }, [secret]);
 
@@ -365,12 +382,56 @@ export default function AdminPage() {
     }
   }, []);
 
+  const fetchVips = useCallback(async () => {
+    setLoading(true); setError("");
+    try {
+      const res = await fetch(
+        `${API_BASE}/admin/vip-users?secret=${encodeURIComponent(secretRef.current)}`
+      );
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Error");
+      setVips(data.vips);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  async function handleCreateVip(e: React.FormEvent) {
+    e.preventDefault();
+    setVipError(""); setVipResult(null); setVipLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/admin/create-vip`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret, email: vipEmail, name: vipName, products: vipProducts }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Error");
+      setVipResult({ galaxyId: data.galaxyId, tempPassword: data.tempPassword, isNewAccount: data.isNewAccount });
+      setVipEmail(""); setVipName(""); setVipProducts(["CHIRON"]);
+      fetchVips();
+    } catch (e) {
+      setVipError(e instanceof Error ? e.message : "Error");
+    } finally {
+      setVipLoading(false);
+    }
+  }
+
+  function toggleVipProduct(key: string) {
+    setVipProducts((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  }
+
   useEffect(() => {
     if (!authed) return;
     if (tab === "orders")         fetchOrders();
     if (tab === "subscriptions")  fetchSubs();
     if (tab === "failures") { fetchOrders(); fetchSubs(); }
-  }, [authed, tab, fetchOrders, fetchSubs]);
+    if (tab === "vip")            fetchVips();
+  }, [authed, tab, fetchOrders, fetchSubs, fetchVips]);
 
   // ── Login screen ──────────────────────────────────────────────────────────
   if (!authed) {
@@ -415,11 +476,12 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: "4px", marginBottom: "24px", borderBottom: "1px solid #2a2a35" }}>
-        {(["orders", "subscriptions", "failures"] as Tab[]).map((t) => {
+        {(["orders", "subscriptions", "failures", "vip"] as Tab[]).map((t) => {
           const labels: Record<Tab, string> = {
             orders:        `Órdenes${orders.length ? ` (${orders.length})` : ""}`,
             subscriptions: `Kiron Vivo${subs.length ? ` (${subs.length})` : ""}`,
             failures:      `Fallos${failures.length ? ` 🔴${failures.length}` : ""}`,
+            vip:           `VIP${vips.length ? ` (${vips.length})` : ""}`,
           };
           return (
             <button
@@ -530,6 +592,84 @@ export default function AdminPage() {
               {allOrders.length === 0 ? "Cargando datos..." : "Sin fallos detectados."}
             </p>
           )}
+        </div>
+      )}
+
+      {/* ── VIP ────────────────────────────────────────────────────────────── */}
+      {tab === "vip" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+          {/* Create VIP form */}
+          <div style={S.card}>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>Crear acceso VIP</div>
+            <form onSubmit={handleCreateVip} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <input
+                style={S.input}
+                type="text"
+                placeholder="Nombre"
+                value={vipName}
+                onChange={(e) => setVipName(e.target.value)}
+              />
+              <input
+                style={S.input}
+                type="email"
+                placeholder="Email *"
+                value={vipEmail}
+                onChange={(e) => setVipEmail(e.target.value)}
+                required
+              />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
+                {VIP_PRODUCT_OPTIONS.map(({ key, label }) => (
+                  <label key={key} style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "13px", color: "#ccc" }}>
+                    <input
+                      type="checkbox"
+                      checked={vipProducts.includes(key)}
+                      onChange={() => toggleVipProduct(key)}
+                      style={{ cursor: "pointer" }}
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+              <div style={S.row}>
+                <button type="submit" disabled={vipLoading || vipProducts.length === 0} style={S.btn("#c4b5fd")}>
+                  {vipLoading ? "Creando..." : "Crear acceso VIP"}
+                </button>
+                {vipError && <span style={{ fontSize: "12px", color: "#f87171" }}>✗ {vipError}</span>}
+              </div>
+            </form>
+            {vipResult && (
+              <div style={{ marginTop: "8px", padding: "12px", background: "#0d2d1a", border: "1px solid #166534", borderRadius: "4px", fontSize: "13px" }}>
+                <div style={{ color: "#86efac", fontWeight: 700, marginBottom: "6px" }}>
+                  ✓ {vipResult.isNewAccount ? "Cuenta creada" : "Acceso añadido a cuenta existente"}
+                </div>
+                <div style={{ color: "#a0a0b0" }}>Galaxy ID: <strong style={{ color: "#fff" }}>{vipResult.galaxyId}</strong></div>
+                {vipResult.tempPassword && (
+                  <div style={{ color: "#a0a0b0", marginTop: "4px" }}>
+                    Contraseña temporal: <strong style={{ color: "#fbbf24" }}>{vipResult.tempPassword}</strong>
+                    <span style={{ color: "#666", fontSize: "11px", marginLeft: "8px" }}>(el usuario puede cambiarla)</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* VIP list */}
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <span style={{ color: "#666", fontSize: "12px" }}>{vips.length} acceso(s) VIP</span>
+              <button onClick={fetchVips} disabled={loading} style={{ ...S.btn(), padding: "6px 12px", fontSize: "12px" }}>
+                {loading ? "Cargando..." : "Actualizar"}
+              </button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {vips.map((o) => (
+                <OrderCard key={o.orderId} o={o} secret={secret} onRefresh={fetchVips} />
+              ))}
+              {vips.length === 0 && !loading && (
+                <p style={{ color: "#555", fontSize: "13px" }}>No hay usuarios VIP todavía.</p>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
