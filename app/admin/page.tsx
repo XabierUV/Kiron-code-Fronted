@@ -314,12 +314,21 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
   // VIP form
-  const [vipEmail, setVipEmail]       = useState("");
-  const [vipName, setVipName]         = useState("");
-  const [vipProducts, setVipProducts] = useState<string[]>(["CHIRON"]);
-  const [vipLoading, setVipLoading]   = useState(false);
-  const [vipResult, setVipResult]     = useState<{ galaxyId: string; tempPassword: string | null; isNewAccount: boolean } | null>(null);
-  const [vipError, setVipError]       = useState("");
+  const [vipEmail, setVipEmail]               = useState("");
+  const [vipName, setVipName]                 = useState("");
+  const [vipBirthDate, setVipBirthDate]       = useState("");
+  const [vipBirthTime, setVipBirthTime]       = useState("");
+  const [vipBirthCity, setVipBirthCity]       = useState("");
+  const [vipBirthCountry, setVipBirthCountry] = useState("");
+  const [vipPersonBName, setVipPersonBName]   = useState("");
+  const [vipPersonBDate, setVipPersonBDate]   = useState("");
+  const [vipPersonBTime, setVipPersonBTime]   = useState("");
+  const [vipPersonBCity, setVipPersonBCity]   = useState("");
+  const [vipPersonBCountry, setVipPersonBCountry] = useState("");
+  const [vipProducts, setVipProducts]         = useState<string[]>(["CHIRON"]);
+  const [vipLoading, setVipLoading]           = useState(false);
+  const [vipResult, setVipResult]             = useState<{ galaxyId: string; tempPassword: string | null; isNewAccount: boolean } | null>(null);
+  const [vipError, setVipError]               = useState("");
   const secretRef = useRef(secret);
   useEffect(() => { secretRef.current = secret; }, [secret]);
 
@@ -402,15 +411,37 @@ export default function AdminPage() {
     e.preventDefault();
     setVipError(""); setVipResult(null); setVipLoading(true);
     try {
+      const hasCompatibility = vipProducts.includes("COMPATIBILITY");
       const res = await fetch(`${API_BASE}/admin/create-vip`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ secret, email: vipEmail, name: vipName, products: vipProducts }),
+        body: JSON.stringify({
+          secret,
+          email: vipEmail,
+          name: vipName,
+          products: vipProducts,
+          birthDate: vipBirthDate || undefined,
+          birthTime: vipBirthTime || undefined,
+          birthCity: vipBirthCity || undefined,
+          birthCountry: vipBirthCountry || undefined,
+          ...(hasCompatibility && vipPersonBName ? {
+            personB: {
+              name: vipPersonBName,
+              birthDate: vipPersonBDate || undefined,
+              birthTime: vipPersonBTime || undefined,
+              birthCity: vipPersonBCity || undefined,
+              birthCountry: vipPersonBCountry || undefined,
+            },
+          } : {}),
+        }),
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error || "Error");
       setVipResult({ galaxyId: data.galaxyId, tempPassword: data.tempPassword, isNewAccount: data.isNewAccount });
-      setVipEmail(""); setVipName(""); setVipProducts(["CHIRON"]);
+      setVipEmail(""); setVipName("");
+      setVipBirthDate(""); setVipBirthTime(""); setVipBirthCity(""); setVipBirthCountry("");
+      setVipPersonBName(""); setVipPersonBDate(""); setVipPersonBTime(""); setVipPersonBCity(""); setVipPersonBCountry("");
+      setVipProducts(["CHIRON"]);
       fetchVips();
     } catch (e) {
       setVipError(e instanceof Error ? e.message : "Error");
@@ -602,34 +633,46 @@ export default function AdminPage() {
           <div style={S.card}>
             <div style={{ color: "#fff", fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>Crear acceso VIP</div>
             <form onSubmit={handleCreateVip} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              <input
-                style={S.input}
-                type="text"
-                placeholder="Nombre"
-                value={vipName}
-                onChange={(e) => setVipName(e.target.value)}
-              />
-              <input
-                style={S.input}
-                type="email"
-                placeholder="Email *"
-                value={vipEmail}
-                onChange={(e) => setVipEmail(e.target.value)}
-                required
-              />
+              {/* Persona A */}
+              <div style={{ color: "#888", fontSize: "11px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Persona A</div>
+              <input style={S.input} type="text" placeholder="Nombre completo" value={vipName} onChange={(e) => setVipName(e.target.value)} />
+              <input style={S.input} type="email" placeholder="Email *" value={vipEmail} onChange={(e) => setVipEmail(e.target.value)} required />
+              <div style={{ display: "flex", gap: "8px" }}>
+                <input style={{ ...S.input, flex: 1 }} type="date" placeholder="Fecha nacimiento" value={vipBirthDate} onChange={(e) => setVipBirthDate(e.target.value)} />
+                <input style={{ ...S.input, width: "110px", flex: "none" }} type="time" placeholder="Hora" value={vipBirthTime} onChange={(e) => setVipBirthTime(e.target.value)} />
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <input style={{ ...S.input, flex: 1 }} type="text" placeholder="Ciudad de nacimiento" value={vipBirthCity} onChange={(e) => setVipBirthCity(e.target.value)} />
+                <input style={{ ...S.input, flex: 1 }} type="text" placeholder="País" value={vipBirthCountry} onChange={(e) => setVipBirthCountry(e.target.value)} />
+              </div>
+
+              {/* Products */}
+              <div style={{ color: "#888", fontSize: "11px", letterSpacing: "0.05em", textTransform: "uppercase", marginTop: "4px" }}>Productos</div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
                 {VIP_PRODUCT_OPTIONS.map(({ key, label }) => (
                   <label key={key} style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "13px", color: "#ccc" }}>
-                    <input
-                      type="checkbox"
-                      checked={vipProducts.includes(key)}
-                      onChange={() => toggleVipProduct(key)}
-                      style={{ cursor: "pointer" }}
-                    />
+                    <input type="checkbox" checked={vipProducts.includes(key)} onChange={() => toggleVipProduct(key)} style={{ cursor: "pointer" }} />
                     {label}
                   </label>
                 ))}
               </div>
+
+              {/* Persona B (solo si COMPATIBILITY está seleccionado) */}
+              {vipProducts.includes("COMPATIBILITY") && (
+                <>
+                  <div style={{ color: "#888", fontSize: "11px", letterSpacing: "0.05em", textTransform: "uppercase", marginTop: "4px" }}>Persona B (El Vínculo)</div>
+                  <input style={S.input} type="text" placeholder="Nombre persona B" value={vipPersonBName} onChange={(e) => setVipPersonBName(e.target.value)} />
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input style={{ ...S.input, flex: 1 }} type="date" placeholder="Fecha nacimiento B" value={vipPersonBDate} onChange={(e) => setVipPersonBDate(e.target.value)} />
+                    <input style={{ ...S.input, width: "110px", flex: "none" }} type="time" placeholder="Hora B" value={vipPersonBTime} onChange={(e) => setVipPersonBTime(e.target.value)} />
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input style={{ ...S.input, flex: 1 }} type="text" placeholder="Ciudad B" value={vipPersonBCity} onChange={(e) => setVipPersonBCity(e.target.value)} />
+                    <input style={{ ...S.input, flex: 1 }} type="text" placeholder="País B" value={vipPersonBCountry} onChange={(e) => setVipPersonBCountry(e.target.value)} />
+                  </div>
+                </>
+              )}
+
               <div style={S.row}>
                 <button type="submit" disabled={vipLoading || vipProducts.length === 0} style={S.btn("#c4b5fd")}>
                   {vipLoading ? "Creando..." : "Crear acceso VIP"}
