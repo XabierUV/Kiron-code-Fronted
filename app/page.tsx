@@ -425,6 +425,33 @@ export default function Page() {
           </article>
         </section>
 
+        {/* Telegram community */}
+        <section style={{ textAlign: "center", padding: "64px 24px", borderTop: "1px solid rgba(201,167,90,0.15)" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "52px", height: "52px", borderRadius: "50%", background: "rgba(201,167,90,0.1)", border: "1px solid rgba(201,167,90,0.3)", marginBottom: "20px" }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.93 6.712-1.67 7.874c-.12.555-.447.69-.904.43l-2.5-1.842-1.207 1.161c-.133.133-.245.245-.503.245l.18-2.546 4.635-4.187c.202-.18-.044-.28-.313-.1L8.23 14.145l-2.46-.768c-.535-.167-.545-.535.112-.792l9.618-3.708c.446-.162.836.1.43.835z" fill="#C9A75A"/>
+            </svg>
+          </div>
+          <h2 style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 700, color: "var(--gold)", marginBottom: "12px" }}>
+            Únete a nuestra comunidad
+          </h2>
+          <p style={{ maxWidth: "480px", margin: "0 auto 28px", color: "var(--text-soft)", lineHeight: 1.7, fontSize: "16px" }}>
+            Contenido astrológico semanal, reflexiones sobre Quirón y acceso anticipado a nuevos productos. Gratis, siempre.
+          </p>
+          <a
+            href="https://t.me/Kiron_Code"
+            target="_blank"
+            rel="noreferrer"
+            className="primaryButton"
+            style={{ display: "inline-flex", alignItems: "center", gap: "8px", textDecoration: "none", padding: "0 28px", minHeight: "48px", lineHeight: "48px" }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.93 6.712-1.67 7.874c-.12.555-.447.69-.904.43l-2.5-1.842-1.207 1.161c-.133.133-.245.245-.503.245l.18-2.546 4.635-4.187c.202-.18-.044-.28-.313-.1L8.23 14.145l-2.46-.768c-.535-.167-.545-.535.112-.792l9.618-3.708c.446-.162.836.1.43.835z" fill="currentColor"/>
+            </svg>
+            Unirse al canal →
+          </a>
+        </section>
+
         <FaqSection t={t} />
       </main>
 
