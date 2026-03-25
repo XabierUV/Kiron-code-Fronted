@@ -171,9 +171,10 @@ function OrderCard({
   o, secret, onRefresh,
 }: { o: OrderRow; secret: string; onRefresh: () => void }) {
   const [, setTick] = useState(0);
-  const [triggering, setTriggering] = useState(false);
-  const [resetting, setResetting]   = useState(false);
-  const [err, setErr]               = useState("");
+  const [triggering, setTriggering]   = useState(false);
+  const [resetting, setResetting]     = useState(false);
+  const [delivering, setDelivering]   = useState(false);
+  const [err, setErr]                 = useState("");
   const [timerStart, setTimerStart] = useState<number | null>(null);
   const [timerDone, setTimerDone]   = useState<{ elapsed: string; ok: boolean } | null>(null);
 
@@ -215,6 +216,24 @@ function OrderCard({
       setErr(e instanceof Error ? e.message : "Error");
     } finally {
       setTriggering(false);
+    }
+  }
+
+  async function handleForceDeliver() {
+    setErr(""); setDelivering(true);
+    try {
+      const res = await fetch(`${API_BASE}/admin/force-deliver`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: o.orderId, secret }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Error");
+      onRefresh();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Error");
+    } finally {
+      setDelivering(false);
     }
   }
 
@@ -286,6 +305,9 @@ function OrderCard({
       <div style={S.row}>
         <button onClick={handleTrigger} disabled={triggering} style={S.btn()}>
           {triggering ? "Enviando..." : "Regenerar PDF"}
+        </button>
+        <button onClick={handleForceDeliver} disabled={delivering} style={S.btn("#818cf8")}>
+          {delivering ? "Enviando..." : "Forzar entrega"}
         </button>
         <button onClick={handleReset} disabled={resetting} style={S.btn("#fb923c")}>
           {resetting ? "Reseteando..." : "Resetear orden"}
