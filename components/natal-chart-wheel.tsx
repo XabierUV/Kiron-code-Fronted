@@ -109,11 +109,14 @@ function getPointLabel(point: ChartPoint) {
   return POINT_LABELS[point.key] || point.name;
 }
 
-function getStackedPointRadius(index: number) {
+// Hard cap: planets must stay inside the Unicode sign ring (starts at innerRadius).
+// Margin = 5% of outerRadius (220) ≈ 11px → MAX = 145 - 11 = 134.
+const MAX_PLANET_RADIUS = 134;
+
+function getStackedPointRadius(index: number): number {
   const cycle = index % 3;
-  if (cycle === 0) return 112;
-  if (cycle === 1) return 100;
-  return 124;
+  const base = cycle === 0 ? 112 : cycle === 1 ? 100 : 124;
+  return Math.min(base, MAX_PLANET_RADIUS);
 }
 
 export function NatalChartWheel({ chartData, fullWidth, lang = "es" }: NatalChartWheelProps) {
@@ -297,7 +300,7 @@ export function NatalChartWheel({ chartData, fullWidth, lang = "es" }: NatalChar
 
         {/* Planets – Unicode symbols, no dot */}
         {points.map((point, index) => {
-          const pointRadius = getStackedPointRadius(index);
+          const pointRadius = Math.min(getStackedPointRadius(index), MAX_PLANET_RADIUS);
           const pos = polarToCartesian(
             center,
             center,
