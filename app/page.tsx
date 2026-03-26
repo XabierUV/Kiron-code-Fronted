@@ -108,6 +108,10 @@ export default function Page() {
   const [chartId, setChartId] = useState<string | null>(null);
   const [reportId, setReportId] = useState<string | null>(null);
 
+  const [showChartModal, setShowChartModal] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalError, setModalError] = useState("");
+
   const t = useMemo(() => copy[lang], [lang]);
 
   useEffect(() => {
@@ -183,6 +187,29 @@ export default function Page() {
       );
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleChartModalSubmit() {
+    if (!name || !birthDate || !birthTime || !birthCity || !birthCountry) {
+      setModalError(t.form.validation);
+      return;
+    }
+    setModalLoading(true);
+    setModalError("");
+    try {
+      const data = await fetchChart({ name, birthDate, birthTime, birthCity, birthCountry });
+      setResolvedLocation(data.location ?? null);
+      setChartData(data.chart ?? null);
+      setPreviewData(data.preview ?? null);
+      setChartId(data.chartId ?? null);
+      setReportId(data.reportId ?? null);
+      setShowChartModal(false);
+      if (pendingProductType === "COMPATIBILITY") setVinculoStep(true);
+    } catch (err) {
+      setModalError(err instanceof Error ? err.message : t.form.genericError);
+    } finally {
+      setModalLoading(false);
     }
   }
 
@@ -381,6 +408,10 @@ export default function Page() {
                         onClick={() => {
                           if (isLocked) return;
                           setPendingProductType(product.productType);
+                          if (!chartData && !loggedInName) {
+                            setShowChartModal(true);
+                            return;
+                          }
                           if (product.productType === "COMPATIBILITY") setVinculoStep(true);
                         }}
                         style={{ width: "100%", opacity: isLocked ? 0.4 : 1, cursor: isLocked ? "not-allowed" : "pointer" }}
@@ -457,7 +488,74 @@ export default function Page() {
 
       <SiteFooter lang={lang} />
 
-      {pendingProductType === "COMPATIBILITY" && vinculoStep && (
+      {showChartModal && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.75)", padding: "24px" }}>
+          <div style={{ background: "var(--surface, #0d0d0d)", border: "1px solid var(--line, rgba(255,255,255,0.1))", borderRadius: "12px", padding: "40px 32px", width: "100%", maxWidth: "440px", position: "relative" }}>
+            <button
+              type="button"
+              onClick={() => { setShowChartModal(false); setPendingProductType(null); setModalError(""); }}
+              style={{ position: "absolute", top: "16px", right: "16px", background: "none", border: "none", cursor: "pointer", fontSize: "20px", color: "var(--text-faint)", lineHeight: 1 }}
+            >✕</button>
+            <h2 style={{ fontSize: "clamp(18px,3vw,22px)", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "10px" }}>
+              {lang === "en" ? "We need your data to personalise your report" : "Necesitamos tus datos para personalizar tu informe"}
+            </h2>
+            <p style={{ color: "var(--text-soft)", fontSize: "15px", lineHeight: "1.6", marginBottom: "28px" }}>
+              {lang === "en" ? "We calculate your birth chart to create a unique report for you." : "Calculamos tu carta natal para crear un informe único para ti."}
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <input
+                type="text"
+                placeholder={lang === "en" ? "Name" : "Nombre"}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="formInput"
+              />
+              <input
+                type="date"
+                placeholder={lang === "en" ? "Date of birth" : "Fecha de nacimiento"}
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="formInput"
+              />
+              <input
+                type="time"
+                placeholder={lang === "en" ? "Time of birth" : "Hora de nacimiento"}
+                value={birthTime}
+                onChange={(e) => setBirthTime(e.target.value)}
+                className="formInput"
+              />
+              <input
+                type="text"
+                placeholder={lang === "en" ? "City of birth" : "Ciudad de nacimiento"}
+                value={birthCity}
+                onChange={(e) => setBirthCity(e.target.value)}
+                className="formInput"
+              />
+              <input
+                type="text"
+                placeholder={lang === "en" ? "Country of birth" : "País de nacimiento"}
+                value={birthCountry}
+                onChange={(e) => setBirthCountry(e.target.value)}
+                className="formInput"
+              />
+              {modalError && (
+                <p style={{ color: "rgba(220,80,80,0.9)", fontSize: "13px", margin: 0 }}>{modalError}</p>
+              )}
+              <button
+                type="button"
+                className="primaryButton"
+                disabled={modalLoading}
+                onClick={handleChartModalSubmit}
+                style={{ marginTop: "6px" }}
+              >
+                {modalLoading ? (lang === "en" ? "Calculating..." : "Calculando...") : (lang === "en" ? "Continue" : "Continuar")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {pendingProductType === "COMPATIBILITY" && vinculoStep && !showChartModal && (
         <VinculoConfigModal
           lang={lang}
           onConfirm={(vd) => {
@@ -468,7 +566,7 @@ export default function Page() {
         />
       )}
 
-      {pendingProductType && !vinculoStep && (
+      {pendingProductType && !vinculoStep && !showChartModal && (
         <ConsentModal
           lang={lang}
           onConfirm={(data) => {
