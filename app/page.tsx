@@ -356,7 +356,7 @@ export default function Page() {
                 },
               ] as const
             ).map((product) => {
-              const isPurchased = purchasedProducts.has(product.productType);
+              const isPurchased = !!loggedInName && purchasedProducts.has(product.productType);
               const isLocked = !isPurchased && product.requiresKey !== null && !purchasedProducts.has(product.requiresKey);
               return (
                 <article key={product.productType} className="insightCard">

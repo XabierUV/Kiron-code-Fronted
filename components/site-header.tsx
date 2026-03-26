@@ -48,28 +48,14 @@ export function SiteHeader({
         <button type="button" className="navAction" onClick={() => handleNav("productos")}>
           {t.nav.premium}
         </button>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
           <a href="/mi-galaxia" className="navAction" style={{ textDecoration: "none" }}>
             {t.nav.myChart}
           </a>
           {loggedInName && (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span style={{ fontSize: "11px", color: "rgba(251,191,36,0.8)", letterSpacing: "0.03em" }}>
-                {lang === "en" ? `Hi, ${loggedInName}` : `Hola, ${loggedInName}`}
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.removeItem("kc_token");
-                  localStorage.removeItem("kc_galaxy_id");
-                  localStorage.removeItem("kc_purchased");
-                  window.location.reload();
-                }}
-                style={{ background: "none", border: "none", cursor: "pointer", fontSize: "11px", color: "var(--text-faint)", padding: 0, textDecoration: "underline" }}
-              >
-                {lang === "en" ? "Sign out" : "Cerrar sesión"}
-              </button>
-            </div>
+            <span style={{ fontSize: "10px", color: "rgba(201,167,90,0.85)", letterSpacing: "0.04em", lineHeight: 1 }}>
+              {loggedInName.split(" ")[0]}
+            </span>
           )}
         </div>
       </nav>
