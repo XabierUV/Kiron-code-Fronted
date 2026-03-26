@@ -795,10 +795,15 @@ button {
 }
 
 .wheelSignLabel {
-  fill: rgba(255, 255, 255, 0.72);
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  fill: rgba(255, 255, 255, 0.65);
+  font-size: 9px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.wheelZodiacSymbol {
+  fill: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
 }
 
 .houseLabel {
