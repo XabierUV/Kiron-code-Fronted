@@ -184,6 +184,25 @@ export function NatalChartWheel({ chartData, fullWidth, lang = "es" }: NatalChar
           );
         })}
 
+        {/* Zodiac Unicode symbols — inner zodiac ring */}
+        {Array.from({ length: 12 }, (_, i) => {
+          const ZODIAC_SYMBOLS = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
+          const labelAngle = lonToAngle(i * 30 + 15, asc);
+          const pos = polarToCartesian(center, center, 168, labelAngle);
+          return (
+            <text
+              key={`usym-${i}`}
+              x={pos.x}
+              y={pos.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              style={{ fill: "rgba(201,167,90,0.65)", fontSize: "12px" }}
+            >
+              {ZODIAC_SYMBOLS[i]}
+            </text>
+          );
+        })}
+
         {/* House cusps */}
         {houses.map((house) => {
           if (typeof house.cuspLongitude !== "number") return null;
