@@ -111,9 +111,9 @@ function getPointLabel(point: ChartPoint) {
 
 function getStackedPointRadius(index: number) {
   const cycle = index % 3;
-  if (cycle === 0) return 168;
-  if (cycle === 1) return 156;
-  return 180;
+  if (cycle === 0) return 112;
+  if (cycle === 1) return 100;
+  return 124;
 }
 
 export function NatalChartWheel({ chartData, fullWidth, lang = "es" }: NatalChartWheelProps) {
@@ -198,7 +198,7 @@ export function NatalChartWheel({ chartData, fullWidth, lang = "es" }: NatalChar
               dominantBaseline="middle"
               style={{ fill: "rgba(201,167,90,0.65)", fontSize: "12px" }}
             >
-              {ZODIAC_SYMBOLS[i]}
+              {`${ZODIAC_SYMBOLS[i]}\uFE0E`}
             </text>
           );
         })}
