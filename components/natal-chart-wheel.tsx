@@ -7,273 +7,286 @@ type NatalChartWheelProps = {
 };
 
 const POINT_ORDER = [
-  "sun", "moon", "mercury", "venus", "mars", "jupiter",
-  "saturn", "uranus", "neptune", "pluto", "chiron", "mean_node",
+  "sun",
+  "moon",
+  "mercury",
+  "venus",
+  "mars",
+  "jupiter",
+  "saturn",
+  "uranus",
+  "neptune",
+  "pluto",
+  "chiron",
+  "mean_node",
 ];
 
 const POINT_LABELS: Record<string, string> = {
-  sun: "☉", moon: "☽", mercury: "☿", venus: "♀", mars: "♂",
-  jupiter: "♃", saturn: "♄", uranus: "⛢", neptune: "♆",
-  pluto: "♇", chiron: "⚷", mean_node: "☊",
+  sun: "☉",
+  moon: "☽",
+  mercury: "☿",
+  venus: "♀",
+  mars: "♂",
+  jupiter: "♃",
+  saturn: "♄",
+  uranus: "♅",
+  neptune: "♆",
+  pluto: "♇",
+  chiron: "⚷",
+  mean_node: "☊",
 };
 
-const ZODIAC_SYMBOLS = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
-const ZODIAC_NAMES   = ["Ari","Tau","Gem","Can","Leo","Vir","Lib","Sco","Sag","Cap","Aqu","Pis"];
-
-const ELEMENT_COLORS = [
-  "rgba(220,70,50,0.11)",  // Aries   — Fire
-  "rgba(90,140,70,0.09)",  // Taurus  — Earth
-  "rgba(80,140,210,0.09)", // Gemini  — Air
-  "rgba(50,120,180,0.11)", // Cancer  — Water
-  "rgba(220,70,50,0.11)",  // Leo     — Fire
-  "rgba(90,140,70,0.09)",  // Virgo   — Earth
-  "rgba(80,140,210,0.09)", // Libra   — Air
-  "rgba(50,120,180,0.11)", // Scorpio — Water
-  "rgba(220,70,50,0.11)",  // Sag     — Fire
-  "rgba(90,140,70,0.09)",  // Cap     — Earth
-  "rgba(80,140,210,0.09)", // Aquarius — Air
-  "rgba(50,120,180,0.11)", // Pisces  — Water
-];
-
-// ── Geometry helpers ────────────────────────────────────────────────────────
-
-function roundCoord(v: number, d = 3) { return Number(v.toFixed(d)); }
-
-function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
-  const rad = ((angleDeg - 90) * Math.PI) / 180;
-  return { x: roundCoord(cx + r * Math.cos(rad)), y: roundCoord(cy + r * Math.sin(rad)) };
+function roundCoord(value: number, decimals = 3) {
+  return Number(value.toFixed(decimals));
 }
 
-/** Ecliptic longitude → SVG angle. ASC at 270° (9 o'clock). Zodiac CCW. */
+function polarToCartesian(
+  cx: number,
+  cy: number,
+  radius: number,
+  angleDeg: number
+) {
+  const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+
+  return {
+    x: roundCoord(cx + radius * Math.cos(angleRad)),
+    y: roundCoord(cy + radius * Math.sin(angleRad)),
+  };
+}
+
+/**
+ * Converts an ecliptic longitude to an SVG angle.
+ *
+ * In a natal chart wheel the Ascendant sits at the 9-o'clock position (270° in
+ * SVG polar terms) and the zodiac advances counter-clockwise, so increasing
+ * ecliptic longitude maps to *decreasing* SVG angle.
+ *
+ * Formula: svgAngle = (270 + asc - lon) mod 360
+ */
 function lonToAngle(lon: number, asc: number): number {
   return ((270 + asc - lon) % 360 + 360) % 360;
 }
 
-/** Signed angular difference a→b in the range (−180, 180]. */
-function angleDiff(a: number, b: number): number {
-  let d = ((b - a) % 360 + 360) % 360;
-  if (d > 180) d -= 360;
-  return d;
+function getZodiacSignLabel(index: number) {
+  const signs = [
+    "Ari",
+    "Tau",
+    "Gem",
+    "Can",
+    "Leo",
+    "Vir",
+    "Lib",
+    "Sco",
+    "Sag",
+    "Cap",
+    "Aqu",
+    "Pis",
+  ];
+
+  return signs[index] ?? "";
 }
 
-/** Donut arc slice (CCW: endAngle = startAngle − 30°). */
-function arcDonutSlice(
-  cx: number, cy: number,
-  rOuter: number, rInner: number,
-  svgStart: number, svgEnd: number
-): string {
-  const o1 = polarToCartesian(cx, cy, rOuter, svgStart);
-  const o2 = polarToCartesian(cx, cy, rOuter, svgEnd);
-  const i1 = polarToCartesian(cx, cy, rInner, svgStart);
-  const i2 = polarToCartesian(cx, cy, rInner, svgEnd);
-  return `M ${o1.x} ${o1.y} A ${rOuter} ${rOuter} 0 0 0 ${o2.x} ${o2.y} L ${i2.x} ${i2.y} A ${rInner} ${rInner} 0 0 1 ${i1.x} ${i1.y} Z`;
-}
-
-/** 5-pointed star path. */
-function starPath(cx: number, cy: number, outerR: number, innerR: number): string {
-  const pts: string[] = [];
-  for (let i = 0; i < 10; i++) {
-    const a = (i * 36 - 90) * Math.PI / 180;
-    const r = i % 2 === 0 ? outerR : innerR;
-    pts.push(`${i === 0 ? "M" : "L"}${roundCoord(cx + r * Math.cos(a))},${roundCoord(cy + r * Math.sin(a))}`);
-  }
-  return pts.join(" ") + " Z";
-}
-
-// ── Planet data helpers ─────────────────────────────────────────────────────
-
-function getPointEntries(chartData: ChartData | null): ChartPoint[] {
+function getPointEntries(chartData: ChartData | null) {
   if (!chartData?.points) return [];
-  return (Object.values(chartData.points) as ChartPoint[])
-    .filter((p): p is ChartPoint => Boolean(p) && typeof p.longitude === "number")
-    .sort((a, b) => {
-      const ai = POINT_ORDER.indexOf(a.key), bi = POINT_ORDER.indexOf(b.key);
-      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-    });
+
+  const validPoints = Object.values(chartData.points).filter(
+    (point): point is ChartPoint =>
+      Boolean(point) && typeof point.longitude === "number"
+  );
+
+  return validPoints.sort((a, b) => {
+    const aIndex = POINT_ORDER.indexOf(a.key);
+    const bIndex = POINT_ORDER.indexOf(b.key);
+
+    const normalizedA = aIndex === -1 ? 999 : aIndex;
+    const normalizedB = bIndex === -1 ? 999 : bIndex;
+
+    return normalizedA - normalizedB;
+  });
 }
 
-/**
- * Anti-collision: planets start at PLANET_BASE_R (near outer edge of house ring).
- * If two planets are angularly closer than MIN_DEG, the later one is nudged
- * INWARD by STEP_R — never outward. Radius is clamped to [PLANET_MIN_R, PLANET_BASE_R].
- *
- * PLANET_BASE_R must be strictly less than zodiacInner so planets stay in the house ring.
- */
-const PLANET_BASE_R = 182; // outer part of house ring, well inside zodiacInner=194
-const PLANET_MIN_R  = 155; // innermost allowed planet position (above house numbers)
-const PLANET_STEP_R = 14;  // radial nudge per collision
-const PLANET_MIN_DEG = 10; // minimum angular separation before nudging
-
-type PlacedPlanet = { key: string; svgAngle: number; radius: number };
-
-function placePlanets(points: ChartPoint[], asc: number): PlacedPlanet[] {
-  const placed: PlacedPlanet[] = [];
-
-  for (const point of points) {
-    const svgAngle = lonToAngle(point.longitude ?? 0, asc);
-    let radius = PLANET_BASE_R;
-
-    // Find the worst angular overlap with already-placed planets at same radius
-    let tries = 0;
-    while (tries < 6) {
-      const conflict = placed.find(
-        (p) => p.radius === radius && Math.abs(angleDiff(p.svgAngle, svgAngle)) < PLANET_MIN_DEG
-      );
-      if (!conflict) break;
-      radius = Math.max(PLANET_MIN_R, radius - PLANET_STEP_R);
-      tries++;
-    }
-
-    placed.push({ key: point.key, svgAngle, radius });
-  }
-
-  return placed;
+function getPointLabel(point: ChartPoint) {
+  return POINT_LABELS[point.key] || point.name;
 }
 
-// ── Component ───────────────────────────────────────────────────────────────
+function getStackedPointRadius(index: number) {
+  const cycle = index % 3;
+  if (cycle === 0) return 168;
+  if (cycle === 1) return 156;
+  return 180;
+}
 
 export function NatalChartWheel({ chartData, fullWidth, lang = "es" }: NatalChartWheelProps) {
-  const size   = 520;
+  const size = 520;
   const center = 260;
 
-  // Ring radii (outside → inside)
-  const outerEdge     = 248; // outermost rim
-  const signNameInner = 230; // inner edge of sign-name text ring  → labels at ~239
-  const zodiacOuter   = 230; // outer edge of zodiac-symbol ring   (= signNameInner)
-  const zodiacInner   = 194; // inner edge of zodiac-symbol ring   → symbols at ~212
-  //
-  // ── HOUSE / PLANET RING: zodiacInner (194) → planetInner (138) ──────────
-  // Planets placed near outer edge (PLANET_BASE_R=182), nudged inward on collision.
-  // House numbers near inner edge at houseNumberR=110.
-  const planetInner  = 138; // inner wall of planet+house ring
-  const houseNumberR = 110; // where house numbers are placed (innermost of house ring)
-  const coreRadius   = 24;  // center core circle
+  const outerRadius = 220;
+  const zodiacRadius = 190;
+  const innerRadius = 145;
+  const houseRadius = 122;
 
-  const points    = getPointEntries(chartData);
-  const houses    = chartData?.houses ?? [];
+  const points = getPointEntries(chartData);
+  const houses = chartData?.houses ?? [];
   const ascendant = chartData?.angles?.ascendant?.longitude ?? null;
   const midheaven = chartData?.angles?.midheaven?.longitude ?? null;
-  const asc       = ascendant ?? 0;
 
-  const placedPlanets = placePlanets(points, asc);
-  const planetMap     = new Map(placedPlanets.map((p) => [p.key, p]));
+  // Reference angle for all ecliptic → SVG conversions.
+  // When no chart is loaded yet we default to 0 so the static ring still renders.
+  const asc = ascendant ?? 0;
 
   return (
     <div className="natalWheelWrap" style={fullWidth ? { maxWidth: "none" } : undefined}>
-      <svg viewBox={`0 0 ${size} ${size}`} className="natalWheel" role="img" aria-label="Natal chart wheel">
+      <svg
+        viewBox={`0 0 ${size} ${size}`}
+        className="natalWheel"
+        role="img"
+        aria-label="Natal chart wheel"
+      >
+        <circle cx={center} cy={center} r={outerRadius} className="wheelOuter" />
+        <circle cx={center} cy={center} r={zodiacRadius} className="wheelRing" />
+        <circle cx={center} cy={center} r={innerRadius} className="wheelInner" />
 
-        {/* ── CAPA 2: Zodiac symbol ring — colored element backgrounds ── */}
-        {Array.from({ length: 12 }, (_, i) => (
-          <path
-            key={`zbg-${i}`}
-            d={arcDonutSlice(center, center, zodiacOuter, zodiacInner,
-              lonToAngle(i * 30, asc), lonToAngle((i + 1) * 30, asc))}
-            fill={ELEMENT_COLORS[i]}
-          />
-        ))}
+        {/* Zodiac ring: 12 signs rotated so that the ASC sign aligns correctly */}
+        {Array.from({ length: 12 }, (_, index) => {
+          // Each sign boundary is at ecliptic longitude index*30
+          const dividerAngle = lonToAngle(index * 30, asc);
+          const start = polarToCartesian(center, center, innerRadius, dividerAngle);
+          const end = polarToCartesian(center, center, outerRadius, dividerAngle);
 
-        {/* ── Ring outlines ── */}
-        <circle cx={center} cy={center} r={outerEdge}     className="wheelOuter" />
-        <circle cx={center} cy={center} r={signNameInner} className="wheelRing" />
-        <circle cx={center} cy={center} r={zodiacInner}   className="wheelRing" />
-        <circle cx={center} cy={center} r={planetInner}   className="wheelInner" />
+          // Label sits at the midpoint of the sign (15° into it, counter-clockwise)
+          const labelAngle = lonToAngle(index * 30 + 15, asc);
+          const labelPos = polarToCartesian(
+            center,
+            center,
+            (zodiacRadius + outerRadius) / 2,
+            labelAngle
+          );
 
-        {/* ── Zodiac sign dividers — only through the two outer zodiac rings ── */}
-        {Array.from({ length: 12 }, (_, i) => {
-          const angle = lonToAngle(i * 30, asc);
-          const s = polarToCartesian(center, center, zodiacInner, angle);
-          const e = polarToCartesian(center, center, outerEdge, angle);
-          return <line key={`zdiv-${i}`} x1={s.x} y1={s.y} x2={e.x} y2={e.y} className="wheelDivider" />;
-        })}
-
-        {/* ── CAPA 1: Sign name abbreviations — outermost ring ── */}
-        {Array.from({ length: 12 }, (_, i) => {
-          const pos = polarToCartesian(center, center, (signNameInner + outerEdge) / 2, lonToAngle(i * 30 + 15, asc));
           return (
-            <text key={`sname-${i}`} x={pos.x} y={pos.y} textAnchor="middle" dominantBaseline="middle" className="wheelSignLabel">
-              {ZODIAC_NAMES[i]}
-            </text>
+            <g key={`zodiac-${index}`}>
+              <line
+                x1={start.x}
+                y1={start.y}
+                x2={end.x}
+                y2={end.y}
+                className="wheelDivider"
+              />
+              <text
+                x={labelPos.x}
+                y={labelPos.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="wheelSignLabel"
+              >
+                {getZodiacSignLabel(index)}
+              </text>
+            </g>
           );
         })}
 
-        {/* ── CAPA 2: Zodiac Unicode symbols — symbol ring ── */}
-        {Array.from({ length: 12 }, (_, i) => {
-          const pos = polarToCartesian(center, center, (zodiacOuter + zodiacInner) / 2, lonToAngle(i * 30 + 15, asc));
-          return (
-            <text key={`zsym-${i}`} x={pos.x} y={pos.y} textAnchor="middle" dominantBaseline="middle" className="wheelZodiacSymbol">
-              {ZODIAC_SYMBOLS[i]}
-            </text>
-          );
-        })}
-
-        {/* ── House cusp lines — span from coreRadius to zodiacInner ── */}
+        {/* House cusps */}
         {houses.map((house) => {
           if (typeof house.cuspLongitude !== "number") return null;
-          const angle = lonToAngle(house.cuspLongitude, asc);
-          const s = polarToCartesian(center, center, coreRadius, angle);
-          const e = polarToCartesian(center, center, zodiacInner, angle);
+
+          const cuspAngle = lonToAngle(house.cuspLongitude, asc);
+          const start = polarToCartesian(center, center, 20, cuspAngle);
+          const end = polarToCartesian(center, center, innerRadius, cuspAngle);
+
+          // Label sits slightly counter-clockwise from the cusp (inside the house)
+          const labelAngle = lonToAngle(house.cuspLongitude + 12, asc);
+          const labelPos = polarToCartesian(center, center, houseRadius, labelAngle);
+
           return (
-            <line key={`hline-${house.number}`} x1={s.x} y1={s.y} x2={e.x} y2={e.y} className="houseDivider" />
+            <g key={`house-${house.number}`}>
+              <line
+                x1={start.x}
+                y1={start.y}
+                x2={end.x}
+                y2={end.y}
+                className="houseDivider"
+              />
+              <text
+                x={labelPos.x}
+                y={labelPos.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="houseLabel"
+              >
+                {house.number}
+              </text>
+            </g>
           );
         })}
 
-        {/* ── CAPA 3B: House numbers — innermost part of house ring ── */}
-        {houses.map((house, idx) => {
-          if (typeof house.cuspLongitude !== "number") return null;
-          // Find the next cusp to place the number at the midpoint of the house sector
-          const nextHouse = houses[(idx + 1) % houses.length];
-          let midLon: number;
-          if (typeof nextHouse?.cuspLongitude === "number") {
-            const span = ((nextHouse.cuspLongitude - house.cuspLongitude + 360) % 360);
-            midLon = house.cuspLongitude + span / 2;
-          } else {
-            midLon = house.cuspLongitude + 15;
-          }
-          const labelAngle = lonToAngle(midLon, asc);
-          const labelPos   = polarToCartesian(center, center, houseNumberR, labelAngle);
-          return (
-            <text key={`hnum-${house.number}`} x={labelPos.x} y={labelPos.y} textAnchor="middle" dominantBaseline="middle" className="houseLabel">
-              {house.number}
-            </text>
-          );
-        })}
+        {/* ASC axis – always at 9 o'clock (270° SVG) after rotation */}
+        {typeof ascendant === "number" ? (() => {
+          const ascAngle = lonToAngle(ascendant, asc); // always 270
+          const start = polarToCartesian(center, center, innerRadius, ascAngle);
+          const end = polarToCartesian(center, center, outerRadius + 10, ascAngle);
+          const label = polarToCartesian(center, center, outerRadius + 24, ascAngle);
 
-        {/* ── ASC axis ── */}
-        {typeof ascendant === "number" && (() => {
-          const angle = lonToAngle(ascendant, asc);
-          const s = polarToCartesian(center, center, zodiacInner, angle);
-          const e = polarToCartesian(center, center, outerEdge + 10, angle);
-          const l = polarToCartesian(center, center, outerEdge + 24, angle);
           return (
             <g>
-              <line x1={s.x} y1={s.y} x2={e.x} y2={e.y} className="ascLine" />
-              <text x={l.x} y={l.y} textAnchor="middle" dominantBaseline="middle" className="angleLabel">ASC</text>
+              <line
+                x1={start.x}
+                y1={start.y}
+                x2={end.x}
+                y2={end.y}
+                className="ascLine"
+              />
+              <text
+                x={label.x}
+                y={label.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="angleLabel"
+              >
+                ASC
+              </text>
             </g>
           );
-        })()}
+        })() : null}
 
-        {/* ── MC axis ── */}
-        {typeof midheaven === "number" && (() => {
-          const angle = lonToAngle(midheaven, asc);
-          const s = polarToCartesian(center, center, zodiacInner, angle);
-          const e = polarToCartesian(center, center, outerEdge + 10, angle);
-          const l = polarToCartesian(center, center, outerEdge + 24, angle);
+        {/* MC axis – converted from ecliptic longitude to SVG angle */}
+        {typeof midheaven === "number" ? (() => {
+          const mcAngle = lonToAngle(midheaven, asc);
+          const start = polarToCartesian(center, center, innerRadius, mcAngle);
+          const end = polarToCartesian(center, center, outerRadius + 10, mcAngle);
+          const label = polarToCartesian(center, center, outerRadius + 24, mcAngle);
+
           return (
             <g>
-              <line x1={s.x} y1={s.y} x2={e.x} y2={e.y} className="mcLine" />
-              <text x={l.x} y={l.y} textAnchor="middle" dominantBaseline="middle" className="angleLabel">MC</text>
+              <line
+                x1={start.x}
+                y1={start.y}
+                x2={end.x}
+                y2={end.y}
+                className="mcLine"
+              />
+              <text
+                x={label.x}
+                y={label.y}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="angleLabel"
+              >
+                MC
+              </text>
             </g>
           );
-        })()}
+        })() : null}
 
-        {/* ── CAPA 3A: Planets — outer part of house ring, anti-collision inward only ── */}
-        {points.map((point) => {
-          const placed = planetMap.get(point.key);
-          if (!placed) return null;
-          // Safety clamp: never outside zodiacInner, never inside planetInner
-          const r = Math.min(zodiacInner - 12, Math.max(planetInner + 6, placed.radius));
-          const pos = polarToCartesian(center, center, r, placed.svgAngle);
+        {/* Planets – Unicode symbols, no dot */}
+        {points.map((point, index) => {
+          const pointRadius = getStackedPointRadius(index);
+          const pos = polarToCartesian(
+            center,
+            center,
+            pointRadius,
+            lonToAngle(point.longitude ?? 0, asc)
+          );
           const isChiron = point.key === "chiron";
+
           return (
             <text
               key={point.key}
@@ -282,39 +295,45 @@ export function NatalChartWheel({ chartData, fullWidth, lang = "es" }: NatalChar
               textAnchor="middle"
               dominantBaseline="middle"
               style={{
-                fill:     isChiron ? "#C9A96E" : "rgba(255,255,255,0.92)",
+                fill: isChiron ? "#C9A96E" : "rgba(255,255,255,0.9)",
                 fontSize: isChiron ? "17px" : "14px",
-                fontWeight: isChiron ? "700" : "400",
               }}
             >
-              {POINT_LABELS[point.key] || point.name}
+              {getPointLabel(point)}
             </text>
           );
         })}
 
-        {/* ── Core circle ── */}
-        <circle cx={center} cy={center} r={coreRadius} className="wheelCore" />
+        <circle cx={center} cy={center} r={18} className="wheelCore" />
 
-        {/* ── Centro: 5-pointed star ── */}
-        <path
-          d={starPath(center, center, 17, 7)}
-          fill="rgba(201,169,110,0.85)"
-          stroke="rgba(201,169,110,0.35)"
-          strokeWidth={0.5}
-        />
-
-        {/* ── CTA button (fullWidth mode only) ── */}
         {fullWidth && (() => {
-          const btnY = size - 20, btnW = 210, btnH = 28;
+          const btnY = size - 20;
+          const btnW = 210;
+          const btnH = 28;
+          const handleClick = () => {
+            const el = document.getElementById("cta-herida-don");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+          };
           return (
-            <g
-              onClick={() => document.getElementById("cta-herida-don")?.scrollIntoView({ behavior: "smooth", block: "center" })}
-              style={{ cursor: "pointer" }}
-            >
-              <rect x={center - btnW / 2} y={btnY - btnH / 2} width={btnW} height={btnH} rx={4} ry={4}
-                fill="rgba(201,169,110,0.06)" stroke="#C9A96E" strokeWidth={1} />
-              <text x={center} y={btnY} textAnchor="middle" dominantBaseline="middle"
-                style={{ fill: "#C9A96E", fontSize: "13px", fontWeight: "600", letterSpacing: "3px", textTransform: "uppercase" }}>
+            <g onClick={handleClick} style={{ cursor: "pointer" }}>
+              <rect
+                x={center - btnW / 2}
+                y={btnY - btnH / 2}
+                width={btnW}
+                height={btnH}
+                rx={4}
+                ry={4}
+                fill="rgba(201,169,110,0.06)"
+                stroke="#C9A96E"
+                strokeWidth={1}
+              />
+              <text
+                x={center}
+                y={btnY}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                style={{ fill: "#C9A96E", fontSize: "13px", fontWeight: "600", letterSpacing: "3px", textTransform: "uppercase" }}
+              >
                 {lang === "en" ? "Chiron revealed" : "Quirón revelado"}
               </text>
             </g>
