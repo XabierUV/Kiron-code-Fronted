@@ -440,11 +440,11 @@ export default function Page() {
                 </h3>
                 <p style={{ margin: "0 0 14px", color: "var(--text-soft)", fontSize: "15px", lineHeight: "1.6" }}>
                   {lang === "en"
-                    ? "Weekly astrology content, transit analysis and early access to new products. Free, always."
-                    : "Contenido astrológico semanal, análisis de tránsitos y acceso anticipado a nuevos productos. Gratis, siempre."}
+                    ? "Astrology content, transit analysis and much more."
+                    : "Contenido astrológico, análisis de tránsitos y mucho más."}
                 </p>
                 <a
-                  href="https://t.me/Kiron_Code"
+                  href="https://t.me/kironcodebot?start=community"
                   target="_blank"
                   rel="noreferrer"
                   style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "10px 20px", background: "rgba(201,169,110,0.10)", border: "1px solid rgba(201,169,110,0.35)", borderRadius: "6px", color: "#C9A96E", fontSize: "14px", fontWeight: 600, textDecoration: "none", letterSpacing: "0.03em", transition: "background 200ms" }}
@@ -467,10 +467,10 @@ export default function Page() {
             Únete a nuestra comunidad
           </h2>
           <p style={{ maxWidth: "480px", margin: "0 auto 28px", color: "var(--text-soft)", lineHeight: 1.7, fontSize: "16px" }}>
-            Contenido astrológico semanal, reflexiones sobre Quirón y acceso anticipado a nuevos productos. Gratis, siempre.
+            Contenido astrológico, análisis de tránsitos y mucho más.
           </p>
           <a
-            href="https://t.me/Kiron_Code"
+            href="https://t.me/kironcodebot?start=community"
             target="_blank"
             rel="noreferrer"
             className="primaryButton"
