@@ -23,7 +23,7 @@ type OrderRow = {
   subscriptionRenewsAt?: string | null;
 };
 
-type Tab = "orders" | "subscriptions" | "failures" | "vip";
+type Tab = "orders" | "subscriptions" | "failures" | "vip" | "comunidad";
 
 type VipRow = OrderRow & { isVip?: boolean };
 
@@ -351,6 +351,10 @@ export default function AdminPage() {
   const [vipLoading, setVipLoading]           = useState(false);
   const [vipResult, setVipResult]             = useState<{ galaxyId: string; tempPassword: string | null; isNewAccount: boolean } | null>(null);
   const [vipError, setVipError]               = useState("");
+
+  const [broadcastMsg, setBroadcastMsg]       = useState("");
+  const [broadcastLoading, setBroadcastLoading] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState<string | null>(null);
   const secretRef = useRef(secret);
   useEffect(() => { secretRef.current = secret; }, [secret]);
 
@@ -428,6 +432,26 @@ export default function AdminPage() {
       setLoading(false);
     }
   }, []);
+
+  async function handleBroadcast() {
+    if (!broadcastMsg.trim()) return;
+    setBroadcastLoading(true); setBroadcastResult(null);
+    try {
+      const res = await fetch(`${API_BASE}/admin/broadcast`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret: secretRef.current, message: broadcastMsg.trim() }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Error");
+      setBroadcastResult(`Enviado a ${data.sent ?? "?"} usuarios.`);
+      setBroadcastMsg("");
+    } catch (e) {
+      setBroadcastResult(`Error: ${e instanceof Error ? e.message : "desconocido"}`);
+    } finally {
+      setBroadcastLoading(false);
+    }
+  }
 
   async function handleCreateVip(e: React.FormEvent) {
     e.preventDefault();
@@ -529,12 +553,13 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: "4px", marginBottom: "24px", borderBottom: "1px solid #2a2a35" }}>
-        {(["orders", "subscriptions", "failures", "vip"] as Tab[]).map((t) => {
+        {(["orders", "subscriptions", "failures", "vip", "comunidad"] as Tab[]).map((t) => {
           const labels: Record<Tab, string> = {
             orders:        `Órdenes${orders.length ? ` (${orders.length})` : ""}`,
             subscriptions: `Kiron Vivo${subs.length ? ` (${subs.length})` : ""}`,
             failures:      `Fallos${failures.length ? ` 🔴${failures.length}` : ""}`,
             vip:           `VIP${vips.length ? ` (${vips.length})` : ""}`,
+            comunidad:     "Comunidad",
           };
           return (
             <button
@@ -734,6 +759,39 @@ export default function AdminPage() {
                 <p style={{ color: "#555", fontSize: "13px" }}>No hay usuarios VIP todavía.</p>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Comunidad ──────────────────────────────────────────────────────── */}
+      {tab === "comunidad" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={S.card}>
+            <div style={{ color: "#fff", fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>
+              Enviar mensaje a la comunidad
+            </div>
+            <textarea
+              style={{ ...S.input, minHeight: "120px", resize: "vertical" }}
+              placeholder="Escribe el mensaje que recibirán todos los usuarios..."
+              value={broadcastMsg}
+              onChange={(e) => setBroadcastMsg(e.target.value)}
+            />
+            <button
+              onClick={handleBroadcast}
+              disabled={broadcastLoading}
+              style={{ ...S.btn(), alignSelf: "flex-start", opacity: broadcastLoading ? 0.6 : 1 }}
+            >
+              {broadcastLoading ? "Enviando..." : "Enviar a todos"}
+            </button>
+            {broadcastResult !== null && (
+              <p style={{
+                fontSize: "13px",
+                color: broadcastResult.startsWith("Error") ? "#f87171" : "#86efac",
+                margin: 0,
+              }}>
+                {broadcastResult}
+              </p>
+            )}
           </div>
         </div>
       )}
