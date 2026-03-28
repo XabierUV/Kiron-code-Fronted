@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx next:*)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''id'''',''''''''\\)\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(t[''''id''''], t[''''slug'''']\\) for t in d.get\\(''''teams'''',[]\\)]\")",
+      "Bash(python -c \"import sys,json; raw=sys.stdin.read\\(\\); d=json.loads\\(raw\\); print\\(d.get\\(''''contextName''''\\), d[''''projects''''][0][''''id'''']\\)\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(t\\) for t in d]\")",
+      "Read(//c/Users/xabier.urquijo/desktop/kiron-code-frontend/$APPDATA/com.vercel.cli/**)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(list\\(d.values\\(\\)\\)[0].get\\(''''token'''',''''''''\\)\\)\")",
+      "Read(//c/Users/xabier.urquijo/desktop/kiron-code-frontend/$LOCALAPPDATA/com.vercel.cli/**)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(list\\(d.values\\(\\)\\)[0].get\\(''''token'''',''''''''\\)[:10], ''''...''''\\)\")",
+      "Bash(find /c/Users/xabier.urquijo -name auth.json -path *vercel*)",
+      "Bash(printf '%s\\\\n' 'import { Router } from \"\"express\"\";' 'import { requireAuth } from \"\"../middleware/auth.middleware.js\"\";' 'import {' '  register,' '  login,' '  forgotPassword,' '  resetPassword,' '  changePassword,' '  getPortal,' '} from \"\"../controllers/auth.controller.js\"\";' '' 'const router = Router\\(\\);' '' 'router.post\\(\"\"/auth/register\"\", register\\);' 'router.post\\(\"\"/auth/login\"\", login\\);' 'router.post\\(\"\"/auth/forgot-password\"\", forgotPassword\\);' 'router.post\\(\"\"/auth/reset-password\"\", resetPassword\\);' 'router.post\\(\"\"/auth/change-password\"\", requireAuth, changePassword\\);' 'router.get\\(\"\"/customer/portal\"\", requireAuth, getPortal\\);' '' 'export default router;')",
+      "Bash(\"c:/Users/xabier.urquijo/desktop/kiron-engine/src/routes/auth.route.js\")",
+      "Bash(DATABASE_URL=\"postgresql://postgres:JCQoQqQLmkUncCEnSnKRAFVszpJgeVTp@centerbeam.proxy.rlwy.net:21597/railway\" npx prisma migrate deploy)"
+    ]
+  }
+}
